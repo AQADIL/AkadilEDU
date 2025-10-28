@@ -1,0 +1,315 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Dialog } from '@headlessui/react';
+import { X, Upload, Trash2, Loader2 } from 'lucide-react';
+import { storage } from '../utils/storage';
+import { uploadAvatar, removeAvatar, onProfileSave } from '../utils/placeholders';
+
+export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProfile }) {
+  const { t } = useTranslation();
+  const [profile, setProfile] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    avatarUrl: ''
+  });
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  useEffect(() => {
+    if (isOpen && userProfile) {
+      // Load profile from Firestore via userProfile prop
+      setProfile({
+        firstName: userProfile.firstName || '',
+        lastName: userProfile.lastName || '',
+        email: userProfile.email || '',
+        phone: userProfile.phone || '',
+        avatarUrl: userProfile.avatarUrl || ''
+      });
+    }
+  }, [isOpen, userProfile]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswords(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+      alert('Please select a JPG or PNG image');
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert('Image must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // TODO: Replace with Firebase upload in Prompt 2
+      const downloadURL = await uploadAvatar(file, (progress) => {
+        setUploadProgress(progress);
+      });
+
+      setProfile(prev => ({ ...prev, avatarUrl: downloadURL }));
+      onAvatarChange?.(downloadURL);
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      alert('Failed to upload avatar');
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!profile.avatarUrl) return;
+
+    if (!confirm(t('profile.removeAvatar') + '?')) return;
+
+    try {
+      // TODO: Replace with Firebase delete in Prompt 2
+      await removeAvatar(profile.avatarUrl);
+      setProfile(prev => ({ ...prev, avatarUrl: '' }));
+      onAvatarChange?.('');
+    } catch (error) {
+      console.error('Avatar remove error:', error);
+      alert('Failed to remove avatar');
+    }
+  };
+
+  const handleSave = async () => {
+    // Validate passwords if changing
+    if (passwords.newPassword || passwords.confirmPassword) {
+      if (passwords.newPassword !== passwords.confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      // TODO: Add password strength validation
+    }
+
+    try {
+      // Save to localStorage for now
+      storage.setProfile(profile);
+      
+      // TODO: Replace with Firebase save in Prompt 2
+      await onProfileSave({
+        ...profile,
+        ...(passwords.newPassword && { password: passwords.newPassword })
+      });
+
+      alert(t('common.success'));
+      onClose();
+    } catch (error) {
+      console.error('Profile save error:', error);
+      alert('Failed to save profile');
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+
+      {/* Modal */}
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <Dialog.Panel className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
+              {t('profile.title')}
+            </Dialog.Title>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={t('common.close')}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-6">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full bg-primary-500 flex items-center justify-center overflow-hidden">
+                  {profile.avatarUrl ? (
+                    <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-white text-3xl font-bold">
+                      {profile.firstName?.[0]?.toUpperCase() || 'U'}
+                    </span>
+                  )}
+                </div>
+                
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <Loader2 className="w-8 h-8 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <label className="btn-primary cursor-pointer flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  {profile.avatarUrl ? t('profile.changeAvatar') : t('profile.uploadAvatar')}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/jpg"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+
+                {profile.avatarUrl && (
+                  <button
+                    onClick={handleRemoveAvatar}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {t('profile.removeAvatar')}
+                  </button>
+                )}
+              </div>
+
+              {uploading && (
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('profile.firstName')}
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={profile.firstName}
+                  onChange={handleInputChange}
+                  className="input-field"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('profile.lastName')}
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={profile.lastName}
+                  onChange={handleInputChange}
+                  className="input-field"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('profile.email')}
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={profile.email}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="user@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('profile.phone')}
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={profile.phone}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="+7 (700) 123-45-67"
+                />
+              </div>
+
+              {/* Password Change */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  {t('profile.password')}
+                </h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('profile.newPassword')}
+                    </label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      value={passwords.newPassword}
+                      onChange={handlePasswordChange}
+                      className="input-field"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t('profile.confirmPassword')}
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={passwords.confirmPassword}
+                      onChange={handlePasswordChange}
+                      className="input-field"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+            <button onClick={onClose} className="flex-1 btn-secondary">
+              {t('profile.cancel')}
+            </button>
+            <button onClick={handleSave} className="flex-1 btn-primary">
+              {t('profile.save')}
+            </button>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
+  );
+}
