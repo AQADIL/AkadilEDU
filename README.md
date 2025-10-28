@@ -362,6 +362,119 @@ All requirements from Prompt 1 have been implemented:
 - ✅ Production-quality code
 - ✅ README with setup instructions
 
+# AkadilEDU v2 🎓
+
+Modern educational platform with Firebase integration, role-based access, and multi-language support.
+
+## ✨ Features
+
+- 🔐 **Authentication System**
+  - Email/Password registration with email verification
+  - Google Sign-In integration
+  - Password reset functionality
+  - Protected routes
+
+- 👥 **Role-Based Access Control**
+  - **Admin**: Full control (youtub.maj@gmail.com)
+  - **Student**: Course access, tests, progress tracking
+
+- 📄 **Profile Management**
+  - Editable user profiles
+  - Avatar upload
+  - Personal information management
+
+- 🌐 **Multi-Language Support**
+  - Russian (Русский)
+  - Kazakh (Қазақ)
+  - English
+
+- 🎨 **Modern UI/UX**
+  - Responsive design (mobile-first)
+  - Dark mode support
+  - Smooth animations
+  - Gradient effects
+
+- ⚡ **Performance Optimizations**
+  - Lazy loading pages
+  - Code splitting
+  - Optimized bundle size
+  - Service Worker (PWA ready)
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18 + Vite
+- **Styling**: Tailwind CSS
+- **Backend**: Firebase
+  - Authentication
+  - Firestore Database
+  - Cloud Storage
+- **Icons**: Lucide React
+- **i18n**: react-i18next
+- **Routing**: React Router v6
+
+## 📦 Installation
+
+```bash
+# Clone repository
+git clone https://github.com/AQADIL/akadiledu-v2-1.git
+cd akadiledu-v2-1
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## 🔧 Configuration
+
+Create `.env` file in root:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
+
+## 📁 Project Structure
+
+```
+akadiledu-v2/
+├── src/
+│   ├── components/       # Reusable components
+│   ├── pages/           # Page components
+│   ├── firebase/        # Firebase configuration
+│   ├── utils/           # Utility functions
+│   ├── styles/          # Global styles
+│   └── i18n.js         # Translations
+├── public/              # Static assets
+└── .gitignore          # Git ignore rules
+```
+
+## 🚀 Deployment
+
+The project is configured for Vercel deployment with `vercel.json`.
+
+```bash
+npm run build
+# Deploy to Vercel
+```
+
+## 👨‍💻 Author
+
+**AQADIL**
+- GitHub: [@AQADIL](https://github.com/AQADIL)
+
+## 📄 License
+
+MIT License
+
 **Ready for Prompt 2: Firebase Integration**
 
 **Prompt 2 Complete!** Type `GO next` to proceed with Admin Panel implementation (Prompt 3).
