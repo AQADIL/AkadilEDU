@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3005,
+    port: 3000,
     strictPort: false,
     host: true,
     hmr: {
@@ -14,6 +14,21 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: false, // Отключаем source maps в production
+    minify: 'terser', // Максимальная минификация
+    terserOptions: {
+      compress: {
+        drop_console: true, // Удаляем console.log в production
+        drop_debugger: true // Удаляем debugger statements
+      }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore']
+        }
+      }
+    }
   }
 })
