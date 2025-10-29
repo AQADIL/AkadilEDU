@@ -1,8 +1,24 @@
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, TrendingUp, Award, Users } from 'lucide-react';
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Handle Firebase auth action links that come to root URL
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    const oobCode = searchParams.get('oobCode');
+    
+    // If this is a Firebase auth action link, redirect to auth action handler
+    if (mode && oobCode) {
+      const queryString = searchParams.toString();
+      navigate(`/__/auth/action?${queryString}`, { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const featuredCourses = [
     { id: 1, title: 'Mathematics Advanced', students: 234, rating: 4.8 },
