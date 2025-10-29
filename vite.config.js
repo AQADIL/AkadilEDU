@@ -15,12 +15,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // Отключаем source maps в production
-    minify: 'terser', // Максимальная минификация
-    terserOptions: {
-      compress: {
-        drop_console: true, // Удаляем console.log в production
-        drop_debugger: true // Удаляем debugger statements
-      }
+    minify: 'esbuild', // Быстрая минификация (встроена в Vite)
+    esbuild: {
+      drop: ['console', 'debugger'], // Удаляем console.log и debugger
     },
     rollupOptions: {
       output: {
