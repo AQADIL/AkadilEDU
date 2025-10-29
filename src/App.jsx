@@ -16,6 +16,8 @@ const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const AuthAction = lazy(() => import('./pages/AuthAction'));
 const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 import { storage } from './utils/storage';
@@ -156,6 +158,10 @@ function App() {
               <Route path="/signup" element={user ? <Navigate to="/" /> : <Signup />} />
               <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Firebase Auth Action Handler */}
+              <Route path="/__/auth/action" element={<AuthAction />} />
               
               {/* Email Verification Required Page */}
               <Route path="/email-verification-required" element={<EmailVerificationRequired />} />
