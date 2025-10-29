@@ -20,9 +20,16 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const AuthAction = lazy(() => import('./pages/AuthAction'));
 const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Admin pages
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
+const CoursesManagement = lazy(() => import('./pages/admin/CoursesManagement'));
+import AdminGuard from './components/AdminGuard';
 import { storage } from './utils/storage';
 import { onAuthStateChanged, initializeAuth } from './firebase/auth';
 import { getUserProfile, logAuthEvent } from './firebase/firestore';
+import { getUserProfile as getRTDBProfile, createUserProfile, logUserSession } from './firebase/realtimeDb';
 import { isFirebaseConfigured } from './firebase/config';
 import './i18n';
 
@@ -61,28 +68,80 @@ function App() {
 
       if (firebaseUser) {
         try {
-          // Fetch user profile from Firestore
-          const profile = await getUserProfile(firebaseUser.uid);
-          setUserProfile(profile);
+          // Fetch user profile from Firestore (optional)
+          let profile = null;
+          try {
+            profile = await getUserProfile(firebaseUser.uid);
+            setUserProfile(profile);
+          } catch (firestoreError) {
+            console.warn('⚠️ Firestore unavailable (offline?):', firestoreError.message);
+            // Continue without Firestore profile
+          }
 
-          // Log authentication event
+          // Check/Create Realtime DB profile
+          try {
+            console.log('🔍 Checking Realtime DB profile for:', firebaseUser.email);
+            let rtdbProfile = await getRTDBProfile(firebaseUser.uid);
+            
+            if (!rtdbProfile) {
+              console.log('📝 Creating new Realtime DB profile...');
+              const isAdmin = firebaseUser.email === 'youtub.maj@gmail.com';
+              console.log('👤 Role will be:', isAdmin ? 'admin' : 'student');
+              
+              rtdbProfile = await createUserProfile(firebaseUser.uid, {
+                email: firebaseUser.email,
+                name: firebaseUser.displayName || profile?.name || 'User',
+                role: isAdmin ? 'admin' : 'student'
+              });
+              
+              console.log('✅ Realtime DB profile created:', rtdbProfile);
+            } else {
+              console.log('✅ Realtime DB profile exists:', rtdbProfile);
+            }
+          } catch (rtdbError) {
+            console.error('❌ Realtime DB Error:', rtdbError);
+            console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
+          }
+
+          // Log authentication event with IP tracking (optional)
           try {
             // Try to get IP address
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
             console.log('🌐 IP Address detected:', ipData.ip);
-            await logAuthEvent(firebaseUser.uid, ipData.ip);
+            
+            // Log to Firestore (optional)
+            try {
+              await logAuthEvent(firebaseUser.uid, ipData.ip);
+            } catch (firestoreError) {
+              console.warn('⚠️ Could not log to Firestore:', firestoreError.message);
+            }
+            
+            // Log to Realtime Database with session tracking
+            try {
+              await logUserSession(firebaseUser.uid, ipData.ip, navigator.userAgent);
+            } catch (rtdbError) {
+              console.warn('⚠️ Could not log session to RTDB:', rtdbError.message);
+            }
+            
             console.log('📝 Login event logged for user:', firebaseUser.email, 'IP:', ipData.ip);
           } catch (error) {
             console.warn('⚠️ Could not fetch IP address:', error.message);
-            await logAuthEvent(firebaseUser.uid, 'unknown');
-            console.log('📝 Login event logged for user:', firebaseUser.email, 'IP: unknown');
+            // Try logging with unknown IP
+            try {
+              await logAuthEvent(firebaseUser.uid, 'unknown');
+              await logUserSession(firebaseUser.uid, 'unknown', navigator.userAgent);
+              console.log('📝 Login event logged for user:', firebaseUser.email, 'IP: unknown');
+            } catch (logError) {
+              console.warn('⚠️ Could not log events:', logError.message);
+            }
           }
 
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
         } catch (error) {
-          console.error('Error fetching user profile:', error);
+          console.error('❌ Error in auth flow:', error);
+          // Don't block login completely
         }
       } else {
         setUserProfile(null);
@@ -224,9 +283,34 @@ function App() {
                 }
               />
               
+              {/* Admin Routes - Protected by AdminGuard */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminGuard>
+                    <AdminDashboard />
+                  </AdminGuard>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminGuard>
+                    <UsersManagement />
+                  </AdminGuard>
+                }
+              />
+              <Route
+                path="/admin/courses"
+                element={
+                  <AdminGuard>
+                    <CoursesManagement />
+                  </AdminGuard>
+                }
+              />
+              
               {/* 404 Page - catch all */}
               <Route path="*" element={<NotFound />} />
-              {/* Admin route will be added in Prompt 3 */}
               </Routes>
             </Suspense>
           </div>

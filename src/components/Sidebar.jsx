@@ -8,9 +8,11 @@ import {
   ClipboardList, 
   ShoppingBag, 
   Shield,
+  Users,
   X 
 } from 'lucide-react';
-import { checkAdminClaim } from '../utils/placeholders';
+import { auth } from '../firebase/config';
+import { isUserAdmin } from '../firebase/realtimeDb';
 
 export default function Sidebar({ isOpen, onClose }) {
   const { t } = useTranslation();
@@ -23,7 +25,45 @@ export default function Sidebar({ isOpen, onClose }) {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
     // Check admin status
-    checkAdminClaim().then(setIsAdmin);
+    const checkAdmin = async () => {
+      const user = auth.currentUser;
+      console.log('🔍 Sidebar checking admin for user:', user?.email);
+      
+      if (!user) {
+        console.log('❌ No user logged in');
+        setIsAdmin(false);
+        return;
+      }
+      
+      // Check if email is admin
+      if (user.email === 'youtub.maj@gmail.com') {
+        console.log('✅ Admin by email:', user.email);
+        setIsAdmin(true);
+        return;
+      }
+      
+      // Check role in database
+      try {
+        console.log('🔍 Checking role in database...');
+        const adminStatus = await isUserAdmin(user.uid);
+        console.log('📊 Admin status from DB:', adminStatus);
+        setIsAdmin(adminStatus);
+      } catch (error) {
+        console.error('❌ Error checking admin status:', error);
+        setIsAdmin(false);
+      }
+    };
+    
+    // Wait for auth to be ready
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        checkAdmin();
+      } else {
+        setIsAdmin(false);
+      }
+    });
+    
+    return () => unsubscribe();
   }, []);
 
   const menuItems = [
@@ -34,9 +74,12 @@ export default function Sidebar({ isOpen, onClose }) {
     { icon: ShoppingBag, label: t('sidebar.shop'), path: '/shop' },
   ];
 
-  if (isAdmin) {
-    menuItems.push({ icon: Shield, label: t('sidebar.admin'), path: '/admin' });
-  }
+  // Admin menu items
+  const adminMenuItems = [
+    { icon: Shield, label: 'Админ Панель', path: '/admin' },
+    { icon: Users, label: 'Пользователи', path: '/admin/users' },
+    { icon: BookOpen, label: 'Курсы', path: '/admin/courses' },
+  ];
 
   const handleMouseEnter = () => {
     if (!isTouchDevice) {
@@ -103,6 +146,20 @@ export default function Sidebar({ isOpen, onClose }) {
             {menuItems.map((item, index) => (
               <NavItem key={index} item={item} />
             ))}
+            
+            {isAdmin && (
+              <>
+                <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+                <div className="pt-2">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-3 mb-2 uppercase">
+                    Администратор
+                  </p>
+                  {adminMenuItems.map((item, index) => (
+                    <NavItem key={`admin-${index}`} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
           </nav>
         </aside>
       </>
@@ -122,6 +179,15 @@ export default function Sidebar({ isOpen, onClose }) {
         {menuItems.map((item, index) => (
           <NavItem key={index} item={item} />
         ))}
+        
+        {isAdmin && (
+          <>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-4 mx-2"></div>
+            {adminMenuItems.map((item, index) => (
+              <NavItem key={`admin-${index}`} item={item} />
+            ))}
+          </>
+        )}
       </nav>
     </aside>
   );

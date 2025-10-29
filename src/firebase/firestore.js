@@ -28,8 +28,9 @@ import { db, isFirebaseConfigured } from './config';
  * @returns {Promise<void>}
  */
 export async function createOrUpdateUserProfile(uid, profileData) {
-  if (!isFirebaseConfigured()) {
-    throw new Error('Firebase is not configured');
+  if (!isFirebaseConfigured() || !db) {
+    console.warn('⚠️ Firestore not available, skipping profile update');
+    return;
   }
 
   try {
@@ -65,6 +66,11 @@ export async function createOrUpdateUserProfile(uid, profileData) {
  * @returns {Promise<Object|null>} - User profile or null
  */
 export async function getUserProfile(uid) {
+  if (!isFirebaseConfigured() || !db) {
+    console.warn('⚠️ Firestore not available');
+    return null;
+  }
+  
   try {
     const userDoc = await getDoc(doc(db, 'users', uid));
     
@@ -76,11 +82,11 @@ export async function getUserProfile(uid) {
   } catch (error) {
     // Handle offline errors gracefully
     if (error.code === 'unavailable' || error.message?.includes('offline')) {
-      console.warn('Firestore offline, using cached data');
+      console.warn('⚠️ Firestore offline');
       return null;
     }
-    console.error('Get profile error:', error);
-    throw error;
+    console.error('❌ Get profile error:', error);
+    return null;
   }
 }
 
@@ -300,7 +306,8 @@ export async function deleteCourse(courseId) {
  * @returns {Promise<void>}
  */
 export async function logAuthEvent(uid, ip = 'unknown', userAgent = '') {
-  if (!isFirebaseConfigured()) {
+  if (!isFirebaseConfigured() || !db) {
+    console.warn('⚠️ Firestore not available, skipping auth log');
     return;
   }
 
@@ -314,9 +321,9 @@ export async function logAuthEvent(uid, ip = 'unknown', userAgent = '') {
       timestamp: serverTimestamp()
     });
     
-    console.log('✅ Auth event logged');
+    console.log('✅ Auth event logged to Firestore');
   } catch (error) {
-    console.error('Log auth event error:', error);
+    console.warn('⚠️ Could not log auth event (Firestore offline?):', error.message);
     // Don't throw - logging should not break auth flow
   }
 }

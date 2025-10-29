@@ -248,12 +248,12 @@ npm run dev
 
 ### 2. Test forgot password:
 ```
-1. Go to http://localhost:3001/forgot-password
+1. Go to http://localhost:3005/forgot-password
 2. Enter your email
 3. Check email inbox
 4. Click reset link
-5. Should open: http://localhost:3001/__/auth/action?mode=resetPassword&...
-6. Auto-redirects to: http://localhost:3001/reset-password?mode=resetPassword&...
+5. Should open: http://localhost:3005/__/auth/action?mode=resetPassword&...
+6. Auto-redirects to: http://localhost:3005/reset-password?mode=resetPassword&...
 7. Enter new password
 8. Success! Redirects to login
 ```

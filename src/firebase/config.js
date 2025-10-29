@@ -14,6 +14,7 @@ import { getStorage } from 'firebase/storage';
 const firebaseConfig = {
   apiKey: "AIzaSyBqKkucrcXnCWsC07w3DwvPkBbhI9XJKIE",
   authDomain: "akadiledu.firebaseapp.com",
+  databaseURL: "https://akadiledu-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "akadiledu",
   storageBucket: "akadiledu.firebasestorage.app",
   messagingSenderId: "78627994035",
@@ -31,7 +32,16 @@ let isInitialized = false;
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
-  db = getFirestore(app);
+  
+  // Initialize Firestore with offline persistence disabled (optional service)
+  try {
+    db = getFirestore(app);
+    console.log('✅ Firestore initialized');
+  } catch (firestoreError) {
+    console.warn('⚠️ Firestore initialization failed (continuing without it):', firestoreError.message);
+    db = null;
+  }
+  
   storage = getStorage(app);
   isInitialized = true;
   console.log('✅ Firebase initialized successfully');

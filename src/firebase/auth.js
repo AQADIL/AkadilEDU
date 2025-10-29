@@ -105,14 +105,19 @@ export async function loginWithEmail(email, password) {
     console.log('✅ User logged in:', user.email);
     console.log('📧 Email verified:', user.emailVerified);
     
-    // Update last login time
-    await createOrUpdateUserProfile(userCredential.user.uid, {
-      lastLoginAt: new Date().toISOString()
-    });
+    // Update last login time (optional - don't block login if Firestore fails)
+    try {
+      await createOrUpdateUserProfile(userCredential.user.uid, {
+        lastLoginAt: new Date().toISOString()
+      });
+    } catch (firestoreError) {
+      console.warn('⚠️ Could not update Firestore profile (offline?):', firestoreError.message);
+      // Continue anyway - login should still work
+    }
 
     return userCredential;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
     throw error;
   }
 }
@@ -135,21 +140,26 @@ export async function loginWithGoogle() {
     const userCredential = await signInWithPopup(auth, provider);
     const user = userCredential.user;
 
-    // Create or update user profile in Firestore
-    const nameParts = (user.displayName || '').split(' ');
-    await createOrUpdateUserProfile(user.uid, {
-      email: user.email,
-      firstName: nameParts[0] || '',
-      lastName: nameParts.slice(1).join(' ') || '',
-      avatarUrl: user.photoURL || '',
-      lastLoginAt: new Date().toISOString(),
-      emailVerified: user.emailVerified
-    });
+    // Create or update user profile in Firestore (optional - don't block login)
+    try {
+      const nameParts = (user.displayName || '').split(' ');
+      await createOrUpdateUserProfile(user.uid, {
+        email: user.email,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        avatarUrl: user.photoURL || '',
+        lastLoginAt: new Date().toISOString(),
+        emailVerified: user.emailVerified
+      });
+    } catch (firestoreError) {
+      console.warn('⚠️ Could not update Firestore profile (offline?):', firestoreError.message);
+      // Continue anyway
+    }
 
     console.log('✅ User logged in with Google:', user.email);
     return userCredential;
   } catch (error) {
-    console.error('Google login error:', error);
+    console.error('❌ Google login error:', error);
     throw error;
   }
 }

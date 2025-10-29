@@ -1,0 +1,209 @@
+{
+  "users": {
+    "REPLACE_WITH_YOUR_UID": {
+      "uid": "REPLACE_WITH_YOUR_UID",
+      "email": "youtub.maj@gmail.com",
+      "name": "Admin",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "registeredAt": "2025-10-29T18:00:00.000Z",
+      "lastLogin": "2025-10-29T18:00:00.000Z",
+      "ipHistory": {},
+      "sessions": {},
+      "purchasedCourses": {
+        "course_math": {
+          "expiresAt": "2026-12-31T23:59:59.000Z",
+          "progress": 0,
+          "assignedBy": "self",
+          "assignedAt": "2025-10-29T18:00:00.000Z"
+        }
+      },
+      "isDeleted": false
+    }
+  },
+  "courses": {
+    "course_math": {
+      "title": "Математика",
+      "description": "Основы математики для подготовки к UBT. Алгебра, геометрия, тригонометрия.",
+      "createdAt": "2025-10-29T18:00:00.000Z",
+      "updatedAt": "2025-10-29T18:00:00.000Z",
+      "createdBy": "REPLACE_WITH_YOUR_UID",
+      "modules": {
+        "module_algebra": {
+          "title": "Алгебра",
+          "order": 0,
+          "lessons": {
+            "lesson_equations": {
+              "title": "Квадратные уравнения",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 15
+            },
+            "lesson_systems": {
+              "title": "Системы уравнений",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 20
+            },
+            "lesson_functions": {
+              "title": "Функции и графики",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 18
+            }
+          }
+        },
+        "module_geometry": {
+          "title": "Геометрия",
+          "order": 1,
+          "lessons": {
+            "lesson_triangles": {
+              "title": "Треугольники и их свойства",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 22
+            },
+            "lesson_circles": {
+              "title": "Окружность и круг",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 16
+            }
+          }
+        },
+        "module_trigonometry": {
+          "title": "Тригонометрия",
+          "order": 2,
+          "lessons": {
+            "lesson_basics": {
+              "title": "Основы тригонометрии",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 25
+            }
+          }
+        }
+      }
+    },
+    "course_physics": {
+      "title": "Физика",
+      "description": "Механика, кинематика, динамика. Подготовка к UBT по физике.",
+      "createdAt": "2025-10-29T18:00:00.000Z",
+      "updatedAt": "2025-10-29T18:00:00.000Z",
+      "createdBy": "REPLACE_WITH_YOUR_UID",
+      "modules": {
+        "module_kinematics": {
+          "title": "Кинематика",
+          "order": 0,
+          "lessons": {
+            "lesson_uniform": {
+              "title": "Равномерное движение",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 12
+            },
+            "lesson_accelerated": {
+              "title": "Ускоренное движение",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 16
+            },
+            "lesson_freefall": {
+              "title": "Свободное падение",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 14
+            }
+          }
+        },
+        "module_dynamics": {
+          "title": "Динамика",
+          "order": 1,
+          "lessons": {
+            "lesson_newton": {
+              "title": "Законы Ньютона",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 20
+            },
+            "lesson_forces": {
+              "title": "Силы в природе",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 18
+            }
+          }
+        }
+      }
+    },
+    "course_chemistry": {
+      "title": "Химия",
+      "description": "Неорганическая и органическая химия для UBT.",
+      "createdAt": "2025-10-29T18:00:00.000Z",
+      "updatedAt": "2025-10-29T18:00:00.000Z",
+      "createdBy": "REPLACE_WITH_YOUR_UID",
+      "modules": {
+        "module_periodic": {
+          "title": "Периодическая система",
+          "order": 0,
+          "lessons": {
+            "lesson_elements": {
+              "title": "Элементы и атомы",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 14
+            },
+            "lesson_structure": {
+              "title": "Строение атома",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 17
+            }
+          }
+        },
+        "module_reactions": {
+          "title": "Химические реакции",
+          "order": 1,
+          "lessons": {
+            "lesson_types": {
+              "title": "Типы реакций",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 19
+            },
+            "lesson_equilibrium": {
+              "title": "Химическое равновесие",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 21
+            }
+          }
+        }
+      }
+    },
+    "course_biology": {
+      "title": "Биология",
+      "description": "Общая биология, ботаника, зоология для подготовки к UBT.",
+      "createdAt": "2025-10-29T18:00:00.000Z",
+      "updatedAt": "2025-10-29T18:00:00.000Z",
+      "createdBy": "REPLACE_WITH_YOUR_UID",
+      "modules": {
+        "module_cell": {
+          "title": "Клеточная биология",
+          "order": 0,
+          "lessons": {
+            "lesson_structure": {
+              "title": "Строение клетки",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 16
+            },
+            "lesson_division": {
+              "title": "Деление клетки",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 13
+            }
+          }
+        },
+        "module_genetics": {
+          "title": "Генетика",
+          "order": 1,
+          "lessons": {
+            "lesson_mendel": {
+              "title": "Законы Менделя",
+              "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "duration": 22
+            }
+          }
+        }
+      }
+    }
+  },
+  "auth_logs": {},
+  "adminLogs": {}
+}
