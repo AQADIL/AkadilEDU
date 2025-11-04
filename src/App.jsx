@@ -5,6 +5,8 @@ import Sidebar from './components/Sidebar';
 import ProfileModal from './components/ProfileModal';
 import CookieConsent from './components/CookieConsent';
 import EmailVerificationBanner from './components/EmailVerificationBanner';
+import SessionRevokedModal from './components/SessionRevokedModal';
+import { useSessionValidator } from './hooks/useSessionValidator';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -41,6 +43,8 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+  const [showSessionRevokedModal, setShowSessionRevokedModal] = useState(false);
+  const [localSessionId, setLocalSessionId] = useState(null);
 
   // Clear old cache on version change
   useEffect(() => {
@@ -151,11 +155,15 @@ function App() {
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
-            // 🚨 REVOKE OTHER SESSIONS - только один может смотреть!
+            // 🚨 SINGLE ACTIVE SESSION - только один может смотреть!
             const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
             if (revokeResult.revoked > 0) {
               console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);
             }
+            
+            // Сохранить sessionId локально для проверки
+            localStorage.setItem('akadil_current_session', sessionProfile.sessionId);
+            setLocalSessionId(sessionProfile.sessionId);
             
             // 🔒 SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
@@ -250,6 +258,30 @@ function App() {
     };
   }, []);
 
+  // 🔒 REAL-TIME SESSION VALIDATION
+  const handleSessionInvalidated = async () => {
+    console.error('🚨 Session invalidated - logging out!');
+    setShowSessionRevokedModal(true);
+    
+    // Logout после 3 секунд
+    setTimeout(async () => {
+      try {
+        const { signOut } = await import('firebase/auth');
+        const { auth } = await import('./firebase/config');
+        await signOut(auth);
+        localStorage.removeItem('akadil_current_session');
+        setLocalSessionId(null);
+        setShowSessionRevokedModal(false);
+        window.location.href = '/login';
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    }, 3000);
+  };
+
+  // Активировать валидатор сессии
+  useSessionValidator(user, localSessionId, handleSessionInvalidated);
+
   const handleAvatarChange = (newAvatarUrl) => {
     if (userProfile) {
       setUserProfile({ ...userProfile, avatarUrl: newAvatarUrl });
@@ -276,6 +308,16 @@ function App() {
       }}
     >
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        {/* Session Revoked Modal */}
+        {showSessionRevokedModal && (
+          <SessionRevokedModal
+            onClose={() => {
+              setShowSessionRevokedModal(false);
+              window.location.href = '/login';
+            }}
+          />
+        )}
+
         {/* Email Verification Banner */}
         {user && showVerificationBanner && (
           <EmailVerificationBanner

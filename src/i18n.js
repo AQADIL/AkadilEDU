@@ -177,6 +177,10 @@ const resources = {
       'security.sessionRevoked.explanation': 'Сіздің аккаунтқа басқа құрылғыдан кіру болды. Қауіпсіздік себептері бойынша алдыңғы сессия автоматты түрде аяқталды. Тек бір құрылғыдан қарауға болады.',
       'security.sessionRevoked.button': 'Түсінікті, қайта кіру',
       'security.sessionRevoked.help': 'Егер бұл сіз болмасаңыз, құпия сөзді дереу өзгертіңіз',
+      'security.singleDeviceRule': 'Аккаунтқа тек бір құрылғыдан кіруге болады',
+      'security.alert': 'Қауіпсіздік ескертуі',
+      'security.loginFromAnotherDevice': 'Біз сіздің аккаунтыңызға басқа құрылғыдан кіргенін анықтадық',
+      'security.pleaseLoginAgain': 'Қайта кіруді растаңыз',
     }
   },
   ru: {
@@ -353,6 +357,10 @@ const resources = {
       'security.sessionRevoked.explanation': 'Был выполнен вход в ваш аккаунт с другого устройства. В целях безопасности предыдущая сессия была автоматически завершена. Только один может смотреть одновременно.',
       'security.sessionRevoked.button': 'Понятно, войти снова',
       'security.sessionRevoked.help': 'Если это были не вы, немедленно смените пароль',
+      'security.singleDeviceRule': 'Вход разрешён только с одного устройства',
+      'security.alert': 'Предупреждение безопасности',
+      'security.loginFromAnotherDevice': 'Мы зафиксировали вход с другого устройства',
+      'security.pleaseLoginAgain': 'Пожалуйста, войдите снова',
     }
   },
   en: {
@@ -529,6 +537,10 @@ const resources = {
       'security.sessionRevoked.explanation': 'Someone logged into your account from another device. For security reasons, the previous session was automatically ended. Only one can watch at a time.',
       'security.sessionRevoked.button': 'Got it, sign in again',
       'security.sessionRevoked.help': 'If this wasn\'t you, change your password immediately',
+      'security.singleDeviceRule': 'Only one device can be logged in at a time',
+      'security.alert': 'Security Alert',
+      'security.loginFromAnotherDevice': 'We detected a login from another device',
+      'security.pleaseLoginAgain': 'Please log in again',
     }
   }
 };

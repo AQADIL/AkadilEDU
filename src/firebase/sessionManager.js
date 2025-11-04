@@ -7,6 +7,55 @@ import { ref, get, update, query, orderByChild, equalTo } from 'firebase/databas
 import { database } from './realtimeDb';
 
 /**
+ * Установить текущую активную сессию
+ * SINGLE ACTIVE SESSION - только одна сессия может быть активна
+ */
+export async function setCurrentSession(uid, sessionId) {
+  if (!database) {
+    console.error('❌ Database not initialized');
+    return { success: false, error: 'Database not initialized' };
+  }
+
+  try {
+    // Устанавливаем currentSession в корне пользователя
+    await update(ref(database, `users/${uid}`), {
+      currentSession: sessionId,
+      lastLogin: new Date().toISOString()
+    });
+
+    console.log(`✅ Current session set: ${sessionId}`);
+    return { success: true, sessionId };
+
+  } catch (error) {
+    console.error('❌ Error setting current session:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Получить текущую активную сессию из DB
+ */
+export async function getCurrentSession(uid) {
+  if (!database) return null;
+
+  try {
+    const userRef = ref(database, `users/${uid}`);
+    const snapshot = await get(userRef);
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      return userData.currentSession || null;
+    }
+
+    return null;
+
+  } catch (error) {
+    console.error('❌ Error getting current session:', error);
+    return null;
+  }
+}
+
+/**
  * Revoke (выкинуть) все другие активные сессии пользователя
  * Оставляет только текущую сессию активной
  */
@@ -43,6 +92,9 @@ export async function revokeOtherSessions(uid, currentSessionId) {
       await update(ref(database), updates);
       console.log(`✅ Revoked ${revokedCount} sessions for user ${uid}`);
     }
+
+    // Установить currentSession
+    await setCurrentSession(uid, currentSessionId);
 
     return {
       revoked: revokedCount,
