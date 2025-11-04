@@ -1,12 +1,40 @@
 import { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, Activity, MapPin, Smartphone, Wifi } from 'lucide-react';
-import { ref, onValue, update } from 'firebase/database';
+import { ref, onValue, update, get } from 'firebase/database';
 import { database } from '../../firebase/realtimeDb';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, critical, high, medium
+  const [userCache, setUserCache] = useState({}); // Cache для данных пользователей
+
+  // Загрузка данных пользователя
+  const fetchUserData = async (uid) => {
+    if (userCache[uid]) return userCache[uid];
+    
+    try {
+      const userRef = ref(database, `users/${uid}`);
+      const snapshot = await get(userRef);
+      
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        const userInfo = {
+          email: userData.email || 'Unknown',
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          fullName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'Unknown User'
+        };
+        
+        setUserCache(prev => ({ ...prev, [uid]: userInfo }));
+        return userInfo;
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+    
+    return { email: 'Unknown', fullName: 'Unknown User' };
+  };
 
   useEffect(() => {
     if (!database) {
@@ -15,13 +43,20 @@ export default function SecurityAlerts() {
     }
 
     const alertsRef = ref(database, 'adminSecurityAlerts');
-    const unsubscribe = onValue(alertsRef, (snapshot) => {
+    const unsubscribe = onValue(alertsRef, async (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const alertsArray = Object.keys(data).map(key => ({
           id: key,
           ...data[key]
         })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        // Загрузить данные пользователей для всех алертов
+        for (const alert of alertsArray) {
+          if (alert.uid) {
+            await fetchUserData(alert.uid);
+          }
+        }
         
         setAlerts(alertsArray);
       } else {
@@ -222,7 +257,14 @@ export default function SecurityAlerts() {
                   {/* User Info */}
                   <div className="mb-4">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Пользователь: <span className="font-medium text-gray-900 dark:text-white">{alert.uid}</span>
+                      Пользователь: <span className="font-medium text-gray-900 dark:text-white">
+                        {userCache[alert.uid]?.fullName || 'Loading...'}
+                      </span>
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Email: <span className="font-medium text-gray-900 dark:text-white">
+                        {userCache[alert.uid]?.email || 'Loading...'}
+                      </span>
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Время: {new Date(alert.timestamp).toLocaleString('ru-RU')}

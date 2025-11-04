@@ -169,6 +169,14 @@ const resources = {
       'common.error': 'Қате',
       'common.success': 'Сәтті',
       'common.close': 'Жабу',
+      
+      // Security System
+      'security.sessionRevoked.title': 'Сессия аяқталды',
+      'security.sessionRevoked.message': 'Басқа құрылғыдан кіру анықталды',
+      'security.sessionRevoked.reason': 'Неліктен бұл болды?',
+      'security.sessionRevoked.explanation': 'Сіздің аккаунтқа басқа құрылғыдан кіру болды. Қауіпсіздік себептері бойынша алдыңғы сессия автоматты түрде аяқталды. Тек бір құрылғыдан қарауға болады.',
+      'security.sessionRevoked.button': 'Түсінікті, қайта кіру',
+      'security.sessionRevoked.help': 'Егер бұл сіз болмасаңыз, құпия сөзді дереу өзгертіңіз',
     }
   },
   ru: {
@@ -337,6 +345,14 @@ const resources = {
       'common.error': 'Ошибка',
       'common.success': 'Успешно',
       'common.close': 'Закрыть',
+      
+      // Security System
+      'security.sessionRevoked.title': 'Сессия завершена',
+      'security.sessionRevoked.message': 'Обнаружен вход с другого устройства',
+      'security.sessionRevoked.reason': 'Почему это произошло?',
+      'security.sessionRevoked.explanation': 'Был выполнен вход в ваш аккаунт с другого устройства. В целях безопасности предыдущая сессия была автоматически завершена. Только один может смотреть одновременно.',
+      'security.sessionRevoked.button': 'Понятно, войти снова',
+      'security.sessionRevoked.help': 'Если это были не вы, немедленно смените пароль',
     }
   },
   en: {
@@ -505,6 +521,14 @@ const resources = {
       'common.error': 'Error',
       'common.success': 'Success',
       'common.close': 'Close',
+      
+      // Security System
+      'security.sessionRevoked.title': 'Session Ended',
+      'security.sessionRevoked.message': 'Login from another device detected',
+      'security.sessionRevoked.reason': 'Why did this happen?',
+      'security.sessionRevoked.explanation': 'Someone logged into your account from another device. For security reasons, the previous session was automatically ended. Only one can watch at a time.',
+      'security.sessionRevoked.button': 'Got it, sign in again',
+      'security.sessionRevoked.help': 'If this wasn\'t you, change your password immediately',
     }
   }
 };

@@ -143,12 +143,19 @@ function App() {
             const { createSessionProfile } = await import('./utils/deviceInfo');
             const { calculateRiskScore, getActionMessage } = await import('./utils/riskScoring');
             const { getUserSessions, createSecurityAlert } = await import('./firebase/realtimeDb');
+            const { revokeOtherSessions } = await import('./firebase/sessionManager');
             
             const sessionProfile = await createSessionProfile();
             
             // Log session
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
+            
+            // 🚨 REVOKE OTHER SESSIONS - только один может смотреть!
+            const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
+            if (revokeResult.revoked > 0) {
+              console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);
+            }
             
             // 🔒 SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
