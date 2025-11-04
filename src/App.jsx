@@ -138,9 +138,10 @@ function App() {
             console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
           }
 
-          // Log session with IP tracking AND security analysis
+          // Log session with IP tracking AND smart security analysis
           try {
-            const { createSessionProfile, detectSuspiciousActivity } = await import('./utils/deviceInfo');
+            const { createSessionProfile } = await import('./utils/deviceInfo');
+            const { calculateRiskScore, getActionMessage } = await import('./utils/riskScoring');
             const { getUserSessions, createSecurityAlert } = await import('./firebase/realtimeDb');
             
             const sessionProfile = await createSessionProfile();
@@ -149,23 +150,75 @@ function App() {
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
-            // 🔒 SECURITY CHECK: Analyze for suspicious activity
+            // 🔒 SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
-            const securityCheck = detectSuspiciousActivity(userSessions, sessionProfile);
+            const riskAssessment = calculateRiskScore(userSessions, sessionProfile, []);
             
-            if (securityCheck.suspicious) {
-              console.warn('🚨 SUSPICIOUS ACTIVITY DETECTED!', securityCheck.flags);
+            console.log('🔒 Risk Assessment:', {
+              score: riskAssessment.score,
+              level: riskAssessment.level,
+              action: riskAssessment.action,
+              message: getActionMessage(riskAssessment.action)
+            });
+            
+            // Handle based on risk level
+            if (riskAssessment.action === 'soft_verify') {
+              // Soft response: notify but allow access with limitations
+              console.warn('⚠️ Medium risk detected - soft verification required');
               
-              // Create security alert
               await createSecurityAlert(firebaseUser.uid, {
-                type: 'suspicious_login',
-                riskLevel: securityCheck.riskLevel,
-                flags: securityCheck.flags,
-                session: sessionProfile
+                type: 'medium_risk_login',
+                riskLevel: 'medium',
+                riskScore: riskAssessment.score,
+                flags: riskAssessment.flags,
+                action: 'soft_verify',
+                session: sessionProfile,
+                message: 'Обнаружена нестандартная активность. Проверьте email для подтверждения.'
               });
               
-              console.log(`🚨 Security alert created: ${securityCheck.riskLevel} risk`);
+              // TODO: Send email notification
+              // TODO: Show in-app notification
+              
+            } else if (riskAssessment.action === 'strong_verify') {
+              // Strong response: require verification, limit content
+              console.error('🚨 HIGH RISK detected - strong verification required');
+              
+              await createSecurityAlert(firebaseUser.uid, {
+                type: 'high_risk_login',
+                riskLevel: 'high',
+                riskScore: riskAssessment.score,
+                flags: riskAssessment.flags,
+                action: 'strong_verify',
+                session: sessionProfile,
+                message: 'Обнаружена подозрительная активность. Доступ к контенту ограничен до подтверждения.'
+              });
+              
+              // TODO: Request 2FA/email verification
+              // TODO: Lock content access
+              // TODO: Show verification modal
+              
+            } else if (riskAssessment.action === 'limit_sessions') {
+              // Session limit reached
+              console.warn('⚠️ Session limit reached');
+              
+              await createSecurityAlert(firebaseUser.uid, {
+                type: 'session_limit',
+                riskLevel: 'medium',
+                riskScore: riskAssessment.score,
+                flags: riskAssessment.flags,
+                action: 'limit_sessions',
+                session: sessionProfile,
+                message: `Достигнут лимит одновременных сессий (${riskAssessment.details.concurrentSessions})`
+              });
+              
+              // TODO: Show session management modal
             }
+            
+            // Always create alert if requiresReview
+            if (riskAssessment.requiresReview) {
+              console.log('📋 Alert created for admin review');
+            }
+            
           } catch (error) {
             console.warn('⚠️ Session logging error:', error.message);
           }

@@ -30,12 +30,15 @@ export function getDeviceInfo() {
   if (ua.includes('Mobile')) deviceType = 'Mobile';
   else if (ua.includes('Tablet') || ua.includes('iPad')) deviceType = 'Tablet';
   
-  // Генерация уникального отпечатка устройства
+  // Получение постоянного Device ID
+  const deviceId = getOrCreateDeviceId();
   const fingerprint = generateDeviceFingerprint();
   
   return {
+    deviceId,           // Постоянный уникальный ID
     browser,
     os,
+    platform: navigator.platform,
     deviceType,
     fingerprint,
     userAgent: ua,
@@ -46,35 +49,43 @@ export function getDeviceInfo() {
 }
 
 /**
+ * Получить или создать постоянный Device ID
+ * Сохраняется в localStorage для постоянной идентификации
+ */
+function getOrCreateDeviceId() {
+  const STORAGE_KEY = 'akadil_device_id';
+  
+  let deviceId = localStorage.getItem(STORAGE_KEY);
+  
+  if (!deviceId) {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      deviceId = crypto.randomUUID();
+    } else {
+      deviceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    localStorage.setItem(STORAGE_KEY, deviceId);
+  }
+  
+  return deviceId;
+}
+
+/**
  * Генерация отпечатка устройства (device fingerprint)
  * Комбинация характеристик для уникальной идентификации
  */
 function generateDeviceFingerprint() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.textBaseline = 'top';
-  ctx.font = '14px Arial';
-  ctx.fillText('Browser fingerprint', 2, 2);
-  const canvasData = canvas.toDataURL();
-  
   const components = [
     navigator.userAgent,
     navigator.language,
-    window.screen.colorDepth,
-    window.screen.width + 'x' + window.screen.height,
     new Date().getTimezoneOffset(),
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
     navigator.hardwareConcurrency || 'unknown',
-    canvasData.slice(0, 100) // Первые 100 символов canvas fingerprint
+    navigator.platform
   ];
   
   // Простой хеш
-  return simpleHash(components.join('|'));
-}
-
-/**
- * Простая хеш-функция
- */
-function simpleHash(str) {
+  const str = components.join('|');
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
@@ -82,6 +93,27 @@ function simpleHash(str) {
     hash = hash & hash;
   }
   return Math.abs(hash).toString(36);
+}
+
+/**
+ * Хеширование IP адреса (SHA-256)
+ */
+async function hashIP(ip) {
+  if (!ip || typeof crypto === 'undefined' || !crypto.subtle) {
+    return ip; // Fallback to plain IP
+  }
+  
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(ip);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  } catch (error) {
+    console.warn('IP hashing failed, using plain IP');
+    return ip;
+  }
 }
 
 /**
@@ -172,14 +204,23 @@ export async function getIPLocation(ip) {
  * Создать полный профиль сессии
  */
 export async function createSessionProfile() {
-  const deviceInfo = getDeviceInfo();
-  const ipInfo = await getUserIP();
+  const device = getDeviceInfo();
+  const ipData = await getUserIP();
+  const ipHash = await hashIP(ipData.ip);
   
   return {
-    device: deviceInfo,
-    ip: ipInfo.ip,
-    timestamp: ipInfo.timestamp,
-    sessionId: generateSessionId()
+    sessionId: generateSessionId(),
+    deviceId: device.deviceId,            // Постоянный ID устройства из localStorage
+    device,
+    ip: ipData.ip,                        // Plain IP (для админа)
+    ipHash,                               // Хешированный IP (для приватности)
+    timestamp: new Date().toISOString(),
+    firstSeen: new Date().toISOString(),
+    lastSeen: new Date().toISOString(),
+    active: true,
+    revoked: false,
+    limited: false,                       // Ограниченный доступ при риске
+    riskScore: 0                          // Начальный риск-score
   };
 }
 
