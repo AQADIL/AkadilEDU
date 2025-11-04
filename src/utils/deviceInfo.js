@@ -197,7 +197,7 @@ export function detectSuspiciousActivity(userSessions, currentSession) {
   const flags = [];
   
   if (!userSessions || Object.keys(userSessions).length === 0) {
-    return { suspicious: false, flags: [] };
+    return { suspicious: false, flags: [], riskLevel: 'low' };
   }
   
   const sessions = Object.values(userSessions);
@@ -207,35 +207,51 @@ export function detectSuspiciousActivity(userSessions, currentSession) {
     return sessionTime > dayAgo;
   });
   
-  // Флаг 1: Множественные IP адреса
-  const uniqueIPs = new Set(recentSessions.map(s => s.ip));
-  if (uniqueIPs.size > 3) {
+  console.log('🔍 Security Analysis:', {
+    totalSessions: sessions.length,
+    recentSessions: recentSessions.length,
+    currentIP: currentSession?.ip
+  });
+  
+  // Флаг 1: Множественные IP адреса (снижен порог с 3 до 2 для теста)
+  const uniqueIPs = new Set(recentSessions.map(s => s.ip).filter(Boolean));
+  console.log('📊 Unique IPs:', Array.from(uniqueIPs));
+  
+  if (uniqueIPs.size > 2) {
     flags.push({
       type: 'multiple_ips',
       severity: 'high',
       message: `Обнаружено ${uniqueIPs.size} разных IP адресов за последние 24 часа`,
       ips: Array.from(uniqueIPs)
     });
+    console.log('🚨 ALERT: Multiple IPs detected!');
   }
   
-  // Флаг 2: Множественные устройства
+  // Флаг 2: Множественные устройства (снижен порог с 5 до 3)
   const uniqueDevices = new Set(recentSessions.map(s => s.device?.fingerprint).filter(Boolean));
-  if (uniqueDevices.size > 5) {
+  console.log('📱 Unique Devices:', uniqueDevices.size);
+  
+  if (uniqueDevices.size > 3) {
     flags.push({
       type: 'multiple_devices',
       severity: 'high',
       message: `Обнаружено ${uniqueDevices.size} разных устройств за последние 24 часа`,
       deviceCount: uniqueDevices.size
     });
+    console.log('🚨 ALERT: Multiple devices detected!');
   }
   
-  // Флаг 3: Быстрая смена IP (в течение часа)
-  const lastSession = recentSessions[recentSessions.length - 2]; // Предыдущая сессия
-  if (lastSession && currentSession.ip !== lastSession.ip) {
-    const timeDiff = new Date(currentSession.timestamp) - new Date(lastSession.timestamp);
-    const hourInMs = 60 * 60 * 1000;
+  // Флаг 3: Быстрая смена IP (в течение 2 часов, было 1 час)
+  const sortedSessions = recentSessions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const lastSession = sortedSessions[1]; // Предыдущая сессия (после текущей)
+  
+  if (lastSession && currentSession && currentSession.ip !== lastSession.ip) {
+    const timeDiff = Math.abs(new Date(currentSession.timestamp) - new Date(lastSession.timestamp));
+    const twoHoursInMs = 2 * 60 * 60 * 1000;
     
-    if (timeDiff < hourInMs) {
+    console.log('⏱️ Time between sessions:', Math.round(timeDiff / 60000), 'minutes');
+    
+    if (timeDiff < twoHoursInMs && timeDiff > 0) {
       flags.push({
         type: 'rapid_ip_change',
         severity: 'medium',
@@ -243,18 +259,21 @@ export function detectSuspiciousActivity(userSessions, currentSession) {
         oldIP: lastSession.ip,
         newIP: currentSession.ip
       });
+      console.log('🚨 ALERT: Rapid IP change!');
     }
   }
   
-  // Флаг 4: Одновременные сессии с разных IP
+  // Флаг 4: Одновременные сессии с разных IP (расширен с 5 до 15 минут)
   const now = Date.now();
-  const activeSessions = sessions.filter(s => {
+  const activeSessions = recentSessions.filter(s => {
     const sessionTime = new Date(s.timestamp).getTime();
-    const fiveMinutes = 5 * 60 * 1000;
-    return (now - sessionTime) < fiveMinutes;
+    const fifteenMinutes = 15 * 60 * 1000;
+    return (now - sessionTime) < fifteenMinutes;
   });
   
-  const simultaneousIPs = new Set(activeSessions.map(s => s.ip));
+  console.log('🕐 Active sessions (last 15min):', activeSessions.length);
+  
+  const simultaneousIPs = new Set(activeSessions.map(s => s.ip).filter(Boolean));
   if (simultaneousIPs.size > 1) {
     flags.push({
       type: 'simultaneous_sessions',
@@ -262,13 +281,18 @@ export function detectSuspiciousActivity(userSessions, currentSession) {
       message: `Одновременные активные сессии с ${simultaneousIPs.size} разных IP адресов`,
       ips: Array.from(simultaneousIPs)
     });
+    console.log('🚨 ALERT: Simultaneous sessions!');
   }
   
-  return {
+  const result = {
     suspicious: flags.length > 0,
     flags,
     riskLevel: calculateRiskLevel(flags)
   };
+  
+  console.log('🔒 Security Result:', result);
+  
+  return result;
 }
 
 /**

@@ -138,15 +138,36 @@ function App() {
             console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
           }
 
-          // Log session with IP tracking
+          // Log session with IP tracking AND security analysis
           try {
-            const { createSessionProfile } = await import('./utils/deviceInfo');
+            const { createSessionProfile, detectSuspiciousActivity } = await import('./utils/deviceInfo');
+            const { getUserSessions, createSecurityAlert } = await import('./firebase/realtimeDb');
+            
             const sessionProfile = await createSessionProfile();
             
+            // Log session
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
+            
+            // 🔒 SECURITY CHECK: Analyze for suspicious activity
+            const userSessions = await getUserSessions(firebaseUser.uid);
+            const securityCheck = detectSuspiciousActivity(userSessions, sessionProfile);
+            
+            if (securityCheck.suspicious) {
+              console.warn('🚨 SUSPICIOUS ACTIVITY DETECTED!', securityCheck.flags);
+              
+              // Create security alert
+              await createSecurityAlert(firebaseUser.uid, {
+                type: 'suspicious_login',
+                riskLevel: securityCheck.riskLevel,
+                flags: securityCheck.flags,
+                session: sessionProfile
+              });
+              
+              console.log(`🚨 Security alert created: ${securityCheck.riskLevel} risk`);
+            }
           } catch (error) {
-            // Silent fail for session logging
+            console.warn('⚠️ Session logging error:', error.message);
           }
 
           // Check email verification
