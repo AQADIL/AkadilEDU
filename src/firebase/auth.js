@@ -18,7 +18,8 @@ import {
   browserLocalPersistence
 } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from './config';
-import { createOrUpdateUserProfile } from './firestore';
+import { createUserProfile as createRTDBProfile, logUserSession, getUserSessions, createSecurityAlert } from './realtimeDb';
+import { createSessionProfile, detectSuspiciousActivity } from '../utils/deviceInfo';
 
 /**
  * Initialize Firebase with persistence
@@ -63,17 +64,25 @@ export async function signupWithEmail(email, password, profileData = {}) {
     await sendEmailVerification(user);
     console.log('✅ Verification email sent to:', email);
 
-    // Create user profile in Firestore
-    await createOrUpdateUserProfile(user.uid, {
-      email: user.email,
-      firstName: profileData.firstName || '',
-      lastName: profileData.lastName || '',
-      phone: profileData.phone || '',
-      avatarUrl: '',
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-      emailVerified: false
-    });
+    // 🔥 CREATE USER PROFILE IN REALTIME DATABASE
+    try {
+      const displayName = `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || email.split('@')[0];
+      
+      await createRTDBProfile(user.uid, {
+        email: user.email,
+        name: displayName,
+        phone: profileData.phone || '',
+        role: 'student',
+        status: 'active',
+        registeredAt: new Date().toISOString(),
+        emailVerified: false
+      });
+      
+      console.log('✅ User profile created in Realtime DB');
+    } catch (dbError) {
+      console.error('⚠️ Failed to create Realtime DB profile:', dbError);
+      // Не блокируем регистрацию если база недоступна
+    }
 
     // CRITICAL: Immediately sign out the user after registration
     // They MUST verify email before accessing the site
@@ -105,13 +114,30 @@ export async function loginWithEmail(email, password) {
     console.log('✅ User logged in:', user.email);
     console.log('📧 Email verified:', user.emailVerified);
     
-    // Update last login time (optional - don't block login if Firestore fails)
+    // 🔒 SECURITY: Log session with IP and device info
     try {
-      await createOrUpdateUserProfile(userCredential.user.uid, {
-        lastLoginAt: new Date().toISOString()
-      });
-    } catch (firestoreError) {
-      console.warn('⚠️ Could not update Firestore profile (offline?):', firestoreError.message);
+      const sessionProfile = await createSessionProfile();
+      await logUserSession(user.uid, sessionProfile);
+      
+      // Check for suspicious activity
+      const userSessions = await getUserSessions(user.uid);
+      const securityCheck = detectSuspiciousActivity(userSessions, sessionProfile);
+      
+      if (securityCheck.suspicious) {
+        console.warn('🚨 Suspicious activity detected!', securityCheck.flags);
+        
+        // Create security alert
+        await createSecurityAlert(user.uid, {
+          type: 'suspicious_login',
+          riskLevel: securityCheck.riskLevel,
+          flags: securityCheck.flags,
+          session: sessionProfile
+        });
+      }
+      
+      console.log('✅ Session logged and analyzed');
+    } catch (sessionError) {
+      console.warn('⚠️ Could not log session:', sessionError);
       // Continue anyway - login should still work
     }
 

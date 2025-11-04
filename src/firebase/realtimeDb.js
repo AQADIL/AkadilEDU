@@ -22,6 +22,108 @@ if (isFirebaseConfigured()) {
 export { database };
 
 /**
+ * Log user session with IP and device info
+ */
+export async function logUserSession(uid, sessionData) {
+  if (!database) {
+    console.error('❌ Database not initialized in logUserSession');
+    return null;
+  }
+  
+  // Валидация данных
+  if (!sessionData || !sessionData.ip || !sessionData.sessionId) {
+    console.error('❌ Invalid session data:', sessionData);
+    return null;
+  }
+  
+  try {
+    console.log('📝 Logging session for user:', uid, 'IP:', sessionData.ip);
+    
+    const sessionRef = ref(database, `users/${uid}/sessions/${sessionData.sessionId}`);
+    await set(sessionRef, sessionData);
+    
+    // Update IP history - используем IP как ключ (заменяем точки на подчёркивания)
+    const ipKey = sessionData.ip.replace(/\./g, '_');
+    const ipHistoryRef = ref(database, `users/${uid}/ipHistory/${ipKey}`);
+    await set(ipHistoryRef, {
+      ip: sessionData.ip,
+      lastSeen: sessionData.timestamp,
+      device: sessionData.device,
+      count: 1 // TODO: increment if exists
+    });
+    
+    // Update last login
+    await update(ref(database, `users/${uid}`), {
+      lastLogin: sessionData.timestamp,
+      lastIP: sessionData.ip
+    });
+    
+    console.log('✅ Session logged for user:', uid);
+    return sessionData.sessionId;
+  } catch (error) {
+    console.error('❌ Error logging session:', error);
+    return null;
+  }
+}
+
+/**
+ * Get user sessions for security analysis
+ */
+export async function getUserSessions(uid) {
+  if (!database) {
+    console.error('❌ Database not initialized');
+    return null;
+  }
+  
+  try {
+    const sessionsRef = ref(database, `users/${uid}/sessions`);
+    const snapshot = await get(sessionsRef);
+    return snapshot.exists() ? snapshot.val() : {};
+  } catch (error) {
+    console.error('❌ Error getting sessions:', error);
+    return {};
+  }
+}
+
+/**
+ * Create security alert for suspicious activity
+ */
+export async function createSecurityAlert(uid, alertData) {
+  if (!database) return null;
+  
+  try {
+    // Create alert for user
+    const userAlertRef = push(ref(database, `users/${uid}/securityAlerts`));
+    await set(userAlertRef, {
+      ...alertData,
+      timestamp: new Date().toISOString(),
+      read: false
+    });
+    
+    // Create alert for admin
+    const adminAlertRef = push(ref(database, 'adminSecurityAlerts'));
+    await set(adminAlertRef, {
+      uid,
+      ...alertData,
+      timestamp: new Date().toISOString(),
+      resolved: false
+    });
+    
+    // Update user security status
+    await update(ref(database, `users/${uid}`), {
+      securityStatus: alertData.riskLevel,
+      lastSecurityAlert: new Date().toISOString()
+    });
+    
+    console.log('🚨 Security alert created for user:', uid);
+    return userAlertRef.key;
+  } catch (error) {
+    console.error('❌ Error creating security alert:', error);
+    return null;
+  }
+}
+
+/**
  * Check if user is admin
  */
 export async function isUserAdmin(uid) {
@@ -31,24 +133,16 @@ export async function isUserAdmin(uid) {
   }
   
   try {
-    console.log('🔍 Checking admin status for UID:', uid);
     const userRef = ref(database, `users/${uid}`);
     const snapshot = await get(userRef);
     
     if (snapshot.exists()) {
       const userData = snapshot.val();
-      console.log('📊 User data from DB:', userData);
-      console.log('📊 Role:', userData.role);
-      const isAdmin = userData.role === 'admin';
-      console.log('✅ Is admin?', isAdmin);
-      return isAdmin;
+      return userData.role === 'admin';
     }
-    console.log('⚠️ User profile not found in database');
     return false;
   } catch (error) {
-    console.error('❌ Error checking admin status:', error);
-    console.error('   Error code:', error.code);
-    console.error('   Error message:', error.message);
+    console.error('❌ Admin check failed:', error.message);
     return false;
   }
 }
@@ -117,26 +211,20 @@ export async function createUserProfile(uid, data) {
  */
 export async function getUserProfile(uid) {
   if (!database) {
-    console.error('❌ Database not initialized in getUserProfile');
+    console.error('❌ Database not initialized');
     return null;
   }
   
   try {
-    console.log('🔍 Getting user profile for UID:', uid);
     const userRef = ref(database, `users/${uid}`);
     const snapshot = await get(userRef);
     
     if (snapshot.exists()) {
-      const profile = snapshot.val();
-      console.log('✅ Profile found:', profile);
-      return profile;
+      return snapshot.val();
     }
-    console.log('⚠️ Profile not found for UID:', uid);
     return null;
   } catch (error) {
-    console.error('❌ Error fetching user profile:', error);
-    console.error('   Error code:', error.code);
-    console.error('   Error message:', error.message);
+    console.error('❌ Profile fetch failed:', error.message);
     return null;
   }
 }
@@ -156,22 +244,29 @@ export async function updateUserProfile(uid, updates) {
  * Fetch all users (for admin)
  */
 export async function fetchAllUsers() {
-  if (!database) return [];
+  if (!database) {
+    console.error('❌ Database not initialized in fetchAllUsers');
+    return [];
+  }
   
   try {
+    console.log('📋 Fetching all users from Realtime DB...');
     const usersRef = ref(database, 'users');
     const snapshot = await get(usersRef);
     
     if (snapshot.exists()) {
       const usersData = snapshot.val();
-      return Object.keys(usersData).map(uid => ({
+      const usersArray = Object.keys(usersData).map(uid => ({
         uid,
         ...usersData[uid]
       }));
+      console.log(`✅ Fetched ${usersArray.length} users from Realtime DB`);
+      return usersArray;
     }
+    console.log('⚠️ No users found in Realtime DB');
     return [];
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('❌ Error fetching users:', error);
     return [];
   }
 }
@@ -246,44 +341,6 @@ export async function softDeleteUser(uid, adminUid) {
   console.log('✅ User soft deleted:', uid);
 }
 
-/**
- * Log user session with IP
- */
-export async function logUserSession(uid, ip, userAgent) {
-  if (!database) return;
-  
-  try {
-    const timestamp = Date.now();
-    
-    // Update last login
-    await update(ref(database, `users/${uid}`), {
-      lastLogin: new Date(timestamp).toISOString()
-    });
-    
-    // Add session
-    await push(ref(database, `users/${uid}/sessions`), {
-      ip,
-      ua: userAgent,
-      ts: new Date(timestamp).toISOString()
-    });
-    
-    // Add to auth logs
-    await push(ref(database, `auth_logs/${uid}`), {
-      ip,
-      ua: userAgent,
-      ts: new Date(timestamp).toISOString()
-    });
-    
-    // Update IP history
-    await update(ref(database, `users/${uid}/ipHistory`), {
-      [timestamp]: ip
-    });
-    
-    console.log('✅ Session logged for user:', uid);
-  } catch (error) {
-    console.error('Error logging session:', error);
-  }
-}
 
 /**
  * Fetch all courses

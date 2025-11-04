@@ -14,13 +14,17 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // Отключаем source maps в production
-    minify: 'esbuild', // Быстрая минификация (встроена в Vite)
+    sourcemap: false,
+    minify: 'esbuild',
     esbuild: {
-      drop: ['console', 'debugger'], // Удаляем console.log и debugger
+      drop: ['console', 'debugger'],
     },
     rollupOptions: {
       output: {
+        // Add content hash to filenames for cache busting
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore']

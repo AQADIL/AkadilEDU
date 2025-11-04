@@ -25,6 +25,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
 const CoursesManagement = lazy(() => import('./pages/admin/CoursesManagement'));
+const SecurityAlerts = lazy(() => import('./pages/admin/SecurityAlerts'));
 import AdminGuard from './components/AdminGuard';
 import { storage } from './utils/storage';
 import { onAuthStateChanged, initializeAuth } from './firebase/auth';
@@ -40,6 +41,33 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+
+  // Clear old cache on version change
+  useEffect(() => {
+    const APP_VERSION = '2.1.0';
+    const storedVersion = localStorage.getItem('app_version');
+    
+    if (storedVersion !== APP_VERSION) {
+      console.log('🔄 New version detected, clearing cache...');
+      localStorage.clear();
+      sessionStorage.clear();
+      localStorage.setItem('app_version', APP_VERSION);
+      
+      // Clear service worker cache if exists
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => registration.unregister());
+        });
+      }
+      
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize theme
@@ -62,8 +90,15 @@ function App() {
       return;
     }
 
+    // Set maximum loading time (10 seconds)
+    const loadingTimeout = setTimeout(() => {
+      console.warn('⚠️ Loading timeout - forcing app to show');
+      setLoading(false);
+    }, 10000);
+
     // Listen to authentication state changes
     const unsubscribe = onAuthStateChanged(async (firebaseUser) => {
+      clearTimeout(loadingTimeout);
       setUser(firebaseUser);
 
       if (firebaseUser) {
@@ -103,38 +138,15 @@ function App() {
             console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
           }
 
-          // Log authentication event with IP tracking (optional)
+          // Log session with IP tracking
           try {
-            // Try to get IP address
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipResponse.json();
-            console.log('🌐 IP Address detected:', ipData.ip);
+            const { createSessionProfile } = await import('./utils/deviceInfo');
+            const sessionProfile = await createSessionProfile();
             
-            // Log to Firestore (optional)
-            try {
-              await logAuthEvent(firebaseUser.uid, ipData.ip);
-            } catch (firestoreError) {
-              console.warn('⚠️ Could not log to Firestore:', firestoreError.message);
-            }
-            
-            // Log to Realtime Database with session tracking
-            try {
-              await logUserSession(firebaseUser.uid, ipData.ip, navigator.userAgent);
-            } catch (rtdbError) {
-              console.warn('⚠️ Could not log session to RTDB:', rtdbError.message);
-            }
-            
-            console.log('📝 Login event logged for user:', firebaseUser.email, 'IP:', ipData.ip);
+            await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
+            await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
           } catch (error) {
-            console.warn('⚠️ Could not fetch IP address:', error.message);
-            // Try logging with unknown IP
-            try {
-              await logAuthEvent(firebaseUser.uid, 'unknown');
-              await logUserSession(firebaseUser.uid, 'unknown', navigator.userAgent);
-              console.log('📝 Login event logged for user:', firebaseUser.email, 'IP: unknown');
-            } catch (logError) {
-              console.warn('⚠️ Could not log events:', logError.message);
-            }
+            // Silent fail for session logging
           }
 
           // Check email verification
@@ -151,7 +163,10 @@ function App() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      unsubscribe();
+    };
   }, []);
 
   const handleAvatarChange = (newAvatarUrl) => {
@@ -305,6 +320,14 @@ function App() {
                 element={
                   <AdminGuard>
                     <CoursesManagement />
+                  </AdminGuard>
+                }
+              />
+              <Route
+                path="/admin/security"
+                element={
+                  <AdminGuard>
+                    <SecurityAlerts />
                   </AdminGuard>
                 }
               />

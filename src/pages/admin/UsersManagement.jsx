@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Edit, Ban, Trash2, BookOpen, Loader2 } from 'lucide-react';
+import { Search, Filter, UserPlus, Edit, Ban, Trash2, BookOpen, Loader2, AlertTriangle } from 'lucide-react';
 import { fetchAllUsers, suspendUser, unsuspendUser, softDeleteUser } from '../../firebase/realtimeDb';
 import { auth } from '../../firebase/config';
 import UserDetailDrawer from '../../components/admin/UserDetailDrawer';
@@ -174,6 +174,9 @@ export default function UsersManagement() {
                   Статус
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Безопасность
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Последний вход
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -211,6 +214,22 @@ export default function UsersManagement() {
                     }`}>
                       {user.status === 'active' ? 'Активен' : 'Заблокирован'}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {user.securityStatus && user.securityStatus !== 'low' ? (
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1 w-fit ${
+                        user.securityStatus === 'critical' 
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                          : user.securityStatus === 'high'
+                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                      }`}>
+                        <AlertTriangle className="w-3 h-3" />
+                        {user.securityStatus.toUpperCase()}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-400">—</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('ru-RU') : 'Никогда'}

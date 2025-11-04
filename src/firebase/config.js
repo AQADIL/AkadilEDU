@@ -33,14 +33,9 @@ try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   
-  // Initialize Firestore with offline persistence disabled (optional service)
-  try {
-    db = getFirestore(app);
-    console.log('✅ Firestore initialized');
-  } catch (firestoreError) {
-    console.warn('⚠️ Firestore initialization failed (continuing without it):', firestoreError.message);
-    db = null;
-  }
+  // Firestore DISABLED - not needed, causes 400 errors
+  db = null;
+  console.log('ℹ️ Firestore disabled (using Realtime Database only)');
   
   storage = getStorage(app);
   isInitialized = true;

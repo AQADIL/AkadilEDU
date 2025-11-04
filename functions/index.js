@@ -6,6 +6,7 @@
  */
 
 const {onCall, HttpsError} = require('firebase-functions/v2/https');
+const {onUserCreated} = require('firebase-functions/v2/identity');
 const admin = require('firebase-admin');
 
 admin.initializeApp();
@@ -282,4 +283,51 @@ exports.bulkAssignCourse = onCall(async (request) => {
   });
   
   return results;
+});
+
+/**
+ * AUTO-CREATE USER PROFILE ON SIGNUP
+ * 
+ * Автоматически создаёт профиль в Realtime DB при регистрации
+ * Триггер срабатывает когда пользователь регистрируется через Firebase Auth
+ */
+exports.createUserProfileOnSignup = onUserCreated(async (event) => {
+  const user = event.data;
+  
+  const db = admin.database();
+  const userRef = db.ref(`users/${user.uid}`);
+  
+  try {
+    // Проверяем, не существует ли уже профиль
+    const snapshot = await userRef.once('value');
+    if (snapshot.exists()) {
+      console.log('⏭️  Profile already exists:', user.uid);
+      return;
+    }
+    
+    // Создаём новый профиль
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName || user.email.split('@')[0],
+      phone: user.phoneNumber || '',
+      role: 'student', // По умолчанию все студенты
+      status: 'active',
+      registeredAt: user.metadata.creationTime,
+      lastLogin: user.metadata.lastSignInTime || user.metadata.creationTime,
+      emailVerified: user.emailVerified || false,
+      ipHistory: {},
+      sessions: {},
+      purchasedCourses: {},
+      isDeleted: false
+    };
+    
+    await userRef.set(userData);
+    
+    console.log('✅ Auto-created profile for new user:', user.email);
+    
+  } catch (error) {
+    console.error('❌ Error auto-creating profile:', error);
+    // Не бросаем ошибку, чтобы не блокировать регистрацию
+  }
 });

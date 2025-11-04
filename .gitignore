@@ -44,6 +44,8 @@ lerna-debug.log*
 .firebaserc
 firebase-debug.log
 firestore-debug.log
+**/serviceAccountKey.json
+scripts/serviceAccountKey.json
 
 # Temporary files
 *.tmp

@@ -1,0 +1,8 @@
+# Service Account Key - НИКОГДА не коммитить в Git!
+serviceAccountKey.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log

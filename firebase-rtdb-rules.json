@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users/' + auth.uid + '/role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users/' + auth.uid + '/role').val() === 'admin')"
+      }
+    },
+    "adminSecurityAlerts": {
+      ".read": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'",
+      ".write": "auth != null"
+    },
+    "adminLogs": {
+      ".read": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'",
+      ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'"
+    },
+    "courses": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'"
+    },
+    "auth_logs": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users/' + auth.uid + '/role').val() === 'admin')",
+        ".write": "auth != null"
+      }
+    },
+    "migrationLogs": {
+      ".read": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'",
+      ".write": "auth != null"
+    }
+  }
+}
