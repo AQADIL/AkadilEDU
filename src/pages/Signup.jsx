@@ -61,7 +61,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      // signupWithEmail автоматически делает logout после регистрации
+      // Регистрация с автоматическим входом
       await signupWithEmail(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName
@@ -69,9 +69,10 @@ export default function Signup() {
       
       setSuccess(true);
       
-      // НЕ делаем автоматический redirect!
-      // Пользователь должен СНАЧАЛА подтвердить email,
-      // ПОТОМ сам перейти на /login
+      // Redirect на страницу подтверждения email
+      setTimeout(() => {
+        navigate('/email-verification-required');
+      }, 1500);
     } catch (error) {
       console.error('Signup error:', error);
 

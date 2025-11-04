@@ -72,13 +72,15 @@ export default function EmailVerificationRequired() {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 overflow-auto animate-gradient">
-      {/* Animated Background Circles */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+      {/* Modern Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
+      
+      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/30 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-float-delayed"></div>
-        <div className="absolute -bottom-40 right-1/4 w-80 h-80 bg-purple-400/30 rounded-full blur-3xl animate-float-slow"></div>
-        <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-400/10 dark:bg-primary-600/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute -bottom-40 right-1/3 w-80 h-80 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl animate-float-slow"></div>
       </div>
       
       {/* CSS Animations */}
@@ -118,105 +120,74 @@ export default function EmailVerificationRequired() {
       `}</style>
 
       {/* Content */}
-      <div className="relative min-h-screen flex items-center justify-center p-3 sm:p-4 py-4 sm:py-8">
-        <div className="w-full max-w-2xl my-4 sm:my-8">
+      <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12">
+        <div className="w-full max-w-3xl">
           {/* Main Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden backdrop-blur-xl">
             
             {/* Header with Icon */}
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-10 text-center relative overflow-hidden animate-gradient-header">
-              <div className="absolute inset-0 bg-grid-white/10"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+            <div className="relative p-8 sm:p-12 text-center overflow-hidden bg-gradient-to-br from-primary-500 to-blue-600 dark:from-primary-600 dark:to-blue-700">
+              {/* Decorative Elements */}
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+              
               <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 animate-bounce shadow-2xl ring-4 ring-white/30">
-                  <Mail className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white drop-shadow-2xl" />
+                {/* Icon */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl border border-white/20">
+                  <Mail className="w-12 h-12 sm:w-14 sm:h-14 text-white" />
                 </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 drop-shadow-2xl px-4">
+                
+                {/* Title */}
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
                   {t('emailVerification.verificationRequired')}
                 </h1>
-                <p className="text-base sm:text-lg lg:text-xl font-medium drop-shadow-lg text-blue-50 px-4">
+                <p className="text-lg sm:text-xl text-white/90 font-medium">
                   {t('emailVerification.almostThere')}
                 </p>
               </div>
-              
-              <style jsx>{`
-                @keyframes gradient-header {
-                  0% { background-position: 0% 50%; }
-                  50% { background-position: 100% 50%; }
-                  100% { background-position: 0% 50%; }
-                }
-                .animate-gradient-header {
-                  background-size: 200% 200%;
-                  animation: gradient-header 6s ease infinite;
-                }
-              `}</style>
             </div>
 
             {/* Body */}
-            <div className="p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6">
+            <div className="p-6 sm:p-8 lg:p-12 space-y-6">
               {/* Email Display */}
               <div className="text-center">
-                <p className="text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 text-sm sm:text-base lg:text-lg">
+                <p className="text-gray-600 dark:text-gray-400 mb-4 text-base sm:text-lg">
                   {t('emailVerification.sentVerificationTo')}
                 </p>
-                <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/30 dark:via-indigo-900/30 dark:to-purple-900/30 rounded-xl p-3 sm:p-4 lg:p-5 border-2 border-blue-300 dark:border-blue-700 shadow-lg animate-gradient-box">
-                  <p className="text-base sm:text-lg lg:text-xl font-bold text-blue-900 dark:text-blue-100 break-all">
+                <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-4 sm:p-5 border-2 border-primary-200 dark:border-primary-700">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Mail className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Email отправлен на:</span>
+                  </div>
+                  <p className="text-lg sm:text-xl font-bold text-primary-900 dark:text-primary-100 break-all">
                     {userEmail}
                   </p>
-                  
-                  <style jsx>{`
-                    @keyframes gradient-box {
-                      0% { border-color: rgb(147 197 253); }
-                      33% { border-color: rgb(165 180 252); }
-                      66% { border-color: rgb(196 181 253); }
-                      100% { border-color: rgb(147 197 253); }
-                    }
-                    .animate-gradient-box {
-                      animation: gradient-box 4s ease infinite;
-                    }
-                  `}</style>
                 </div>
               </div>
 
               {/* Instructions */}
-              <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-7 border-2 border-blue-200 dark:border-blue-800 shadow-lg animate-gradient-border">
-                <h3 className="font-bold text-blue-900 dark:text-blue-300 mb-3 sm:mb-4 lg:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg lg:text-xl">
-                  <span className="text-2xl sm:text-3xl">📬</span>
+              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-3 text-lg">
+                  <span className="text-2xl">📬</span>
                   {t('emailVerification.howToVerify')}
                 </h3>
-                <ol className="space-y-3 sm:space-y-4 text-sm sm:text-base text-blue-900 dark:text-blue-200">
-                  <li className="flex gap-3 sm:gap-4 items-start">
-                    <span className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shadow-md animate-gradient-badge">1</span>
-                    <span className="pt-0.5 sm:pt-1">{t('emailVerification.step1Check')}</span>
+                <ol className="space-y-4 text-base">
+                  <li className="flex gap-4 items-start group">
+                    <span className="flex-shrink-0 w-8 h-8 bg-primary-500 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-sm group-hover:scale-110 transition-transform">1</span>
+                    <span className="pt-1 text-gray-700 dark:text-gray-300">{t('emailVerification.step1Check')}</span>
                   </li>
-                  <li className="flex gap-3 sm:gap-4 items-start">
-                    <span className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shadow-md animate-gradient-badge">2</span>
-                    <span className="pt-0.5 sm:pt-1">{t('emailVerification.step2FindEmail')}</span>
+                  <li className="flex gap-4 items-start group">
+                    <span className="flex-shrink-0 w-8 h-8 bg-primary-500 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-sm group-hover:scale-110 transition-transform">2</span>
+                    <span className="pt-1 text-gray-700 dark:text-gray-300">{t('emailVerification.step2FindEmail')}</span>
                   </li>
-                  <li className="flex gap-3 sm:gap-4 items-start">
-                    <span className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shadow-md animate-gradient-badge">3</span>
-                    <span className="pt-0.5 sm:pt-1">{t('emailVerification.step3ClickLink')}</span>
+                  <li className="flex gap-4 items-start group">
+                    <span className="flex-shrink-0 w-8 h-8 bg-primary-500 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-sm group-hover:scale-110 transition-transform">3</span>
+                    <span className="pt-1 text-gray-700 dark:text-gray-300">{t('emailVerification.step3ClickLink')}</span>
                   </li>
-                  <li className="flex gap-3 sm:gap-4 items-start">
-                    <span className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shadow-md animate-gradient-badge">4</span>
-                    <span className="pt-0.5 sm:pt-1">{t('emailVerification.step4ReturnHere')}</span>
+                  <li className="flex gap-4 items-start group">
+                    <span className="flex-shrink-0 w-8 h-8 bg-primary-500 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-sm group-hover:scale-110 transition-transform">4</span>
+                    <span className="pt-1 text-gray-700 dark:text-gray-300">{t('emailVerification.step4ReturnHere')}</span>
                   </li>
                 </ol>
-                
-                <style jsx>{`
-                  @keyframes gradient-badge {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                  }
-                  .animate-gradient-badge {
-                    background-size: 200% 200%;
-                    animation: gradient-badge 3s ease infinite;
-                  }
-                  .animate-gradient-border {
-                    animation: gradient-box 5s ease infinite;
-                  }
-                `}</style>
               </div>
 
               {/* Warning */}
@@ -253,80 +224,60 @@ export default function EmailVerificationRequired() {
               )}
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 pt-2">
-                {/* Check Verification */}
+              <div className="grid grid-cols-1 gap-4 pt-4">
+                {/* Check Verification - Primary */}
                 <button
                   onClick={handleCheckVerification}
                   disabled={checking}
-                  className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl transition-all transform hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 sm:gap-3 shadow-xl animate-gradient-button"
+                  className="w-full px-8 py-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                 >
                   {checking ? (
                     <>
-                      <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                      <span className="text-sm sm:text-base lg:text-lg">{t('emailVerification.checking')}</span>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>{t('emailVerification.checking')}</span>
                     </>
                   ) : (
                     <>
-                      <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6" />
-                      <span className="text-sm sm:text-base lg:text-lg">{t('emailVerification.iVerified')}</span>
+                      <RefreshCw className="w-5 h-5" />
+                      <span>{t('emailVerification.iVerified')}</span>
                     </>
                   )}
                 </button>
 
-                {/* Resend Email */}
+                {/* Resend Email - Secondary */}
                 <button
                   onClick={handleResend}
                   disabled={resending || resendSuccess}
-                  className="w-full px-6 py-3 sm:px-8 sm:py-4 bg-white dark:bg-gray-700 border-2 border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl hover:bg-blue-50 dark:hover:bg-gray-600 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 sm:gap-3 animate-border-pulse"
+                  className="w-full px-8 py-4 bg-white dark:bg-gray-700 border-2 border-primary-600 dark:border-primary-500 text-primary-700 dark:text-primary-400 font-semibold rounded-xl hover:bg-primary-50 dark:hover:bg-gray-600 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                 >
                   {resending ? (
                     <>
-                      <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                      <span className="text-sm sm:text-base">{t('emailVerification.resending')}</span>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>{t('emailVerification.resending')}</span>
                     </>
                   ) : (
                     <>
-                      <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
-                      <span className="text-sm sm:text-base">{t('emailVerification.resendEmail')}</span>
+                      <Mail className="w-5 h-5" />
+                      <span>{t('emailVerification.resendEmail')}</span>
                     </>
                   )}
                 </button>
 
-                {/* Logout */}
+                {/* Logout - Tertiary */}
                 <button
                   onClick={handleLogout}
-                  className="w-full px-6 py-3 sm:px-8 sm:py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-base sm:text-lg rounded-xl sm:rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all hover:shadow-lg flex items-center justify-center gap-2"
+                  className="w-full px-8 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-2"
                 >
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-sm sm:text-base">{t('emailVerification.logoutAndTryAnother')}</span>
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm">{t('emailVerification.logoutAndTryAnother')}</span>
                 </button>
               </div>
-              
-              {/* Button Animations */}
-              <style jsx>{`
-                @keyframes gradient-button {
-                  0% { background-position: 0% 50%; }
-                  50% { background-position: 100% 50%; }
-                  100% { background-position: 0% 50%; }
-                }
-                @keyframes border-pulse {
-                  0%, 100% { border-color: rgb(37 99 235); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-                  50% { border-color: rgb(79 70 229); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); }
-                }
-                .animate-gradient-button {
-                  background-size: 200% 200%;
-                  animation: gradient-button 4s ease infinite;
-                }
-                .animate-border-pulse {
-                  animation: border-pulse 2s ease infinite;
-                }
-              `}</style>
             </div>
           </div>
 
           {/* Footer Note */}
-          <div className="mt-6 text-center">
-            <p className="text-white/80 text-sm">
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               {t('emailVerification.needHelp')}
             </p>
           </div>

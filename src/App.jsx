@@ -156,6 +156,24 @@ function App() {
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
             // 🚨 SINGLE ACTIVE SESSION - только один может смотреть!
+            // Проверяем: может эта сессия уже была revoked?
+            const { getCurrentSession } = await import('./firebase/sessionManager');
+            const dbCurrentSession = await getCurrentSession(firebaseUser.uid);
+            const localStoredSession = localStorage.getItem('akadil_current_session');
+            
+            // Если у нас уже есть старая сессия и она не совпадает с DB - значит нас выкинули
+            if (localStoredSession && dbCurrentSession && localStoredSession !== dbCurrentSession) {
+              console.warn('🚨 Old session detected - was revoked by another device!');
+              // Показать модалку и НЕ выкидывать других
+              setShowSessionRevokedModal(true);
+              setTimeout(() => {
+                localStorage.removeItem('akadil_current_session');
+                window.location.href = '/login';
+              }, 3000);
+              return; // Не продолжаем дальше
+            }
+            
+            // Только если это НОВАЯ сессия - выкидываем других
             const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
             if (revokeResult.revoked > 0) {
               console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);

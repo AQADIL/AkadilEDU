@@ -84,10 +84,9 @@ export async function signupWithEmail(email, password, profileData = {}) {
       // Не блокируем регистрацию если база недоступна
     }
 
-    // CRITICAL: Immediately sign out the user after registration
-    // They MUST verify email before accessing the site
-    await signOut(auth);
-    console.log('🚪 User logged out after registration - email verification required');
+    // ✅ Пользователь остается залогиненным, но App.jsx покажет ему
+    // страницу подтверждения email и не даст доступ к контенту
+    console.log('✅ User registered and logged in - awaiting email verification');
 
     return userCredential;
   } catch (error) {
