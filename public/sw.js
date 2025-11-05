@@ -1,17 +1,22 @@
-const CACHE_NAME = 'akadiledu-v2.0.0';
+const CACHE_NAME = 'akadiledu-v2.1.0';
 const urlsToCache = [
   '/',
   '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
 // Install service worker
 self.addEventListener('install', (event) => {
+  console.log('🔧 Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Opened cache');
+      console.log('✅ Cache opened');
       return cache.addAll(urlsToCache);
     })
   );
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
 });
 
 // Cache and return requests
@@ -57,16 +62,20 @@ self.addEventListener('fetch', (event) => {
 
 // Update service worker
 self.addEventListener('activate', (event) => {
+  console.log('🚀 Service Worker activated');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('🗑️ Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
+  // Take control of all pages immediately
+  return self.clients.claim();
 });
