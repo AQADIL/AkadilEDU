@@ -3,6 +3,8 @@ import { Users, BookOpen, Shield, Settings, Bell, Send, AlertCircle } from 'luci
 import { ref, get } from 'firebase/database';
 import { database } from '../../firebase/realtimeDb';
 import { Link } from 'react-router-dom';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../../firebase/config';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -91,33 +93,45 @@ export default function AdminDashboard() {
     setSendResult(null);
     
     try {
-      // TODO: Implement Cloud Function for FCM
-      // For now, show instruction
-      alert(
-        '📱 Push Notifications Setup Needed!\n\n' +
-        '1. Включите Cloud Messaging в Firebase Console\n' +
-        '2. Создайте Cloud Function для отправки\n' +
-        '3. Добавьте FCM SDK в приложение\n\n' +
-        'Инструкция в PUSH_NOTIFICATIONS_SETUP.md'
-      );
+      console.log('📱 Sending push notification to all users...');
       
-      setSendResult({
-        success: false,
-        message: '⚠️ Push notifications не настроены. Смотрите PUSH_NOTIFICATIONS_SETUP.md'
+      const functions = getFunctions(app);
+      const sendPushToAll = httpsCallable(functions, 'sendPushToAll');
+      
+      const result = await sendPushToAll({
+        title: pushTitle,
+        message: pushMessage
       });
-      
-      // Simulate success for demo
-      // In production, call Cloud Function:
-      // const response = await fetch('/api/sendPushNotification', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ title: pushTitle, message: pushMessage })
-      // });
-      
+
+      console.log('✅ Push result:', result.data);
+
+      setSendResult({
+        success: result.data.success,
+        message: result.data.message
+      });
+
+      if (result.data.success) {
+        // Clear form on success
+        setPushTitle('');
+        setPushMessage('');
+      }
+
     } catch (error) {
-      console.error('Error sending push:', error);
+      console.error('❌ Error sending push:', error);
+      
+      let errorMessage = 'Ошибка отправки';
+      
+      if (error.code === 'functions/not-found') {
+        errorMessage = '⚠️ Cloud Function не найдена. Выполните: firebase deploy --only functions';
+      } else if (error.code === 'functions/permission-denied') {
+        errorMessage = '🔒 Только администраторы могут отправлять уведомления';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setSendResult({
         success: false,
-        message: 'Ошибка отправки: ' + error.message
+        message: errorMessage
       });
     } finally {
       setSending(false);

@@ -286,6 +286,103 @@ exports.bulkAssignCourse = onCall(async (request) => {
 });
 
 /**
+ * Send Push Notification to All Users
+ * 
+ * Sends FCM push notification to all users who have FCM tokens
+ * 
+ * @param {string} title - Notification title
+ * @param {string} message - Notification body
+ * @returns {object} Results with success/failure counts
+ */
+exports.sendPushToAll = onCall(async (request) => {
+  // Check authentication
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  
+  const requesterUid = request.auth.uid;
+  const {title, message} = request.data;
+  
+  if (!title || !message) {
+    throw new HttpsError('invalid-argument', 'Title and message are required');
+  }
+  
+  // Verify requester is admin
+  await verifyAdmin(requesterUid);
+  
+  try {
+    console.log(`📱 Sending push to all users: "${title}"`);
+    
+    // Get all users with FCM tokens
+    const usersSnapshot = await admin.database().ref('/users').once('value');
+    
+    if (!usersSnapshot.exists()) {
+      throw new HttpsError('not-found', 'No users found');
+    }
+    
+    const tokens = [];
+    const userEmails = [];
+    
+    usersSnapshot.forEach((userSnap) => {
+      const userData = userSnap.val();
+      if (userData.fcmToken) {
+        tokens.push(userData.fcmToken);
+        userEmails.push(userData.email);
+      }
+    });
+    
+    if (tokens.length === 0) {
+      return {
+        success: false,
+        message: 'Нет пользователей с FCM токенами. Пользователи должны войти в приложение и разрешить уведомления.',
+        successCount: 0,
+        failureCount: 0
+      };
+    }
+    
+    console.log(`📤 Sending to ${tokens.length} users:`, userEmails);
+    
+    // Send to all tokens (max 500 per batch)
+    const payload = {
+      notification: {
+        title: title,
+        body: message,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png'
+      }
+    };
+    
+    const response = await admin.messaging().sendToDevice(tokens, payload);
+    
+    console.log(`✅ Success: ${response.successCount}, Failed: ${response.failureCount}`);
+    
+    // Log admin action
+    await admin.database().ref('/adminLogs').push({
+      adminUid: requesterUid,
+      action: 'sendPushToAll',
+      payload: {title, message, recipientCount: tokens.length},
+      results: {
+        success: response.successCount,
+        failure: response.failureCount
+      },
+      ts: new Date().toISOString()
+    });
+    
+    return {
+      success: true,
+      message: `Отправлено ${response.successCount} из ${tokens.length} пользователей`,
+      successCount: response.successCount,
+      failureCount: response.failureCount,
+      totalUsers: tokens.length
+    };
+    
+  } catch (error) {
+    console.error('❌ Send push to all error:', error);
+    throw new HttpsError('internal', `Failed to send push: ${error.message}`);
+  }
+});
+
+/**
  * AUTO-CREATE USER PROFILE ON SIGNUP
  * 
  * Автоматически создаёт профиль в Realtime DB при регистрации
