@@ -3,10 +3,11 @@
  * 
  * IMPORTANT: These functions require admin privileges and should only be called
  * by authenticated admin users. All functions verify the caller's admin status.
+ * 
+ * Using Cloud Functions v1 for compatibility with Spark (free) plan
  */
 
-const {onCall, HttpsError, onRequest} = require('firebase-functions/v2/https');
-const {onUserCreated} = require('firebase-functions/v2/identity');
+const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 admin.initializeApp();
@@ -18,12 +19,12 @@ async function verifyAdmin(uid) {
   const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
   
   if (!userSnapshot.exists()) {
-    throw new HttpsError('not-found', 'User not found');
+    throw new functions.https.HttpsError('not-found', 'User not found');
   }
   
   const userData = userSnapshot.val();
   if (userData.role !== 'admin') {
-    throw new HttpsError('permission-denied', 'Only admins can perform this action');
+    throw new functions.https.HttpsError('permission-denied', 'Only admins can perform this action');
   }
   
   return true;
@@ -37,17 +38,17 @@ async function verifyAdmin(uid) {
  * @param {string} uid - Target user ID to delete
  * @returns {object} Success message
  */
-exports.deleteUser = onCall(async (request) => {
+exports.deleteUser = functions.https.onCall(async (data, context) => {
   // Check authentication
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const requesterUid = request.auth.uid;
-  const targetUid = request.data.uid;
+  const requesterUid = context.auth.uid;
+  const targetUid = data.uid;
   
   if (!targetUid) {
-    throw new HttpsError('invalid-argument', 'User ID is required');
+    throw new functions.https.HttpsError('invalid-argument', 'User ID is required');
   }
   
   // Verify requester is admin
@@ -89,7 +90,7 @@ exports.deleteUser = onCall(async (request) => {
     
   } catch (error) {
     console.error('Delete user error:', error);
-    throw new HttpsError('internal', `Failed to delete user: ${error.message}`);
+    throw new functions.https.HttpsError('internal', `Failed to delete user: ${error.message}`);
   }
 });
 
@@ -104,17 +105,17 @@ exports.deleteUser = onCall(async (request) => {
  * @param {string} expiresAt - ISO date string for expiration
  * @returns {object} Success message
  */
-exports.assignCourseServer = onCall(async (request) => {
+exports.assignCourseServer = functions.https.onCall(async (data, context) => {
   // Check authentication
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const requesterUid = request.auth.uid;
-  const {uid, courseId, expiresAt} = request.data;
+  const requesterUid = context.auth.uid;
+  const {uid, courseId, expiresAt} = data;
   
   if (!uid || !courseId) {
-    throw new HttpsError('invalid-argument', 'User ID and Course ID are required');
+    throw new functions.https.HttpsError('invalid-argument', 'User ID and Course ID are required');
   }
   
   // Verify requester is admin
@@ -124,13 +125,13 @@ exports.assignCourseServer = onCall(async (request) => {
     // Verify course exists
     const courseSnapshot = await admin.database().ref(`/courses/${courseId}`).once('value');
     if (!courseSnapshot.exists()) {
-      throw new HttpsError('not-found', 'Course not found');
+      throw new functions.https.HttpsError('not-found', 'Course not found');
     }
     
     // Verify target user exists
     const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
-      throw new HttpsError('not-found', 'User not found');
+      throw new functions.https.HttpsError('not-found', 'User not found');
     }
     
     // Assign course
@@ -157,7 +158,7 @@ exports.assignCourseServer = onCall(async (request) => {
     
   } catch (error) {
     console.error('Assign course error:', error);
-    throw new HttpsError('internal', `Failed to assign course: ${error.message}`);
+    throw new functions.https.HttpsError('internal', `Failed to assign course: ${error.message}`);
   }
 });
 
@@ -172,17 +173,17 @@ exports.assignCourseServer = onCall(async (request) => {
  * @param {string} body - Notification body
  * @returns {object} Success message
  */
-exports.sendPushToUser = onCall(async (request) => {
+exports.sendPushToUser = functions.https.onCall(async (data, context) => {
   // Check authentication
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const requesterUid = request.auth.uid;
-  const {uid, title, body} = request.data;
+  const requesterUid = context.auth.uid;
+  const {uid, title, body} = data;
   
   if (!uid || !title || !body) {
-    throw new HttpsError('invalid-argument', 'User ID, title, and body are required');
+    throw new functions.https.HttpsError('invalid-argument', 'User ID, title, and body are required');
   }
   
   // Verify requester is admin
@@ -192,14 +193,14 @@ exports.sendPushToUser = onCall(async (request) => {
     // Get user's FCM token
     const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
-      throw new HttpsError('not-found', 'User not found');
+      throw new functions.https.HttpsError('not-found', 'User not found');
     }
     
     const userData = userSnapshot.val();
     const fcmToken = userData.fcmToken;
     
     if (!fcmToken) {
-      throw new HttpsError('failed-precondition', 'User does not have FCM token');
+      throw new functions.https.HttpsError('failed-precondition', 'User does not have FCM token');
     }
     
     // Send notification
@@ -229,7 +230,7 @@ exports.sendPushToUser = onCall(async (request) => {
     
   } catch (error) {
     console.error('Send push error:', error);
-    throw new HttpsError('internal', `Failed to send push: ${error.message}`);
+    throw new functions.https.HttpsError('internal', `Failed to send push: ${error.message}`);
   }
 });
 
@@ -241,16 +242,16 @@ exports.sendPushToUser = onCall(async (request) => {
  * @param {string} expiresAt - ISO date string
  * @returns {object} Results
  */
-exports.bulkAssignCourse = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated');
+exports.bulkAssignCourse = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const requesterUid = request.auth.uid;
-  const {uids, courseId, expiresAt} = request.data;
+  const requesterUid = context.auth.uid;
+  const {uids, courseId, expiresAt} = data;
   
   if (!uids || !Array.isArray(uids) || !courseId) {
-    throw new HttpsError('invalid-argument', 'UIDs array and Course ID are required');
+    throw new functions.https.HttpsError('invalid-argument', 'UIDs array and Course ID are required');
   }
   
   await verifyAdmin(requesterUid);
@@ -294,20 +295,17 @@ exports.bulkAssignCourse = onCall(async (request) => {
  * @param {string} message - Notification body
  * @returns {object} Results with success/failure counts
  */
-exports.sendPushToAll = onCall({
-  cors: true,
-  region: 'us-central1'
-}, async (request) => {
+exports.sendPushToAll = functions.https.onCall(async (data, context) => {
   // Check authentication
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const requesterUid = request.auth.uid;
-  const {title, message} = request.data;
+  const requesterUid = context.auth.uid;
+  const {title, message} = data;
   
   if (!title || !message) {
-    throw new HttpsError('invalid-argument', 'Title and message are required');
+    throw new functions.https.HttpsError('invalid-argument', 'Title and message are required');
   }
   
   // Verify requester is admin
@@ -320,7 +318,7 @@ exports.sendPushToAll = onCall({
     const usersSnapshot = await admin.database().ref('/users').once('value');
     
     if (!usersSnapshot.exists()) {
-      throw new HttpsError('not-found', 'No users found');
+      throw new functions.https.HttpsError('not-found', 'No users found');
     }
     
     const tokens = [];
@@ -381,7 +379,7 @@ exports.sendPushToAll = onCall({
     
   } catch (error) {
     console.error('❌ Send push to all error:', error);
-    throw new HttpsError('internal', `Failed to send push: ${error.message}`);
+    throw new functions.https.HttpsError('internal', `Failed to send push: ${error.message}`);
   }
 });
 
@@ -391,8 +389,7 @@ exports.sendPushToAll = onCall({
  * Автоматически создаёт профиль в Realtime DB при регистрации
  * Триггер срабатывает когда пользователь регистрируется через Firebase Auth
  */
-exports.createUserProfileOnSignup = onUserCreated(async (event) => {
-  const user = event.data;
+exports.createUserProfileOnSignup = functions.auth.user().onCreate(async (user) => {
   
   const db = admin.database();
   const userRef = db.ref(`users/${user.uid}`);

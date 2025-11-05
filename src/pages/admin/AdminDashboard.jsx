@@ -3,10 +3,11 @@ import { Users, BookOpen, Shield, Settings, Bell, Send, AlertCircle } from 'luci
 import { ref, get } from 'firebase/database';
 import { database } from '../../firebase/realtimeDb';
 import { Link } from 'react-router-dom';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../../firebase/config';
+import { auth } from '../../firebase/config';
 
 export default function AdminDashboard() {
+  const user = auth.currentUser;
+  
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalCourses: 0,
@@ -95,22 +96,30 @@ export default function AdminDashboard() {
     try {
       console.log('📱 Sending push notification to all users...');
       
-      const functions = getFunctions(app, 'us-central1');
-      const sendPushToAll = httpsCallable(functions, 'sendPushToAll');
+      // Send to local backend instead of Cloud Functions
+      const BACKEND_URL = 'http://localhost:3001';
       
-      const result = await sendPushToAll({
-        title: pushTitle,
-        message: pushMessage
+      const response = await fetch(`${BACKEND_URL}/api/send-push-to-all`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: pushTitle,
+          message: pushMessage,
+          adminUid: user?.uid // Pass admin UID for logging
+        })
       });
 
-      console.log('✅ Push result:', result.data);
+      const result = await response.json();
+      console.log('✅ Push result:', result);
 
       setSendResult({
-        success: result.data.success,
-        message: result.data.message
+        success: result.success,
+        message: result.message
       });
 
-      if (result.data.success) {
+      if (result.success) {
         // Clear form on success
         setPushTitle('');
         setPushMessage('');
@@ -121,10 +130,8 @@ export default function AdminDashboard() {
       
       let errorMessage = 'Ошибка отправки';
       
-      if (error.code === 'functions/not-found') {
-        errorMessage = '⚠️ Cloud Function не найдена. Выполните: firebase deploy --only functions';
-      } else if (error.code === 'functions/permission-denied') {
-        errorMessage = '🔒 Только администраторы могут отправлять уведомления';
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = '⚠️ Backend не запущен. Выполните: cd backend && npm start';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -295,21 +302,6 @@ export default function AdminDashboard() {
           </h2>
           
           <div className="space-y-4">
-            {/* Info Banner */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                ℹ️ Требуется Blaze план для Cloud Functions. 
-                <a 
-                  href="https://console.firebase.google.com/project/akadiledu/usage/details" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-semibold ml-1"
-                >
-                  Upgrade здесь
-                </a>
-              </p>
-            </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Заголовок
