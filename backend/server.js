@@ -70,9 +70,28 @@ app.post('/api/send-push-to-all', async (req, res) => {
       }
     };
 
-    const response = await admin.messaging().sendToDevice(tokens, payload);
-
-    console.log(`✅ Success: ${response.successCount}, Failed: ${response.failureCount}`);
+    let response;
+    try {
+      response = await admin.messaging().sendToDevice(tokens, payload);
+      console.log(`✅ Success: ${response.successCount}, Failed: ${response.failureCount}`);
+      
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const invalidTokens = [];
+        response.results.forEach((result, index) => {
+          if (result.error) {
+            console.log(`❌ Invalid token ${index}:`, result.error.code);
+            invalidTokens.push(tokens[index]);
+          }
+        });
+        
+        // TODO: Clean up invalid tokens from database
+        console.log(`🗑️ Found ${invalidTokens.length} invalid tokens`);
+      }
+    } catch (sendError) {
+      console.error('❌ FCM send error:', sendError);
+      throw new Error(`FCM отправка не удалась: ${sendError.message}`);
+    }
 
     // Log to database
     if (adminUid) {

@@ -30,29 +30,39 @@ const VAPID_KEY = 'BINQDapHvjWQVn2MWslpDd1-_zpINrD29EtIM0XzoHHJ8N4U1ybgGuKdS3g11
  */
 export async function requestNotificationPermission(userId) {
   if (!messaging) {
-    console.warn('FCM not available');
+    console.warn('⚠️ FCM not available - Service Worker may not be registered');
     return null;
   }
 
   try {
+    console.log('📱 Current permission status:', Notification.permission);
+    
     // Check if already granted
     if (Notification.permission === 'granted') {
-      console.log('📱 Notification permission already granted');
+      console.log('✅ Notification permission already granted');
       return await getFCMToken(userId);
     }
 
+    // Check if denied
+    if (Notification.permission === 'denied') {
+      console.warn('❌ Notifications were denied by user. Cannot request again.');
+      alert('Push уведомления заблокированы. Разрешите в настройках браузера:\nChrome: Настройки → Конфиденциальность → Уведомления → localhost');
+      return null;
+    }
+
     // Request permission
+    console.log('🔔 Requesting notification permission...');
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
-      console.log('✅ Notification permission granted');
+      console.log('✅ Notification permission granted!');
       return await getFCMToken(userId);
     } else {
-      console.log('❌ Notification permission denied');
+      console.log('❌ Notification permission denied by user');
       return null;
     }
   } catch (error) {
-    console.error('Error requesting notification permission:', error);
+    console.error('❌ Error requesting notification permission:', error);
     return null;
   }
 }
@@ -62,28 +72,40 @@ export async function requestNotificationPermission(userId) {
  */
 async function getFCMToken(userId) {
   try {
+    console.log('🔄 Getting FCM token...');
+    console.log('VAPID Key:', VAPID_KEY.substring(0, 20) + '...');
+    
+    // Wait for service worker
+    const registration = await navigator.serviceWorker.ready;
+    console.log('✅ Service Worker ready:', registration);
+    
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: await navigator.serviceWorker.ready
+      serviceWorkerRegistration: registration
     });
     
     if (token) {
-      console.log('📱 FCM Token:', token);
+      console.log('📱 FCM Token received:', token.substring(0, 50) + '...');
       
       // Save token to database
       if (database && userId) {
         const tokenRef = ref(database, `users/${userId}/fcmToken`);
         await set(tokenRef, token);
-        console.log('✅ FCM token saved to database');
+        console.log('✅ FCM token saved to database at users/' + userId + '/fcmToken');
+      } else {
+        console.warn('⚠️ Cannot save token: database or userId missing');
       }
       
       return token;
     } else {
-      console.warn('⚠️ No FCM token received');
+      console.warn('⚠️ No FCM token received from Firebase');
       return null;
     }
   } catch (error) {
-    console.error('Error getting FCM token:', error);
+    console.error('❌ Error getting FCM token:', error);
+    if (error.code === 'messaging/permission-blocked') {
+      console.error('Permission blocked - user needs to enable in browser settings');
+    }
     return null;
   }
 }
