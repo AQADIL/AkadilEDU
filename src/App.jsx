@@ -46,30 +46,27 @@ function App() {
   const [showSessionRevokedModal, setShowSessionRevokedModal] = useState(false);
   const [localSessionId, setLocalSessionId] = useState(null);
 
-  // Clear old cache on version change
+  // Version check (without clearing PWA cache)
   useEffect(() => {
     const APP_VERSION = '2.1.0';
     const storedVersion = localStorage.getItem('app_version');
     
     if (storedVersion !== APP_VERSION) {
-      console.log('🔄 New version detected, clearing cache...');
+      console.log('🔄 New version detected:', APP_VERSION);
+      // Clear localStorage but preserve session and device IDs
+      const sessionId = localStorage.getItem('akadil_current_session');
+      const deviceId = localStorage.getItem('akadil_device_id');
+      
       localStorage.clear();
       sessionStorage.clear();
+      
+      // Restore important data
+      if (sessionId) localStorage.setItem('akadil_current_session', sessionId);
+      if (deviceId) localStorage.setItem('akadil_device_id', deviceId);
       localStorage.setItem('app_version', APP_VERSION);
       
-      // Clear service worker cache if exists
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          registrations.forEach(registration => registration.unregister());
-        });
-      }
-      
-      // Clear all caches
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-        });
-      }
+      // Service Worker will auto-update via sw.js version change
+      console.log('✅ Version updated, PWA cache preserved');
     }
   }, []);
 
