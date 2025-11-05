@@ -295,6 +295,21 @@ export default function AdminDashboard() {
           </h2>
           
           <div className="space-y-4">
+            {/* Info Banner */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-800 dark:text-blue-300">
+                ℹ️ Требуется Blaze план для Cloud Functions. 
+                <a 
+                  href="https://console.firebase.google.com/project/akadiledu/usage/details" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold ml-1"
+                >
+                  Upgrade здесь
+                </a>
+              </p>
+            </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Заголовок
