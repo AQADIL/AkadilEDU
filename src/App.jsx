@@ -262,19 +262,16 @@ function App() {
           
           // Request push notification permission after 2 seconds (give time for app to load)
           setTimeout(async () => {
-            if (!localStorage.getItem('fcm_permission_requested')) {
-              try {
-                console.log('📱 Requesting push notification permission...');
-                const token = await requestNotificationPermission(firebaseUser.uid);
-                if (token) {
-                  localStorage.setItem('fcm_permission_requested', 'true');
-                  console.log('✅ Push notifications enabled');
-                } else {
-                  console.warn('⚠️ User denied notification permission');
-                }
-              } catch (error) {
-                console.warn('⚠️ Push notification setup error:', error);
+            try {
+              console.log('📱 Requesting push notification permission...');
+              const token = await requestNotificationPermission(firebaseUser.uid);
+              if (token) {
+                console.log('✅ Push notifications enabled');
+              } else {
+                console.warn('⚠️ User denied notification permission');
               }
+            } catch (error) {
+              console.warn('⚠️ Push notification setup error:', error);
             }
           }, 2000);
         } catch (error) {
