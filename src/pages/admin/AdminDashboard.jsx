@@ -4,7 +4,6 @@ import { ref, get } from 'firebase/database';
 import { database } from '../../firebase/realtimeDb';
 import { Link } from 'react-router-dom';
 import { auth } from '../../firebase/config';
-import TestPushButton from './TestPushButton';
 
 export default function AdminDashboard() {
   const user = auth.currentUser;
@@ -259,9 +258,6 @@ export default function AdminDashboard() {
           );
         })}
       </div>
-
-      {/* Test Push Button */}
-      <TestPushButton />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
