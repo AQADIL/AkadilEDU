@@ -7,6 +7,7 @@ import CookieConsent from './components/CookieConsent';
 import EmailVerificationBanner from './components/EmailVerificationBanner';
 import SessionRevokedModal from './components/SessionRevokedModal';
 import { useSessionValidator } from './hooks/useSessionValidator';
+import { requestNotificationPermission, setupForegroundMessageListener } from './firebase/messaging';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -83,6 +84,9 @@ function App() {
     if (isFirebaseConfigured()) {
       initializeAuth();
     }
+    
+    // Setup foreground message listener
+    setupForegroundMessageListener();
   }, []);
 
   useEffect(() => {
@@ -255,6 +259,17 @@ function App() {
 
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
+          
+          // Request push notification permission (only once after login)
+          if (!localStorage.getItem('fcm_permission_requested')) {
+            try {
+              console.log('📱 Requesting push notification permission...');
+              await requestNotificationPermission(firebaseUser.uid);
+              localStorage.setItem('fcm_permission_requested', 'true');
+            } catch (error) {
+              console.warn('⚠️ Push notification setup error:', error);
+            }
+          }
         } catch (error) {
           console.error('❌ Error in auth flow:', error);
           // Don't block login completely

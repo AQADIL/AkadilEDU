@@ -1,15 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, Activity, TrendingUp } from 'lucide-react';
-import { fetchAllUsers, fetchAllCourses, fetchAdminLogs } from '../../firebase/realtimeDb';
+import { Users, BookOpen, Shield, Settings, Bell, Send, AlertCircle } from 'lucide-react';
+import { ref, get } from 'firebase/database';
+import { database } from '../../firebase/realtimeDb';
+import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalCourses: 0,
     activeUsers: 0,
-    recentActions: 0
+    recentActions: 0,
+    activeSessions: 0,
+    securityAlerts: 0,
+    storageUsed: 0,
+    revenue: 0
   });
   const [loading, setLoading] = useState(true);
+  const [systemHealth, setSystemHealth] = useState('healthy');
+  
+  // Push notification state
+  const [pushTitle, setPushTitle] = useState('');
+  const [pushMessage, setPushMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState(null);
 
   useEffect(() => {
     loadStats();
@@ -17,22 +30,97 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const [users, courses, logs] = await Promise.all([
-        fetchAllUsers(),
-        fetchAllCourses(),
-        fetchAdminLogs(10)
+      // Fetch all stats in parallel
+      const usersRef = ref(database, 'users');
+      const sessionsRef = ref(database, 'sessions');
+      const alertsRef = ref(database, 'security_alerts');
+      
+      const [usersSnap, sessionsSnap, alertsSnap] = await Promise.all([
+        get(usersRef),
+        get(sessionsRef),
+        get(alertsRef)
       ]);
 
+      const users = usersSnap.val() || {};
+      const sessions = sessionsSnap.val() || {};
+      const alerts = alertsSnap.val() || {};
+
+      // Calculate active sessions (last 30 minutes)
+      const now = Date.now();
+      const thirtyMinutes = 30 * 60 * 1000;
+      const activeSessions = Object.values(sessions).filter(
+        s => now - s.timestamp < thirtyMinutes
+      ).length;
+
+      // Calculate unresolved security alerts
+      const unresolvedAlerts = Object.values(alerts).filter(
+        a => !a.resolved
+      ).length;
+
       setStats({
-        totalUsers: users.length,
-        totalCourses: courses.length,
-        activeUsers: users.filter(u => u.status === 'active').length,
-        recentActions: logs.length
+        totalUsers: Object.keys(users).length,
+        totalCourses: 12, // Mock for now
+        activeUsers: Object.values(users).filter(u => u.isActive).length,
+        recentActions: Object.keys(sessions).length,
+        activeSessions,
+        securityAlerts: unresolvedAlerts,
+        storageUsed: 0, // Will implement with Storage API
+        revenue: 0 // Will implement with payments
       });
+
+      // Check system health
+      if (unresolvedAlerts > 10) {
+        setSystemHealth('warning');
+      } else if (unresolvedAlerts > 20) {
+        setSystemHealth('critical');
+      } else {
+        setSystemHealth('healthy');
+      }
     } catch (error) {
       console.error('Error loading stats:', error);
+      setSystemHealth('error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendPushNotification = async () => {
+    if (!pushTitle || !pushMessage) return;
+    
+    setSending(true);
+    setSendResult(null);
+    
+    try {
+      // TODO: Implement Cloud Function for FCM
+      // For now, show instruction
+      alert(
+        '📱 Push Notifications Setup Needed!\n\n' +
+        '1. Включите Cloud Messaging в Firebase Console\n' +
+        '2. Создайте Cloud Function для отправки\n' +
+        '3. Добавьте FCM SDK в приложение\n\n' +
+        'Инструкция в PUSH_NOTIFICATIONS_SETUP.md'
+      );
+      
+      setSendResult({
+        success: false,
+        message: '⚠️ Push notifications не настроены. Смотрите PUSH_NOTIFICATIONS_SETUP.md'
+      });
+      
+      // Simulate success for demo
+      // In production, call Cloud Function:
+      // const response = await fetch('/api/sendPushNotification', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ title: pushTitle, message: pushMessage })
+      // });
+      
+    } catch (error) {
+      console.error('Error sending push:', error);
+      setSendResult({
+        success: false,
+        message: 'Ошибка отправки: ' + error.message
+      });
+    } finally {
+      setSending(false);
     }
   };
 
@@ -41,25 +129,23 @@ export default function AdminDashboard() {
       icon: Users,
       label: 'Всего пользователей',
       value: stats.totalUsers,
-      color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30'
+      color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
+      link: '/admin/users'
     },
     {
       icon: BookOpen,
       label: 'Всего курсов',
       value: stats.totalCourses,
-      color: 'text-green-600 bg-green-100 dark:bg-green-900/30'
+      color: 'text-green-600 bg-green-100 dark:bg-green-900/30',
+      link: '/admin/courses'
     },
     {
-      icon: Activity,
-      label: 'Активных пользователей',
-      value: stats.activeUsers,
-      color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30'
-    },
-    {
-      icon: TrendingUp,
-      label: 'Последних действий',
-      value: stats.recentActions,
-      color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30'
+      icon: Shield,
+      label: 'Alerts безопасности',
+      value: stats.securityAlerts,
+      color: stats.securityAlerts > 0 ? 'text-red-600 bg-red-100 dark:bg-red-900/30' : 'text-gray-600 bg-gray-100 dark:bg-gray-900/30',
+      link: '/admin/security-alerts',
+      badge: stats.securityAlerts > 0 ? 'alert' : null
     }
   ];
 
@@ -83,20 +169,57 @@ export default function AdminDashboard() {
         </p>
       </div>
 
+      {/* System Health Banner */}
+      {systemHealth !== 'healthy' && (
+        <div className={`rounded-xl p-4 border-l-4 ${
+          systemHealth === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500' :
+          systemHealth === 'critical' ? 'bg-red-50 dark:bg-red-900/20 border-red-500' :
+          'bg-gray-50 dark:bg-gray-900/20 border-gray-500'
+        }`}>
+          <div className="flex items-center gap-3">
+            <AlertTriangle className={`w-5 h-5 ${
+              systemHealth === 'warning' ? 'text-yellow-600' :
+              systemHealth === 'critical' ? 'text-red-600' : 'text-gray-600'
+            }`} />
+            <div>
+              <p className="font-semibold">
+                {systemHealth === 'warning' ? '⚠️ Требует внимания' : '🚨 Критическое состояние'}
+              </p>
+              <p className="text-sm opacity-80">
+                {stats.securityAlerts > 0 && `${stats.securityAlerts} непроверенных alerts безопасности`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
-          return (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          const Card = (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                    {stat.value}
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {stat.value}
+                    </p>
+                    {stat.badge === 'online' && (
+                      <span className="flex h-3 w-3">
+                        <span className="animate-ping absolute h-3 w-3 rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative rounded-full h-3 w-3 bg-green-500"></span>
+                      </span>
+                    )}
+                    {stat.badge === 'alert' && stat.value > 0 && (
+                      <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full animate-pulse">
+                        !
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
                   <Icon className="w-6 h-6" />
@@ -104,36 +227,148 @@ export default function AdminDashboard() {
               </div>
             </div>
           );
+          
+          return stat.link ? (
+            <Link key={index} to={stat.link}>
+              {Card}
+            </Link>
+          ) : (
+            <div key={index}>{Card}</div>
+          );
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-          Быстрые действия
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="btn-primary py-3">
-            Добавить пользователя
-          </button>
-          <button className="btn-primary py-3">
-            Создать курс
-          </button>
-          <button className="btn-secondary py-3">
-            Просмотреть логи
-          </button>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Admin Tools */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Инструменты администратора
+          </h2>
+          <div className="space-y-3">
+            <Link to="/admin/users" className="block">
+              <button className="w-full btn-primary py-3 flex items-center justify-center gap-2">
+                <Users className="w-5 h-5" />
+                Управление пользователями
+              </button>
+            </Link>
+            <Link to="/admin/courses" className="block">
+              <button className="w-full btn-primary py-3 flex items-center justify-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                Управление курсами
+              </button>
+            </Link>
+            <Link to="/admin/security-alerts" className="block">
+              <button className="w-full btn-secondary py-3 flex items-center justify-center gap-2">
+                <Shield className="w-5 h-5" />
+                Security Alerts
+                {stats.securityAlerts > 0 && (
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {stats.securityAlerts}
+                  </span>
+                )}
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Push Notifications */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Bell className="w-5 h-5" />
+            Отправить Push Уведомление
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Заголовок
+              </label>
+              <input
+                type="text"
+                value={pushTitle}
+                onChange={(e) => setPushTitle(e.target.value)}
+                placeholder="Новый курс доступен!"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Сообщение
+              </label>
+              <textarea
+                value={pushMessage}
+                onChange={(e) => setPushMessage(e.target.value)}
+                placeholder="Математика 102 теперь доступна для изучения!"
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            
+            <button
+              onClick={handleSendPushNotification}
+              disabled={sending || !pushTitle || !pushMessage}
+              className="w-full btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sending ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Отправка...
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  Отправить всем пользователям
+                </>
+              )}
+            </button>
+            
+            {sendResult && (
+              <div className={`p-4 rounded-lg ${
+                sendResult.success 
+                  ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200' 
+                  : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+              }`}>
+                <p className="text-sm font-medium">
+                  {sendResult.message}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          💡 Используйте боковую панель
-        </h3>
-        <p className="text-blue-700 dark:text-blue-400">
-          Перейдите в "Пользователи" для управления пользователями или "Курсы" для управления курсами.
-        </p>
-      </div>
+      {/* Security Alerts Info */}
+      {stats.securityAlerts > 0 && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-lg p-6">
+          <div className="flex gap-4">
+            <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-2">
+                🛡️ Что такое Security Alerts?
+              </h3>
+              <p className="text-yellow-800 dark:text-yellow-400 text-sm mb-3">
+                Система автоматически отслеживает подозрительную активность:
+              </p>
+              <ul className="space-y-1 text-sm text-yellow-700 dark:text-yellow-400">
+                <li>• <strong>Вход с нового устройства</strong> - когда пользователь заходит с незнакомого браузера/компьютера</li>
+                <li>• <strong>Вход с нового IP</strong> - резкая смена локации или использование VPN</li>
+                <li>• <strong>Вход с нового города</strong> - пользователь вдруг зашел из другой страны</li>
+                <li>• <strong>Множественные попытки входа</strong> - подозрение на взлом</li>
+              </ul>
+              <div className="mt-4">
+                <Link to="/admin/security-alerts">
+                  <button className="btn-secondary text-sm py-2 px-4">
+                    Посмотреть {stats.securityAlerts} непроверенных alerts →
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

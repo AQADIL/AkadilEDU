@@ -1,4 +1,4 @@
-const CACHE_NAME = 'akadiledu-v2.1.0';
+const CACHE_NAME = 'akadiledu-v2.2.0';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -26,8 +26,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Don't cache API requests
-  if (event.request.url.includes('/api/')) {
+  // Don't cache API requests or Firebase requests
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('firebase') ||
+      event.request.url.includes('firestore') ||
+      event.request.url.includes('firebasestorage')) {
+    return;
+  }
+
+  // Don't cache dynamic JS/CSS chunks from Vite
+  const url = new URL(event.request.url);
+  if (url.pathname.match(/\.(js|css|map)$/)) {
+    // Always fetch fresh JS/CSS files to avoid MIME type issues
+    event.respondWith(fetch(event.request));
     return;
   }
 
@@ -44,12 +55,18 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
 
-        // Clone the response
-        const responseToCache = response.clone();
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
+        // Only cache images, fonts, and static assets
+        const contentType = response.headers.get('content-type');
+        if (contentType && (
+          contentType.includes('image/') ||
+          contentType.includes('font/') ||
+          contentType.includes('woff')
+        )) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
 
         return response;
       }).catch(() => {
