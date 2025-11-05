@@ -356,7 +356,7 @@ function App() {
         />
 
         {/* Main Content */}
-        <main className="lg:pl-16 pt-8 pb-16 transition-all duration-300">
+        <main className="lg:pl-16 pt-20 sm:pt-24 pb-16 transition-all duration-300">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <Suspense fallback={
               <div className="flex items-center justify-center min-h-screen">
