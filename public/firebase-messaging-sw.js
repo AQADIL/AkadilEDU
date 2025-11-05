@@ -8,7 +8,7 @@ firebase.initializeApp({
   authDomain: "akadiledu.firebaseapp.com",
   databaseURL: "https://akadiledu-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "akadiledu",
-  storageBucket: "akadiledu.firebasestorage.app",
+  storageBucket: "akadiledu.appspot.com",
   messagingSenderId: "78627994035",
   appId: "1:78627994035:web:eb93f14c26e6c9d96273c6"
 });
