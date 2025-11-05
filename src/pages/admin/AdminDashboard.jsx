@@ -95,7 +95,7 @@ export default function AdminDashboard() {
     try {
       console.log('📱 Sending push notification to all users...');
       
-      const functions = getFunctions(app);
+      const functions = getFunctions(app, 'us-central1');
       const sendPushToAll = httpsCallable(functions, 'sendPushToAll');
       
       const result = await sendPushToAll({

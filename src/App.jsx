@@ -260,16 +260,23 @@ function App() {
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
           
-          // Request push notification permission (only once after login)
-          if (!localStorage.getItem('fcm_permission_requested')) {
-            try {
-              console.log('📱 Requesting push notification permission...');
-              await requestNotificationPermission(firebaseUser.uid);
-              localStorage.setItem('fcm_permission_requested', 'true');
-            } catch (error) {
-              console.warn('⚠️ Push notification setup error:', error);
+          // Request push notification permission after 2 seconds (give time for app to load)
+          setTimeout(async () => {
+            if (!localStorage.getItem('fcm_permission_requested')) {
+              try {
+                console.log('📱 Requesting push notification permission...');
+                const token = await requestNotificationPermission(firebaseUser.uid);
+                if (token) {
+                  localStorage.setItem('fcm_permission_requested', 'true');
+                  console.log('✅ Push notifications enabled');
+                } else {
+                  console.warn('⚠️ User denied notification permission');
+                }
+              } catch (error) {
+                console.warn('⚠️ Push notification setup error:', error);
+              }
             }
-          }
+          }, 2000);
         } catch (error) {
           console.error('❌ Error in auth flow:', error);
           // Don't block login completely

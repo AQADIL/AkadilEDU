@@ -5,7 +5,7 @@
  * by authenticated admin users. All functions verify the caller's admin status.
  */
 
-const {onCall, HttpsError} = require('firebase-functions/v2/https');
+const {onCall, HttpsError, onRequest} = require('firebase-functions/v2/https');
 const {onUserCreated} = require('firebase-functions/v2/identity');
 const admin = require('firebase-admin');
 
@@ -294,7 +294,10 @@ exports.bulkAssignCourse = onCall(async (request) => {
  * @param {string} message - Notification body
  * @returns {object} Results with success/failure counts
  */
-exports.sendPushToAll = onCall(async (request) => {
+exports.sendPushToAll = onCall({
+  cors: true,
+  region: 'us-central1'
+}, async (request) => {
   // Check authentication
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'User must be authenticated');
