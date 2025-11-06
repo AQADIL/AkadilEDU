@@ -13,9 +13,6 @@ export default function MyCourses() {
         <p className="text-gray-600 dark:text-gray-400">
           Your enrolled courses will appear here...
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-          This page will be implemented with Firebase integration in Prompt 2.
-        </p>
       </div>
     </div>
   );
