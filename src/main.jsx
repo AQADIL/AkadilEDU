@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './styles/index.css';
 
-// ✅ PWA Service Worker Registration
+// ✅ Service Worker Registration (PWA + FCM Push Notifications)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js')
+      .register('/firebase-messaging-sw.js', { scope: '/' })
       .then(registration => {
         console.log('✅ Service Worker registered:', registration);
+        console.log('📱 Push notifications ready');
         
         // Check for updates periodically
         setInterval(() => {

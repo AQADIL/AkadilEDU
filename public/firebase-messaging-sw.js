@@ -1,8 +1,17 @@
-// Firebase Cloud Messaging Service Worker
+// Combined Service Worker: PWA + FCM Push Notifications
+const CACHE_NAME = 'akadiledu-v2.3.0';
+const urlsToCache = [
+  '/',
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
+];
+
+// ============ FIREBASE CLOUD MESSAGING ============
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
 
-// Initialize Firebase in the service worker
+// Initialize Firebase
 firebase.initializeApp({
   apiKey: "AIzaSyBqKkucrcXnCWsC07w3DwvPkBbhI9XJKIE",
   authDomain: "akadiledu.firebaseapp.com",
@@ -15,9 +24,9 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handle background messages
+// Handle background push messages
 messaging.onBackgroundMessage((payload) => {
-  console.log('📱 Received background message:', payload);
+  console.log('📱 [SW] Received background message:', payload);
   
   const notificationTitle = payload.notification?.title || 'AkadilEDU';
   const notificationOptions = {
@@ -25,19 +34,156 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     vibrate: [200, 100, 200],
-    data: payload.data
+    tag: 'akadiledu-notification',
+    requireInteraction: false,
+    data: payload.data || {}
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Handle notification click
+// ============ PWA CACHING ============
+
+// Install service worker
+self.addEventListener('install', (event) => {
+  console.log('🔧 [SW] Installing...');
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('✅ [SW] Cache opened');
+      return cache.addAll(urlsToCache);
+    })
+  );
+  self.skipWaiting();
+});
+
+// Activate service worker
+self.addEventListener('activate', (event) => {
+  console.log('🚀 [SW] Activated');
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('🗑️ [SW] Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  return self.clients.claim();
+});
+
+// Fetch handler with caching
+self.addEventListener('fetch', (event) => {
+  // Skip non-http(s) requests
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // Don't cache API requests or Firebase requests
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('firebase') ||
+      event.request.url.includes('firestore') ||
+      event.request.url.includes('firebasestorage')) {
+    return;
+  }
+
+  // Don't cache dynamic JS/CSS chunks
+  const url = new URL(event.request.url);
+  if (url.pathname.match(/\.(js|css|map)$/)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      if (response) {
+        return response;
+      }
+
+      return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (contentType && (
+          contentType.includes('image/') ||
+          contentType.includes('font/') ||
+          contentType.includes('woff')
+        )) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+
+        return response;
+      }).catch(() => {
+        return new Response('Network error', { status: 408 });
+      });
+    })
+  );
+});
+
+// ============ PUSH EVENT HANDLER (for browsers that don't use FCM directly) ============
+self.addEventListener('push', (event) => {
+  console.log('📱 [SW] Push event received');
+  
+  let notificationData = {
+    title: 'AkadilEDU',
+    body: 'Новое уведомление',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png'
+  };
+
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      console.log('📱 [SW] Push payload:', payload);
+      
+      if (payload.notification) {
+        notificationData.title = payload.notification.title || notificationData.title;
+        notificationData.body = payload.notification.body || notificationData.body;
+      }
+    } catch (error) {
+      console.error('❌ [SW] Error parsing push data:', error);
+      notificationData.body = event.data.text();
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      vibrate: [200, 100, 200],
+      tag: 'akadiledu-push',
+      requireInteraction: false
+    })
+  );
+});
+
+// ============ NOTIFICATION CLICK HANDLER ============
 self.addEventListener('notificationclick', (event) => {
-  console.log('🖱️ Notification clicked');
+  console.log('🖱️ [SW] Notification clicked');
   event.notification.close();
   
-  // Open the app
   event.waitUntil(
-    clients.openWindow('/')
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // If app is already open, focus it
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url === '/' && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise, open new window
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
   );
 });

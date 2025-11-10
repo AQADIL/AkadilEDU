@@ -67,38 +67,54 @@ app.post('/api/send-push-to-all', async (req, res) => {
 
     console.log(`📤 Sending to ${tokens.length} users:`, userEmails);
 
-    // Send push notifications
-    const payload = {
+    // Send push notifications using FCM HTTP v1 API (new method)
+    const messages = tokens.map(token => ({
+      token: token,
       notification: {
         title: title,
-        body: message,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png'
+        body: message
+      },
+      webpush: {
+        notification: {
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192.png'
+        }
       }
-    };
+    }));
 
-    let response;
+    let successCount = 0;
+    let failureCount = 0;
+    const invalidTokens = [];
+
     try {
-      response = await admin.messaging().sendToDevice(tokens, payload);
-      console.log(`✅ Success: ${response.successCount}, Failed: ${response.failureCount}`);
-      
-      // Remove invalid tokens
-      if (response.failureCount > 0) {
-        const invalidTokens = [];
-        response.results.forEach((result, index) => {
-          if (result.error) {
-            console.log(`❌ Invalid token ${index}:`, result.error.code);
+      // Send to each token individually (more reliable than batch)
+      const sendPromises = messages.map(async (message, index) => {
+        try {
+          await admin.messaging().send(message);
+          console.log(`✅ Sent to user ${index + 1}/${tokens.length}`);
+          successCount++;
+        } catch (error) {
+          console.log(`❌ Failed to send to user ${index + 1}: ${error.code}`);
+          failureCount++;
+          if (error.code === 'messaging/invalid-registration-token' ||
+              error.code === 'messaging/registration-token-not-registered') {
             invalidTokens.push(tokens[index]);
           }
-        });
-        
-        // TODO: Clean up invalid tokens from database
+        }
+      });
+
+      await Promise.all(sendPromises);
+      console.log(`✅ Success: ${successCount}, Failed: ${failureCount}`);
+      
+      if (invalidTokens.length > 0) {
         console.log(`🗑️ Found ${invalidTokens.length} invalid tokens`);
       }
     } catch (sendError) {
       console.error('❌ FCM send error:', sendError);
       throw new Error(`FCM отправка не удалась: ${sendError.message}`);
     }
+
+    const response = { successCount, failureCount };
 
     // Log to database
     if (adminUid) {
