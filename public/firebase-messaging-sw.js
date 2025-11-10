@@ -31,10 +31,12 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || 'AkadilEDU';
   const notificationOptions = {
     body: payload.notification?.body || 'Новое уведомление',
-    icon: '/icons/icon-192.png',
+    icon: payload.notification?.icon || '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
+    image: payload.notification?.image || payload.data?.image, // Большое фото
     vibrate: [200, 100, 200],
-    tag: 'akadiledu-notification',
+    tag: 'akadiledu-push', // Одинаковый tag предотвращает дубликаты
+    renotify: false, // Не показывать повторно если tag совпадает
     requireInteraction: false,
     data: payload.data || {}
   };
@@ -129,41 +131,12 @@ self.addEventListener('fetch', (event) => {
 });
 
 // ============ PUSH EVENT HANDLER (for browsers that don't use FCM directly) ============
+// NOTE: This is a fallback. FCM handles most push events via onBackgroundMessage above.
+// We skip this to prevent duplicates since FCM already handles it.
 self.addEventListener('push', (event) => {
-  console.log('📱 [SW] Push event received');
-  
-  let notificationData = {
-    title: 'AkadilEDU',
-    body: 'Новое уведомление',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png'
-  };
-
-  if (event.data) {
-    try {
-      const payload = event.data.json();
-      console.log('📱 [SW] Push payload:', payload);
-      
-      if (payload.notification) {
-        notificationData.title = payload.notification.title || notificationData.title;
-        notificationData.body = payload.notification.body || notificationData.body;
-      }
-    } catch (error) {
-      console.error('❌ [SW] Error parsing push data:', error);
-      notificationData.body = event.data.text();
-    }
-  }
-
-  event.waitUntil(
-    self.registration.showNotification(notificationData.title, {
-      body: notificationData.body,
-      icon: notificationData.icon,
-      badge: notificationData.badge,
-      vibrate: [200, 100, 200],
-      tag: 'akadiledu-push',
-      requireInteraction: false
-    })
-  );
+  console.log('📱 [SW] Push event received (skipping - FCM handles this)');
+  // Don't show notification here - FCM's onBackgroundMessage already does it
+  // This prevents duplicate notifications
 });
 
 // ============ NOTIFICATION CLICK HANDLER ============

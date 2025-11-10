@@ -24,7 +24,7 @@ app.use(express.json());
 // Send push to all users
 app.post('/api/send-push-to-all', async (req, res) => {
   try {
-    const { title, message, adminUid } = req.body;
+    const { title, message, imageUrl, adminUid } = req.body;
 
     if (!title || !message) {
       return res.status(400).json({ 
@@ -33,7 +33,7 @@ app.post('/api/send-push-to-all', async (req, res) => {
       });
     }
 
-    console.log(`📱 Sending push: "${title}"`);
+    console.log(`📱 Sending push: "${title}"${imageUrl ? ' with image' : ''}`);
 
     // Get all users with FCM tokens
     const usersSnapshot = await admin.database().ref('/users').once('value');
@@ -68,19 +68,30 @@ app.post('/api/send-push-to-all', async (req, res) => {
     console.log(`📤 Sending to ${tokens.length} users:`, userEmails);
 
     // Send push notifications using FCM HTTP v1 API (new method)
-    const messages = tokens.map(token => ({
-      token: token,
-      notification: {
-        title: title,
-        body: message
-      },
-      webpush: {
+    const messages = tokens.map(token => {
+      const msg = {
+        token: token,
         notification: {
-          icon: '/icons/icon-192.png',
-          badge: '/icons/icon-192.png'
+          title: title,
+          body: message
+        },
+        webpush: {
+          notification: {
+            icon: '/icons/icon-192.png',
+            badge: '/icons/icon-192.png',
+            tag: 'akadiledu-push', // Предотвращает дубликаты
+            renotify: false
+          }
         }
+      };
+
+      // Добавляем изображение если есть
+      if (imageUrl) {
+        msg.webpush.notification.image = imageUrl;
       }
-    }));
+
+      return msg;
+    });
 
     let successCount = 0;
     let failureCount = 0;

@@ -122,8 +122,11 @@ export function setupForegroundMessageListener() {
     const notificationTitle = payload.notification?.title || 'AkadilEDU';
     const notificationOptions = {
       body: payload.notification?.body || 'Новое уведомление',
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-192.png'
+      icon: payload.notification?.icon || '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      image: payload.notification?.image || payload.data?.image, // Большое фото
+      tag: 'akadiledu-push', // Предотвращает дубликаты
+      renotify: false
     };
     
     // Show notification even when app is open
