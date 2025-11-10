@@ -7,6 +7,7 @@ export default function CourseEditor({ course, isOpen, onClose }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    coverUrl: '',
     modules: {}
   });
   const [saving, setSaving] = useState(false);
@@ -16,12 +17,14 @@ export default function CourseEditor({ course, isOpen, onClose }) {
       setFormData({
         title: course.title || '',
         description: course.description || '',
+        coverUrl: course.coverUrl || '',
         modules: course.modules || {}
       });
     } else {
       setFormData({
         title: '',
         description: '',
+        coverUrl: '',
         modules: {}
       });
     }
@@ -194,6 +197,39 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                 rows={3}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
               />
+            </div>
+
+            {/* Cover URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                URL Обложки (1920x480)
+              </label>
+              <input
+                type="url"
+                value={formData.coverUrl}
+                onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
+                placeholder="https://example.com/cover.jpg"
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                📸 Рекомендуемый размер: 1920x480. Если не указать - сгенерируется красивый градиент автоматически
+              </p>
+              {formData.coverUrl && (
+                <div className="mt-3 rounded-lg overflow-hidden">
+                  <img
+                    src={formData.coverUrl}
+                    alt="Preview"
+                    className="w-full h-32 object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="hidden p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+                    ❌ Не удалось загрузить изображение. Проверьте URL.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Modules */}
