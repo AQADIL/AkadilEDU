@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, Save, MapPin, Clock, Monitor, Wifi, Smartphone, AlertTriangle, Shield } from 'lucide-react';
-import { updateUserProfile, getUserSessions } from '../../firebase/realtimeDb';
+import { X, Save, MapPin, Clock, Monitor, Wifi, Smartphone, AlertTriangle, Shield, BookOpen, Plus } from 'lucide-react';
+import { updateUserProfile, getUserSessions, getUserCourses } from '../../firebase/realtimeDb';
+import AssignCourseModal from './AssignCourseModal';
 
 export default function UserDetailDrawer({ user, isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -12,6 +13,9 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
   const [sessions, setSessions] = useState({});
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('info'); // info, sessions, courses
+  const [userCourses, setUserCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -22,8 +26,21 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
         role: user.role || 'student'
       });
       loadAuthLogs();
+      loadUserCourses();
     }
   }, [user]);
+
+  const loadUserCourses = async () => {
+    setLoadingCourses(true);
+    try {
+      const courses = await getUserCourses(user.uid);
+      setUserCourses(courses);
+    } catch (error) {
+      console.error('Error loading user courses:', error);
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
 
   const loadAuthLogs = async () => {
     try {
@@ -332,6 +349,92 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
 
           {/* Courses Tab */}
           {activeTab === 'courses' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Назначенные курсы
+                </h3>
+                <button
+                  onClick={() => setShowAssignModal(true)}
+                  className="btn-primary px-4 py-2 text-sm flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Выдать курс
+                </button>
+              </div>
+
+              {loadingCourses ? (
+                <div className="text-center py-8 text-gray-500">
+                  Загрузка...
+                </div>
+              ) : userCourses.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                  <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Курсы ещё не назначены
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {userCourses.map((course) => {
+                    const isExpired = course.enrollment?.expiryDate && course.enrollment.expiryDate < Date.now();
+                    const expiryDateStr = course.enrollment?.expiryDate 
+                      ? new Date(course.enrollment.expiryDate).toLocaleDateString('ru-RU')
+                      : 'Постоянно';
+
+                    return (
+                      <div
+                        key={course.id}
+                        className={`p-4 rounded-xl border-2 ${
+                          isExpired
+                            ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                            : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                              {course.title}
+                            </h4>
+                            <div className="flex items-center gap-3 mt-2 text-sm">
+                              <span className="text-gray-600 dark:text-gray-400">
+                                📅 {expiryDateStr}
+                              </span>
+                              {course.enrollment?.progress > 0 && (
+                                <span className="text-primary-600 dark:text-primary-400">
+                                  📊 {course.enrollment.progress}%
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {isExpired && (
+                            <span className="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full text-xs font-medium">
+                              Истёк
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Assign Course Modal */}
+          <AssignCourseModal
+            user={user}
+            isOpen={showAssignModal}
+            onClose={() => setShowAssignModal(false)}
+            onSuccess={() => {
+              loadUserCourses();
+              setShowAssignModal(false);
+            }}
+          />
+
+          {/* Purchased Courses Tab */}
+          {activeTab === 'purchasedCourses' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Купленные курсы

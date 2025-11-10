@@ -77,37 +77,19 @@ export default function CourseDetail() {
     }
   };
 
-  const getLessonIcon = (type) => {
-    switch (type) {
-      case 'homework':
-        return <FileText className="w-5 h-5" />;
-      case 'formulas':
-        return <Calculator className="w-5 h-5" />;
-      default:
-        return <Play className="w-5 h-5" />;
-    }
-  };
-
-  const getLessonTypeLabel = (type) => {
-    switch (type) {
-      case 'homework':
-        return t('courseDetail.homework');
-      case 'formulas':
-        return t('courseDetail.formulas');
-      default:
-        return t('courseDetail.video');
-    }
+  const hasAttachments = (lesson) => {
+    return !!(lesson.homeworkUrl || lesson.formulasUrl);
   };
 
   const renderLessonContent = (lesson) => {
     if (!lesson) return null;
 
-    const lessonType = lesson.type || 'video';
-
-    if (lessonType === 'video') {
-      const embedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
-      return (
-        <div className="aspect-video bg-black rounded-lg overflow-hidden">
+    const embedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
+    
+    return (
+      <div className="space-y-4">
+        {/* Видео */}
+        <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
           {embedUrl ? (
             <iframe
               src={embedUrl}
@@ -117,26 +99,54 @@ export default function CourseDetail() {
             />
           ) : (
             <div className="flex items-center justify-center h-full text-white">
-              <p>Видео недоступно</p>
+              <div className="text-center">
+                <Play className="w-16 h-16 mx-auto mb-2 opacity-50" />
+                <p>Видео недоступно</p>
+              </div>
             </div>
           )}
         </div>
-      );
-    }
 
-    // Для homework и formulas - Google Drive embed
-    const embedUrl = getGoogleDriveEmbedUrl(lesson.fileUrl || lesson.videoUrl);
-    return (
-      <div className="aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden">
-        {embedUrl ? (
-          <iframe
-            src={embedUrl}
-            className="w-full h-full"
-            allow="autoplay"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">Файл недоступен</p>
+        {/* Дополнительные материалы */}
+        {(lesson.homeworkUrl || lesson.formulasUrl) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {lesson.homeworkUrl && (
+              <button
+                onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.homeworkUrl), '_blank')}
+                className="group p-4 sm:p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/40 dark:hover:to-blue-800/40 border-2 border-blue-200 dark:border-blue-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-blue-600 dark:bg-blue-500 rounded-lg group-hover:scale-110 transition-transform">
+                    <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-blue-900 dark:text-blue-100 text-sm sm:text-base">
+                    {t('courseDetail.homework')}
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 text-left">
+                  Үй жұмысын ашыңыз
+                </p>
+              </button>
+            )}
+
+            {lesson.formulasUrl && (
+              <button
+                onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.formulasUrl), '_blank')}
+                className="group p-4 sm:p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/40 dark:hover:to-green-800/40 border-2 border-green-200 dark:border-green-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-green-600 dark:bg-green-500 rounded-lg group-hover:scale-110 transition-transform">
+                    <Calculator className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-green-900 dark:text-green-100 text-sm sm:text-base">
+                    {t('courseDetail.formulas')}
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-green-700 dark:text-green-300 text-left">
+                  Формулалар жинағын көріңіз
+                </p>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -193,9 +203,24 @@ export default function CourseDetail() {
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {selectedLesson.title}
                   </h2>
-                  <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full text-sm font-medium">
-                    {getLessonTypeLabel(selectedLesson.type)}
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                      <Play className="w-3 h-3" />
+                      {t('courseDetail.video')}
+                    </span>
+                    {selectedLesson.homeworkUrl && (
+                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                        <FileText className="w-3 h-3" />
+                        ҮЖ
+                      </span>
+                    )}
+                    {selectedLesson.formulasUrl && (
+                      <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                        <Calculator className="w-3 h-3" />
+                        Формулы
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {renderLessonContent(selectedLesson)}
                 {selectedLesson.duration && (
@@ -311,7 +336,7 @@ export default function CourseDetail() {
                                     }`} />
                                   </div>
                                 ) : (
-                                  getLessonIcon(lesson.type)
+                                  <Play className="w-5 h-5" />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -321,13 +346,27 @@ export default function CourseDetail() {
                                 }`}>
                                   {lesson.title}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                  {getLessonTypeLabel(lesson.type)}
-                                  {lesson.duration && ` • ${lesson.duration} мин`}
-                                  {!isPurchased && isHovered && (
-                                    <span className="ml-2 text-red-600 dark:text-red-400 animate-pulse">• Заблокировано</span>
+                                <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500 dark:text-gray-400">
+                                  <span className="flex items-center gap-1">
+                                    <Play className="w-3 h-3" />
+                                    {lesson.duration ? `${lesson.duration} мин` : 'Видео'}
+                                  </span>
+                                  {lesson.homeworkUrl && (
+                                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                                      <FileText className="w-3 h-3" />
+                                      ҮЖ
+                                    </span>
                                   )}
-                                </p>
+                                  {lesson.formulasUrl && (
+                                    <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                                      <Calculator className="w-3 h-3" />
+                                      Ф
+                                    </span>
+                                  )}
+                                  {!isPurchased && isHovered && (
+                                    <span className="text-red-600 dark:text-red-400 animate-pulse font-medium">• Заблокировано</span>
+                                  )}
+                                </div>
                               </div>
                               {isPurchased && (
                                 <CheckCircle className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${

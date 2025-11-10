@@ -101,10 +101,10 @@ export default function CourseEditor({ course, isOpen, onClose }) {
             ...currentLessons,
             [lessonId]: {
               title: 'Новый урок',
-              type: 'video',
               videoUrl: '',
-              fileUrl: '',
-              duration: 0
+              duration: 0,
+              homeworkUrl: '',
+              formulasUrl: ''
             }
           }
         }
@@ -288,58 +288,78 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                       {module.lessons && Object.entries(module.lessons).map(([lessonId, lesson]) => (
                         <div
                           key={lessonId}
-                          className="bg-white dark:bg-gray-600 rounded-lg p-3"
+                          className="bg-white dark:bg-gray-600 rounded-lg p-3 sm:p-4"
                         >
                           <div className="flex items-start gap-2">
-                            {lesson.type === 'video' && <Youtube className="w-5 h-5 text-red-600 mt-2 flex-shrink-0" />}
-                            {lesson.type === 'homework' && <FileText className="w-5 h-5 text-blue-600 mt-2 flex-shrink-0" />}
-                            {lesson.type === 'formulas' && <Calculator className="w-5 h-5 text-green-600 mt-2 flex-shrink-0" />}
-                            <div className="flex-1 space-y-2">
+                            <Youtube className="w-5 h-5 text-red-600 mt-2 flex-shrink-0" />
+                            <div className="flex-1 space-y-3">
+                              {/* Название урока */}
                               <input
                                 type="text"
                                 value={lesson.title}
                                 onChange={(e) => updateLesson(moduleId, lessonId, 'title', e.target.value)}
-                                className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                placeholder="Название урока"
+                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm font-medium"
+                                placeholder="📚 Название урока"
                               />
                               
-                              {/* Выбор типа */}
-                              <select
-                                value={lesson.type || 'video'}
-                                onChange={(e) => updateLesson(moduleId, lessonId, 'type', e.target.value)}
-                                className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                              >
-                                <option value="video">🎥 Видео (YouTube)</option>
-                                <option value="homework">📝 Үй жұмысы / Домашнее задание</option>
-                                <option value="formulas">📐 Формулалар / Формулы</option>
-                              </select>
-
-                              {/* URL в зависимости от типа */}
-                              {lesson.type === 'video' ? (
+                              {/* YouTube URL */}
+                              <div className="space-y-1">
+                                <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">🎥 Видео (YouTube)</label>
                                 <input
                                   type="text"
                                   value={lesson.videoUrl || ''}
                                   onChange={(e) => updateLesson(moduleId, lessonId, 'videoUrl', e.target.value)}
-                                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                  placeholder="YouTube URL: https://youtube.com/watch?v=..."
+                                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                  placeholder="https://youtube.com/watch?v=..."
                                 />
-                              ) : (
+                              </div>
+
+                              {/* Длительность */}
+                              <div className="space-y-1">
+                                <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">⏱️ Длительность</label>
                                 <input
-                                  type="text"
-                                  value={lesson.fileUrl || ''}
-                                  onChange={(e) => updateLesson(moduleId, lessonId, 'fileUrl', e.target.value)}
-                                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                  placeholder="Google Drive URL: https://drive.google.com/file/d/.../view"
+                                  type="number"
+                                  value={lesson.duration || 0}
+                                  onChange={(e) => updateLesson(moduleId, lessonId, 'duration', parseInt(e.target.value) || 0)}
+                                  className="w-full sm:w-32 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                  placeholder="Минут"
                                 />
-                              )}
-                              
-                              <input
-                                type="number"
-                                value={lesson.duration || 0}
-                                onChange={(e) => updateLesson(moduleId, lessonId, 'duration', parseInt(e.target.value) || 0)}
-                                className="w-32 px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                placeholder="Минут"
-                              />
+                              </div>
+
+                              {/* Дополнительные материалы */}
+                              <div className="pt-2 border-t border-gray-200 dark:border-gray-600 space-y-3">
+                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">📎 Дополнительные материалы (опционально)</p>
+                                
+                                {/* Домашнее задание */}
+                                <div className="space-y-1">
+                                  <label className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                    <FileText className="w-3 h-3" />
+                                    <span>Үй жұмысы / Домашнее задание (Google Drive)</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={lesson.homeworkUrl || ''}
+                                    onChange={(e) => updateLesson(moduleId, lessonId, 'homeworkUrl', e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                    placeholder="https://drive.google.com/file/d/.../view"
+                                  />
+                                </div>
+
+                                {/* Формулы */}
+                                <div className="space-y-1">
+                                  <label className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                    <Calculator className="w-3 h-3" />
+                                    <span>Формулалар / Формулы (Google Drive)</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={lesson.formulasUrl || ''}
+                                    onChange={(e) => updateLesson(moduleId, lessonId, 'formulasUrl', e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                    placeholder="https://drive.google.com/file/d/.../view"
+                                  />
+                                </div>
+                              </div>
                             </div>
                             <button
                               onClick={() => deleteLesson(moduleId, lessonId)}

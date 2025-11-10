@@ -351,7 +351,7 @@ export async function fetchAllCourses() {
   try {
     const coursesRef = ref(database, 'courses');
     const snapshot = await get(coursesRef);
-    
+
     if (snapshot.exists()) {
       const coursesData = snapshot.val();
       return Object.keys(coursesData).map(courseId => ({
@@ -436,6 +436,91 @@ export async function deleteCourse(courseId, adminUid) {
   });
   
   console.log('✅ Course deleted:', courseId);
+}
+
+/**
+ * Assign course to user with expiry date
+ */
+export async function assignCourseToUser(userId, courseId, expiryDate, adminUid) {
+  if (!database) throw new Error('Database not initialized');
+  
+  const userCourseRef = ref(database, `users/${userId}/courses/${courseId}`);
+  await set(userCourseRef, {
+    enrolledAt: Date.now(),
+    expiryDate: expiryDate || null, // null = permanent access
+    progress: 0,
+    completedLessons: {},
+    assignedBy: adminUid
+  });
+  
+  // Log admin action
+  await push(ref(database, 'adminLogs'), {
+    adminUid,
+    action: 'assignCourse',
+    payload: { userId, courseId, expiryDate },
+    ts: new Date().toISOString()
+  });
+  
+  console.log('✅ Course assigned to user:', { userId, courseId, expiryDate });
+}
+
+/**
+ * Remove course from user
+ */
+export async function removeCourseFromUser(userId, courseId, adminUid) {
+  if (!database) throw new Error('Database not initialized');
+  
+  await remove(ref(database, `users/${userId}/courses/${courseId}`));
+  
+  // Log admin action
+  await push(ref(database, 'adminLogs'), {
+    adminUid,
+    action: 'removeCourse',
+    payload: { userId, courseId },
+    ts: new Date().toISOString()
+  });
+  
+  console.log('✅ Course removed from user:', { userId, courseId });
+}
+
+/**
+ * Get user's enrolled courses
+ */
+export async function getUserCourses(userId) {
+  if (!database) return [];
+  
+  try {
+    const userCoursesRef = ref(database, `users/${userId}/courses`);
+    const snapshot = await get(userCoursesRef);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const coursesData = snapshot.val();
+    const courseIds = Object.keys(coursesData);
+    
+    // Fetch full course details
+    const coursesPromises = courseIds.map(async (courseId) => {
+      const courseRef = ref(database, `courses/${courseId}`);
+      const courseSnapshot = await get(courseRef);
+      
+      if (courseSnapshot.exists()) {
+        return {
+          id: courseId,
+          ...courseSnapshot.val(),
+          enrollment: coursesData[courseId]
+        };
+      }
+      return null;
+    });
+
+    const courses = await Promise.all(coursesPromises);
+    return courses.filter(course => course !== null);
+  } catch (error) {
+    console.error('Error fetching user courses:', error);
+    return [];
+  }
 }
 
 /**
