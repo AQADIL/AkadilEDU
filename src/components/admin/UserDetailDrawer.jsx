@@ -52,6 +52,9 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
   };
 
   const getSecurityBadge = () => {
+    // ADMINS = GODS - No security badges for them
+    if (user.role === 'admin') return null;
+
     const status = user.securityStatus;
     if (!status || status === 'low') return null;
     

@@ -7,7 +7,7 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
   const [courses, setCourses] = useState([]);
   const [userCourses, setUserCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
+  const [accessDays, setAccessDays] = useState('');
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState(false);
 
@@ -42,7 +42,10 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
 
     setAssigning(true);
     try {
-      const expiryTimestamp = expiryDate ? new Date(expiryDate).getTime() : null;
+      // Рассчитываем дату окончания на основе дней
+      const expiryTimestamp = accessDays && accessDays > 0
+        ? Date.now() + (parseInt(accessDays) * 24 * 60 * 60 * 1000)
+        : null;
       await assignCourseToUser(user.uid, selectedCourse, expiryTimestamp, auth.currentUser.uid);
       
       if (onSuccess) onSuccess();
@@ -108,21 +111,47 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
                 </select>
               </div>
 
-              {/* Expiry Date */}
+              {/* Access Days */}
               <div className="space-y-3">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Дата окончания доступа (опционально)
+                  Срок доступа (дни)
                 </label>
-                <input
-                  type="date"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-base"
-                />
+                <div className="flex gap-3">
+                  <input
+                    type="number"
+                    value={accessDays}
+                    onChange={(e) => setAccessDays(e.target.value)}
+                    min="1"
+                    placeholder="Например: 30"
+                    className="flex-1 px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-base"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAccessDays('30')}
+                      className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 text-sm font-medium"
+                    >
+                      30д
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAccessDays('90')}
+                      className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 text-sm font-medium"
+                    >
+                      90д
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAccessDays('365')}
+                      className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 text-sm font-medium"
+                    >
+                      1г
+                    </button>
+                  </div>
+                </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Если не указать - доступ будет постоянным
+                  Оставьте пустым для постоянного доступа
                 </p>
               </div>
 

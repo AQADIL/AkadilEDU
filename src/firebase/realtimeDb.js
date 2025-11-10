@@ -23,11 +23,28 @@ export { database };
 
 /**
  * Log user session with IP and device info
+ * ⚠️ ADMINS ARE NOT LOGGED - они боги системы
  */
 export async function logUserSession(uid, sessionData) {
   if (!database) {
     console.error('❌ Database not initialized in logUserSession');
     return null;
+  }
+  
+  // Проверяем роль пользователя - НЕ ЛОГИРУЕМ АДМИНОВ
+  try {
+    const userRef = ref(database, `users/${uid}`);
+    const userSnap = await get(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.val();
+      if (userData.role === 'admin') {
+        console.log('👑 Admin detected - skipping session logging');
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error('Error checking user role:', error);
   }
   
   // Валидация данных
@@ -42,20 +59,9 @@ export async function logUserSession(uid, sessionData) {
     const sessionRef = ref(database, `users/${uid}/sessions/${sessionData.sessionId}`);
     await set(sessionRef, sessionData);
     
-    // Update IP history - используем IP как ключ (заменяем точки на подчёркивания)
-    const ipKey = sessionData.ip.replace(/\./g, '_');
-    const ipHistoryRef = ref(database, `users/${uid}/ipHistory/${ipKey}`);
-    await set(ipHistoryRef, {
-      ip: sessionData.ip,
-      lastSeen: sessionData.timestamp,
-      device: sessionData.device,
-      count: 1 // TODO: increment if exists
-    });
-    
-    // Update last login
+    // Update last login (без IP для чистоты)
     await update(ref(database, `users/${uid}`), {
-      lastLogin: sessionData.timestamp,
-      lastIP: sessionData.ip
+      lastLogin: sessionData.timestamp
     });
     
     console.log('✅ Session logged for user:', uid);
@@ -87,9 +93,26 @@ export async function getUserSessions(uid) {
 
 /**
  * Create security alert for suspicious activity
+ * ⚠️ НЕ СОЗДАЕМ АЛЕРТЫ ДЛЯ АДМИНОВ
  */
 export async function createSecurityAlert(uid, alertData) {
   if (!database) return null;
+  
+  // Проверяем роль - НЕ СОЗДАЕМ АЛЕРТЫ ДЛЯ АДМИНОВ
+  try {
+    const userRef = ref(database, `users/${uid}`);
+    const userSnap = await get(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.val();
+      if (userData.role === 'admin') {
+        console.log('👑 Admin detected - skipping security alert');
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error('Error checking user role:', error);
+  }
   
   try {
     // Create alert for user
