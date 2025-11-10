@@ -224,8 +224,8 @@ export default function Courses() {
                       {course.modules ? Object.keys(course.modules).length : 0} модулей
                     </span>
                     {isPurchased(course.id) && (
-                      <span className="px-3 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-medium rounded-full flex items-center gap-1 animate-pulse">
-                        <CheckCircle className="w-3 h-3" />
+                      <span className="px-3 py-1.5 bg-green-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg">
+                        <CheckCircle className="w-3.5 h-3.5" />
                         {t('courses.purchased')}
                       </span>
                     )}
@@ -259,16 +259,16 @@ export default function Courses() {
                   {/* Action Button */}
                   <button 
                     onClick={() => handleCourseClick(course)}
-                    className={`w-full py-2.5 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-colors ${
+                    className={`w-full py-2.5 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all duration-300 ${
                       isPurchased(course.id)
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-2 border-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 shadow-lg shadow-green-500/20'
                         : 'btn-primary'
                     }`}
                   >
                     {isPurchased(course.id) ? (
                       <>
-                        <CheckCircle className="w-4 h-4" />
-                        {t('courses.openCourse')}
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-semibold">{t('courses.openCourse')}</span>
                       </>
                     ) : (
                       <>

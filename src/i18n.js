@@ -45,6 +45,8 @@ const resources = {
       'courses.coverUrlHint': '📸 Ұсынылған өлшем: 1920x480. Көрсетілмесе - әдемі градиент автоматты түрде жасалады',
       'courses.coverPreview': 'Алдын-ала қарау',
       'courses.coverLoadError': '❌ Суретті жүктеу мүмкін болмады. URL тексеріңіз.',
+      'courses.purchased': 'Сатып алынған',
+      'courses.openCourse': 'Курсты ашу',
       
       // Course Detail
       'courseDetail.backToCourses': 'Курстарға оралу',

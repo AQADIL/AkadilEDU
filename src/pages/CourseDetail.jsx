@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Lock, Unlock, Play, FileText, Calculator, Loader2, BookOpen, CheckCircle } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube } from 'lucide-react';
 import { ref, get } from 'firebase/database';
-import { database } from '../firebase/realtimeDb';
+import { database, getUserCourses } from '../firebase/realtimeDb';
+import { auth } from '../firebase/config';
 
 // Функция для преобразования Google Drive ссылки в embed
 const getGoogleDriveEmbedUrl = (url) => {
@@ -48,7 +49,25 @@ export default function CourseDetail() {
 
   useEffect(() => {
     loadCourse();
+    checkPurchaseStatus();
   }, [id]);
+
+  const checkPurchaseStatus = async () => {
+    if (!auth.currentUser) {
+      setIsPurchased(false);
+      return;
+    }
+
+    try {
+      const userCourses = await getUserCourses(auth.currentUser.uid);
+      const purchased = userCourses.some(c => c.id === id);
+      setIsPurchased(purchased);
+      console.log('✅ Purchase check:', { courseId: id, purchased });
+    } catch (error) {
+      console.error('Error checking purchase status:', error);
+      setIsPurchased(false);
+    }
+  };
 
   const loadCourse = async () => {
     if (!database) {
