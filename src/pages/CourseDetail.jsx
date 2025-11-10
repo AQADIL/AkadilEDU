@@ -43,7 +43,8 @@ export default function CourseDetail() {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
-  const [isLocked, setIsLocked] = useState(true); // По умолчанию все закрыто
+  const [isPurchased, setIsPurchased] = useState(false); // Куплен ли курс
+  const [hoveredLesson, setHoveredLesson] = useState(null);
 
   useEffect(() => {
     loadCourse();
@@ -64,8 +65,8 @@ export default function CourseDetail() {
         setCourse(courseData);
         
         // TODO: Проверить куплен ли курс пользователем
-        // Пока для демонстрации разблокируем первый урок
-        setIsLocked(false);
+        // Пока все заблокировано
+        setIsPurchased(false);
       } else {
         navigate('/courses');
       }
@@ -185,8 +186,8 @@ export default function CourseDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {selectedLesson ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+          {selectedLesson && isPurchased ? (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden animate-fade-in">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -205,14 +206,44 @@ export default function CourseDetail() {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
-              <BookOpen className="w-20 h-20 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                {t('courseDetail.courseContent')}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400">
-                Выберите урок из списка справа
-              </p>
+            <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-12 text-center border-2 border-primary-200 dark:border-primary-900">
+              <div className="max-w-md mx-auto">
+                <div className="relative inline-block mb-6">
+                  <BookOpen className="w-24 h-24 text-primary-600 dark:text-primary-400 mx-auto" />
+                  <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 rounded-full p-2">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  {t('courseDetail.courseContent')}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                  Ознакомьтесь со структурой курса справа 👉
+                </p>
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <BookOpen className="w-4 h-4" />
+                      <span>{modulesList.length} модулей</span>
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center gap-1">
+                      <Play className="w-4 h-4" />
+                      <span>
+                        {modulesList.reduce((total, module) => 
+                          total + Object.keys(module.lessons || {}).length, 0
+                        )} уроков
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button className="btn-primary px-8 py-3 text-lg font-semibold">
+                  🛒 Купить курс
+                </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                  Получите полный доступ ко всем материалам
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -252,39 +283,55 @@ export default function CourseDetail() {
                       {/* Lessons */}
                       <div className="divide-y divide-gray-200 dark:divide-gray-700">
                         {lessonsList.map((lesson, lessonIndex) => {
-                          const lessonLocked = isLocked && !(moduleIndex === 0 && lessonIndex === 0);
                           const isActive = selectedLesson?.id === lesson.id;
+                          const isHovered = hoveredLesson === lesson.id;
 
                           return (
                             <button
                               key={lesson.id}
-                              onClick={() => !lessonLocked && setSelectedLesson({ ...lesson, id: lesson.id })}
-                              disabled={lessonLocked}
-                              className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left ${
-                                isActive ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                              } ${lessonLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                              onClick={() => isPurchased && setSelectedLesson({ ...lesson, id: lesson.id })}
+                              onMouseEnter={() => setHoveredLesson(lesson.id)}
+                              onMouseLeave={() => setHoveredLesson(null)}
+                              disabled={!isPurchased}
+                              className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 text-left group ${
+                                isActive ? 'bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-600' : 'border-l-4 border-transparent'
+                              } ${
+                                isPurchased ? 'hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer' : 'cursor-not-allowed'
+                              } ${
+                                isHovered && !isPurchased ? 'bg-red-50 dark:bg-red-900/10' : ''
+                              }`}
                             >
-                              <div className={`flex-shrink-0 ${isActive ? 'text-primary-600' : 'text-gray-400'}`}>
-                                {lessonLocked ? (
-                                  <Lock className="w-5 h-5" />
+                              <div className={`flex-shrink-0 transition-all duration-200 ${
+                                isActive ? 'text-primary-600 scale-110' : !isPurchased ? 'text-gray-400' : 'text-gray-500 group-hover:text-primary-500'
+                              }`}>
+                                {!isPurchased ? (
+                                  <div className="relative">
+                                    <Lock className={`w-5 h-5 ${
+                                      isHovered ? 'animate-bounce' : ''
+                                    }`} />
+                                  </div>
                                 ) : (
                                   getLessonIcon(lesson.type)
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className={`text-sm font-medium truncate ${
-                                  isActive ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
+                                  isActive ? 'text-primary-700 dark:text-primary-300' : 
+                                  !isPurchased ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'
                                 }`}>
                                   {lesson.title}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                   {getLessonTypeLabel(lesson.type)}
                                   {lesson.duration && ` • ${lesson.duration} мин`}
+                                  {!isPurchased && isHovered && (
+                                    <span className="ml-2 text-red-600 dark:text-red-400 animate-pulse">• Заблокировано</span>
+                                  )}
                                 </p>
                               </div>
-                              {!lessonLocked && (
-                                <CheckCircle className={`w-5 h-5 flex-shrink-0 ${
-                                  isActive ? 'text-primary-600' : 'text-gray-300'
+                              {isPurchased && (
+                                <CheckCircle className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
+                                  isActive ? 'text-primary-600 scale-110' : 'text-gray-300 group-hover:text-primary-400'
                                 }`} />
                               )}
                             </button>
@@ -297,11 +344,19 @@ export default function CourseDetail() {
               </div>
             )}
 
-            {isLocked && (
-              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <p className="text-sm text-yellow-800 dark:text-yellow-300 text-center">
-                  🔒 {t('courseDetail.allLocked')}
-                </p>
+            {!isPurchased && (
+              <div className="mt-6 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <Lock className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200 mb-2">
+                      🔒 {t('courseDetail.allLocked')}
+                    </p>
+                    <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                      Приобретите курс, чтобы получить доступ ко всем материалам
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -79,7 +79,6 @@ export default function Sidebar({ isOpen, onClose }) {
   const adminMenuItems = [
     { icon: Shield, label: 'Админ Панель', path: '/admin' },
     { icon: Users, label: 'Пользователи', path: '/admin/users' },
-    { icon: BookOpen, label: 'Курсы', path: '/admin/courses' },
     { icon: AlertTriangle, label: 'Безопасность', path: '/admin/security' },
   ];
 

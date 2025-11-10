@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Plus, Trash2, Youtube, GripVertical } from 'lucide-react';
+import { X, Save, Plus, Trash2, Youtube, GripVertical, FileText, Calculator } from 'lucide-react';
 import { createCourse, updateCourse } from '../../firebase/realtimeDb';
 import { auth } from '../../firebase/config';
 
@@ -101,7 +101,9 @@ export default function CourseEditor({ course, isOpen, onClose }) {
             ...currentLessons,
             [lessonId]: {
               title: 'Новый урок',
+              type: 'video',
               videoUrl: '',
+              fileUrl: '',
               duration: 0
             }
           }
@@ -289,7 +291,9 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                           className="bg-white dark:bg-gray-600 rounded-lg p-3"
                         >
                           <div className="flex items-start gap-2">
-                            <Youtube className="w-5 h-5 text-red-600 mt-2 flex-shrink-0" />
+                            {lesson.type === 'video' && <Youtube className="w-5 h-5 text-red-600 mt-2 flex-shrink-0" />}
+                            {lesson.type === 'homework' && <FileText className="w-5 h-5 text-blue-600 mt-2 flex-shrink-0" />}
+                            {lesson.type === 'formulas' && <Calculator className="w-5 h-5 text-green-600 mt-2 flex-shrink-0" />}
                             <div className="flex-1 space-y-2">
                               <input
                                 type="text"
@@ -298,16 +302,40 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                                 className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
                                 placeholder="Название урока"
                               />
-                              <input
-                                type="text"
-                                value={lesson.videoUrl}
-                                onChange={(e) => updateLesson(moduleId, lessonId, 'videoUrl', e.target.value)}
+                              
+                              {/* Выбор типа */}
+                              <select
+                                value={lesson.type || 'video'}
+                                onChange={(e) => updateLesson(moduleId, lessonId, 'type', e.target.value)}
                                 className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                placeholder="YouTube URL или ID видео"
-                              />
+                              >
+                                <option value="video">🎥 Видео (YouTube)</option>
+                                <option value="homework">📝 Үй жұмысы / Домашнее задание</option>
+                                <option value="formulas">📐 Формулалар / Формулы</option>
+                              </select>
+
+                              {/* URL в зависимости от типа */}
+                              {lesson.type === 'video' ? (
+                                <input
+                                  type="text"
+                                  value={lesson.videoUrl || ''}
+                                  onChange={(e) => updateLesson(moduleId, lessonId, 'videoUrl', e.target.value)}
+                                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                  placeholder="YouTube URL: https://youtube.com/watch?v=..."
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={lesson.fileUrl || ''}
+                                  onChange={(e) => updateLesson(moduleId, lessonId, 'fileUrl', e.target.value)}
+                                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                  placeholder="Google Drive URL: https://drive.google.com/file/d/.../view"
+                                />
+                              )}
+                              
                               <input
                                 type="number"
-                                value={lesson.duration}
+                                value={lesson.duration || 0}
                                 onChange={(e) => updateLesson(moduleId, lessonId, 'duration', parseInt(e.target.value) || 0)}
                                 className="w-32 px-3 py-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
                                 placeholder="Минут"
