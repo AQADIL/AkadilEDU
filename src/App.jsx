@@ -441,6 +441,20 @@ function App() {
                 }
               />
               <Route
+                path="/my-courses/:id"
+                element={
+                  user ? (
+                    user.emailVerified ? (
+                      <CourseDetail />
+                    ) : (
+                      <Navigate to="/email-verification-required" />
+                    )
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
                 path="/test-ubt"
                 element={
                   user ? (

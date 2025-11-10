@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X } from 'lucide-react';
 import { ref, get } from 'firebase/database';
 import { database, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
@@ -36,9 +36,42 @@ const getYouTubeEmbedUrl = (url) => {
   return url;
 };
 
+// Мотивационные цитаты на казахском
+const motivationalQuotes = [
+  {
+    text: "Білім - күш, білім - қуат",
+    author: "Қазақ мақалы"
+  },
+  {
+    text: "Оқу - өмір бойы жалғасатын саяхат",
+    author: "Даналық"
+  },
+  {
+    text: "Үйренуге ешқашан кеш емес",
+    author: "Қазақ мақалы"
+  },
+  {
+    text: "Білімді адам - байлық иесі",
+    author: "Абай"
+  },
+  {
+    text: "Оқы, оқы, оқы - бұл табысқа жету жолы",
+    author: "Қазақ даналығы"
+  },
+  {
+    text: "Әр сабақ - жаңа мүмкіндік",
+    author: "Заманауи даналық"
+  }
+];
+
+const getRandomQuote = () => {
+  return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+};
+
 export default function CourseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   
   const [course, setCourse] = useState(null);
@@ -46,11 +79,40 @@ export default function CourseDetail() {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [isPurchased, setIsPurchased] = useState(false); // Куплен ли курс
   const [hoveredLesson, setHoveredLesson] = useState(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false); // Мобильный sidebar
+  const [completedLessons, setCompletedLessons] = useState(new Set()); // Просмотренные уроки
+  const [currentQuote] = useState(getRandomQuote()); // Случайная цитата
+  
+  // Определяем, открыт ли курс из my-courses
+  const isFromMyCourses = location.pathname.startsWith('/my-courses');
 
   useEffect(() => {
     loadCourse();
     checkPurchaseStatus();
+    loadCompletedLessons();
   }, [id]);
+
+  const loadCompletedLessons = () => {
+    // Загрузить из localStorage
+    const saved = localStorage.getItem(`completed_lessons_${id}`);
+    if (saved) {
+      setCompletedLessons(new Set(JSON.parse(saved)));
+    }
+  };
+
+  const toggleLessonComplete = (lessonId) => {
+    setCompletedLessons(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(lessonId)) {
+        newSet.delete(lessonId);
+      } else {
+        newSet.add(lessonId);
+      }
+      // Сохранить в localStorage
+      localStorage.setItem(`completed_lessons_${id}`, JSON.stringify([...newSet]));
+      return newSet;
+    });
+  };
 
   const checkPurchaseStatus = async () => {
     if (!auth.currentUser) {
@@ -128,42 +190,46 @@ export default function CourseDetail() {
 
         {/* Дополнительные материалы */}
         {(lesson.homeworkUrl || lesson.formulasUrl) && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {lesson.homeworkUrl && (
               <button
                 onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.homeworkUrl), '_blank')}
-                className="group p-4 sm:p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/40 dark:hover:to-blue-800/40 border-2 border-blue-200 dark:border-blue-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+                className="group p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/40 dark:hover:to-blue-800/40 border-2 border-blue-200 dark:border-blue-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-blue-600 dark:bg-blue-500 rounded-lg group-hover:scale-110 transition-transform">
-                    <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-600 dark:bg-blue-500 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                    <FileText className="w-5 h-5 text-white" />
                   </div>
-                  <h4 className="font-bold text-blue-900 dark:text-blue-100 text-sm sm:text-base">
-                    {t('courseDetail.homework')}
-                  </h4>
+                  <div className="text-left flex-1 min-w-0">
+                    <h4 className="font-bold text-blue-900 dark:text-blue-100 text-sm sm:text-base">
+                      Үй жұмысы
+                    </h4>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 truncate">
+                      Тапсырманы ашу
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 text-left">
-                  Үй жұмысын ашыңыз
-                </p>
               </button>
             )}
 
             {lesson.formulasUrl && (
               <button
                 onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.formulasUrl), '_blank')}
-                className="group p-4 sm:p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/40 dark:hover:to-green-800/40 border-2 border-green-200 dark:border-green-700 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+                className="group p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/40 dark:hover:to-green-800/40 border-2 border-green-200 dark:border-green-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-green-600 dark:bg-green-500 rounded-lg group-hover:scale-110 transition-transform">
-                    <Calculator className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-green-600 dark:bg-green-500 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Calculator className="w-5 h-5 text-white" />
                   </div>
-                  <h4 className="font-bold text-green-900 dark:text-green-100 text-sm sm:text-base">
-                    {t('courseDetail.formulas')}
-                  </h4>
+                  <div className="text-left flex-1 min-w-0">
+                    <h4 className="font-bold text-green-900 dark:text-green-100 text-sm sm:text-base">
+                      Формулалар жинағы
+                    </h4>
+                    <p className="text-xs text-green-700 dark:text-green-300 truncate">
+                      Барлық формулаларды көру
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-green-700 dark:text-green-300 text-left">
-                  Формулалар жинағын көріңіз
-                </p>
               </button>
             )}
           </div>
@@ -193,48 +259,215 @@ export default function CourseDetail() {
   return (
     <div className="space-y-6 pb-8">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <button
-          onClick={() => navigate('/courses')}
+          onClick={() => navigate(isFromMyCourses ? '/my-courses' : '/courses')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        
+        {/* Mobile Menu Button - только на мобилках */}
+        {isPurchased && (
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        )}
+        
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white truncate">
             {course.title}
           </h1>
           {course.description && (
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
               {course.description}
             </p>
           )}
         </div>
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <div className="absolute right-0 top-0 bottom-0 w-96 max-w-[90vw] bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-2xl overflow-y-auto animate-slide-in-right">
+            {/* Sidebar Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-primary-500 to-purple-600 text-white p-5 flex items-center justify-between z-10 shadow-lg">
+              <div>
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Курс мазмұны
+                </h3>
+                <p className="text-xs opacity-90 mt-1">
+                  {modulesList.length} модуль • {modulesList.reduce((total, module) => 
+                    total + Object.keys(module.lessons || {}).length, 0
+                  )} сабақ
+                </p>
+              </div>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Sidebar Content */}
+            <div className="p-4">
+              {modulesList.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                  Модулдер жоқ
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {modulesList.map((module, moduleIndex) => {
+                    const lessons = module.lessons || {};
+                    const lessonsList = Object.keys(lessons).map(key => ({
+                      id: key,
+                      ...lessons[key]
+                    }));
+                    
+                    const completedCount = lessonsList.filter(l => completedLessons.has(l.id)).length;
+
+                    return (
+                      <div key={module.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+                        {/* Module Header */}
+                        <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 dark:from-primary-500/20 dark:to-purple-500/20 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                              {module.title}
+                            </h4>
+                            <span className="text-xs font-semibold text-primary-600 dark:text-primary-400 px-2 py-1 bg-primary-100 dark:bg-primary-900/30 rounded-full">
+                              {completedCount}/{lessonsList.length}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Lessons */}
+                        <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                          {lessonsList.map((lesson, lessonIndex) => {
+                            const isLocked = !isPurchased;
+                            const isSelected = selectedLesson?.id === lesson.id;
+                            const isCompleted = completedLessons.has(lesson.id);
+
+                            return (
+                              <div
+                                key={lesson.id}
+                                className={`group transition-all duration-200 ${
+                                  isLocked
+                                    ? 'opacity-50'
+                                    : isSelected
+                                    ? 'bg-primary-50 dark:bg-primary-900/20'
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
+                                }`}
+                              >
+                                <div className="flex items-start gap-3 px-4 py-3">
+                                  {/* Checkbox */}
+                                  {!isLocked && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleLessonComplete(lesson.id);
+                                      }}
+                                      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${
+                                        isCompleted
+                                          ? 'bg-green-500 border-green-500 scale-110'
+                                          : 'border-gray-300 dark:border-gray-600 hover:border-primary-500'
+                                      }`}
+                                    >
+                                      {isCompleted && (
+                                        <CheckCircle className="w-4 h-4 text-white" />
+                                      )}
+                                    </button>
+                                  )}
+                                  
+                                  {/* Lesson Content */}
+                                  <button
+                                    onClick={() => {
+                                      if (!isLocked) {
+                                        setSelectedLesson(lesson);
+                                        setIsMobileSidebarOpen(false);
+                                      }
+                                    }}
+                                    disabled={isLocked}
+                                    className="flex-1 text-left min-w-0"
+                                  >
+                                    <div className="flex items-start gap-2">
+                                      {isLocked ? (
+                                        <Lock className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                                      ) : (
+                                        <Play className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                                          isSelected
+                                            ? 'text-primary-600 dark:text-primary-400'
+                                            : 'text-gray-500 dark:text-gray-400'
+                                        }`} />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <span className={`text-sm font-medium block ${
+                                          isCompleted
+                                            ? 'line-through text-gray-500 dark:text-gray-400'
+                                            : isSelected
+                                            ? 'text-primary-700 dark:text-primary-300'
+                                            : 'text-gray-700 dark:text-gray-300'
+                                        }`}>
+                                          {lesson.title}
+                                        </span>
+                                        {lesson.duration && (
+                                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            {lesson.duration} мин
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {selectedLesson && isPurchased ? (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden animate-fade-in">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white line-clamp-2">
                     {selectedLesson.title}
                   </h2>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                    <span className="px-2.5 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full text-xs font-medium flex items-center gap-1">
                       <Play className="w-3 h-3" />
                       {t('courseDetail.video')}
                     </span>
                     {selectedLesson.homeworkUrl && (
-                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                      <span className="px-2.5 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium flex items-center gap-1">
                         <FileText className="w-3 h-3" />
                         ҮЖ
                       </span>
                     )}
                     {selectedLesson.formulasUrl && (
-                      <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1">
+                      <span className="px-2.5 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs font-medium flex items-center gap-1">
                         <Calculator className="w-3 h-3" />
                         Формулы
                       </span>
@@ -244,31 +477,47 @@ export default function CourseDetail() {
                 {renderLessonContent(selectedLesson)}
                 {selectedLesson.duration && (
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-                    {t('courseEditor.duration')}: {selectedLesson.duration} {t('courseEditor.duration').toLowerCase()}
+                    {t('courseEditor.duration')}: {selectedLesson.duration} мин
                   </p>
                 )}
               </div>
             </div>
-          ) : (
-            <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-12 text-center border-2 border-primary-200 dark:border-primary-900">
+          ) : isPurchased ? (
+            // Мотивационная цитата для купленного курса
+            <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-8 sm:p-12 text-center border-2 border-primary-200 dark:border-primary-900">
               <div className="max-w-md mx-auto">
                 <div className="relative inline-block mb-6">
-                  <BookOpen className="w-24 h-24 text-primary-600 dark:text-primary-400 mx-auto" />
+                  <div className="text-6xl sm:text-7xl mb-4 animate-bounce">📚</div>
+                </div>
+                <blockquote className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">
+                  "{currentQuote.text}"
+                </blockquote>
+                <p className="text-sm sm:text-base text-primary-600 dark:text-primary-400 font-semibold">
+                  — {currentQuote.author}
+                </p>
+              </div>
+            </div>
+          ) : (
+            // Блок "Купить курс" для не купленных
+            <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-8 sm:p-12 text-center border-2 border-primary-200 dark:border-primary-900">
+              <div className="max-w-md mx-auto">
+                <div className="relative inline-block mb-6">
+                  <BookOpen className="w-20 h-20 sm:w-24 sm:h-24 text-primary-600 dark:text-primary-400 mx-auto" />
                   <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 rounded-full p-2">
-                    <Lock className="w-6 h-6" />
+                    <Lock className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  {t('courseDetail.courseContent')}
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Курс мазмұны
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                  Ознакомьтесь со структурой курса справа 👉
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                  Оң жақтағы құрылымды қараңыз 👉
                 </p>
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
                   <div className="flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <BookOpen className="w-4 h-4" />
-                      <span>{modulesList.length} модулей</span>
+                      <span>{modulesList.length} модуль</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center gap-1">
@@ -276,123 +525,142 @@ export default function CourseDetail() {
                       <span>
                         {modulesList.reduce((total, module) => 
                           total + Object.keys(module.lessons || {}).length, 0
-                        )} уроков
+                        )} сабақ
                       </span>
                     </div>
                   </div>
                 </div>
-                <button className="btn-primary px-8 py-3 text-lg font-semibold">
-                  🛒 Купить курс
+                <button className="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-base sm:text-lg font-semibold">
+                  🛒 Курсты сатып алу
                 </button>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-                  Получите полный доступ ко всем материалам
+                  Барлық материалдарға толық қол жеткізу
                 </p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Sidebar - Course Content */}
-        <div className="space-y-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              {t('courseDetail.courseContent')}
+        {/* Desktop Sidebar - Course Content (hidden on mobile) */}
+        <div className="hidden lg:block space-y-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-24">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-primary-600" />
+              Курс мазмұны
             </h3>
 
             {modulesList.length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                {t('courseDetail.noModules')}
+                Модулдер жоқ
               </p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
                 {modulesList.map((module, moduleIndex) => {
                   const lessons = module.lessons || {};
                   const lessonsList = Object.keys(lessons).map(key => ({
                     id: key,
                     ...lessons[key]
                   }));
+                  
+                  const completedCount = lessonsList.filter(l => completedLessons.has(l.id)).length;
 
                   return (
-                    <div key={module.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div key={module.id} className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
                       {/* Module Header */}
-                      <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                          <span className="flex items-center justify-center w-6 h-6 bg-primary-600 text-white rounded-full text-xs">
-                            {moduleIndex + 1}
-                          </span>
-                          {module.title}
-                        </h4>
+                      <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 dark:from-primary-500/20 dark:to-purple-500/20 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                            <span className="flex items-center justify-center w-6 h-6 bg-primary-600 text-white rounded-full text-xs">
+                              {moduleIndex + 1}
+                            </span>
+                            {module.title}
+                          </h4>
+                          {isPurchased && (
+                            <span className="text-xs font-semibold text-primary-600 dark:text-primary-400 px-2 py-1 bg-primary-100 dark:bg-primary-900/30 rounded-full">
+                              {completedCount}/{lessonsList.length}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Lessons */}
-                      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                      <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
                         {lessonsList.map((lesson, lessonIndex) => {
-                          const isActive = selectedLesson?.id === lesson.id;
-                          const isHovered = hoveredLesson === lesson.id;
+                          const isLocked = !isPurchased;
+                          const isSelected = selectedLesson?.id === lesson.id;
+                          const isCompleted = completedLessons.has(lesson.id);
 
                           return (
-                            <button
+                            <div
                               key={lesson.id}
-                              onClick={() => isPurchased && setSelectedLesson({ ...lesson, id: lesson.id })}
-                              onMouseEnter={() => setHoveredLesson(lesson.id)}
-                              onMouseLeave={() => setHoveredLesson(null)}
-                              disabled={!isPurchased}
-                              className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-200 text-left group ${
-                                isActive ? 'bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-600' : 'border-l-4 border-transparent'
-                              } ${
-                                isPurchased ? 'hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer' : 'cursor-not-allowed'
-                              } ${
-                                isHovered && !isPurchased ? 'bg-red-50 dark:bg-red-900/10' : ''
+                              className={`group transition-all duration-200 ${
+                                isLocked
+                                  ? 'opacity-50'
+                                  : isSelected
+                                  ? 'bg-primary-50 dark:bg-primary-900/20'
+                                  : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
                               }`}
                             >
-                              <div className={`flex-shrink-0 transition-all duration-200 ${
-                                isActive ? 'text-primary-600 scale-110' : !isPurchased ? 'text-gray-400' : 'text-gray-500 group-hover:text-primary-500'
-                              }`}>
-                                {!isPurchased ? (
-                                  <div className="relative">
-                                    <Lock className={`w-5 h-5 ${
-                                      isHovered ? 'animate-bounce' : ''
-                                    }`} />
-                                  </div>
-                                ) : (
-                                  <Play className="w-5 h-5" />
+                              <div className="flex items-start gap-3 px-4 py-3">
+                                {/* Checkbox */}
+                                {!isLocked && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleLessonComplete(lesson.id);
+                                    }}
+                                    className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${
+                                      isCompleted
+                                        ? 'bg-green-500 border-green-500 scale-110'
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-500'
+                                    }`}
+                                  >
+                                    {isCompleted && (
+                                      <CheckCircle className="w-4 h-4 text-white" />
+                                    )}
+                                  </button>
                                 )}
+                                
+                                {/* Lesson Content */}
+                                <button
+                                  onClick={() => {
+                                    if (!isLocked) {
+                                      setSelectedLesson(lesson);
+                                    }
+                                  }}
+                                  disabled={isLocked}
+                                  className="flex-1 text-left min-w-0"
+                                >
+                                  <div className="flex items-start gap-2">
+                                    {isLocked ? (
+                                      <Lock className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                                    ) : (
+                                      <Play className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                                        isSelected
+                                          ? 'text-primary-600 dark:text-primary-400'
+                                          : 'text-gray-500 dark:text-gray-400'
+                                      }`} />
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                      <span className={`text-sm font-medium block ${
+                                        isCompleted
+                                          ? 'line-through text-gray-500 dark:text-gray-400'
+                                          : isSelected
+                                          ? 'text-primary-700 dark:text-primary-300'
+                                          : 'text-gray-700 dark:text-gray-300'
+                                      }`}>
+                                        {lesson.title}
+                                      </span>
+                                      {lesson.duration && (
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                          {lesson.duration} мин
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </button>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${
-                                  isActive ? 'text-primary-700 dark:text-primary-300' : 
-                                  !isPurchased ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'
-                                }`}>
-                                  {lesson.title}
-                                </p>
-                                <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500 dark:text-gray-400">
-                                  <span className="flex items-center gap-1">
-                                    <Play className="w-3 h-3" />
-                                    {lesson.duration ? `${lesson.duration} мин` : 'Видео'}
-                                  </span>
-                                  {lesson.homeworkUrl && (
-                                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                                      <FileText className="w-3 h-3" />
-                                      ҮЖ
-                                    </span>
-                                  )}
-                                  {lesson.formulasUrl && (
-                                    <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                                      <Calculator className="w-3 h-3" />
-                                      Ф
-                                    </span>
-                                  )}
-                                  {!isPurchased && isHovered && (
-                                    <span className="text-red-600 dark:text-red-400 animate-pulse font-medium">• Заблокировано</span>
-                                  )}
-                                </div>
-                              </div>
-                              {isPurchased && (
-                                <CheckCircle className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${
-                                  isActive ? 'text-primary-600 scale-110' : 'text-gray-300 group-hover:text-primary-400'
-                                }`} />
-                              )}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -403,15 +671,15 @@ export default function CourseDetail() {
             )}
 
             {!isPurchased && (
-              <div className="mt-6 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl">
+              <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl">
                 <div className="flex items-start gap-3">
-                  <Lock className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
+                  <Lock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200 mb-2">
-                      🔒 {t('courseDetail.allLocked')}
+                    <p className="text-xs font-semibold text-yellow-900 dark:text-yellow-200 mb-1">
+                      🔒 Курс жабық
                     </p>
                     <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                      Приобретите курс, чтобы получить доступ ко всем материалам
+                      Барлық материалдарға қол жеткізу үшін курсты сатып алыңыз
                     </p>
                   </div>
                 </div>

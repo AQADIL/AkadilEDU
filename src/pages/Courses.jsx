@@ -90,10 +90,10 @@ export default function Courses() {
 
   const handleCourseClick = (course) => {
     if (isPurchased(course.id)) {
-      // Переводим на my-courses с этим курсом
-      navigate('/my-courses', { state: { selectedCourseId: course.id } });
+      // Если курс куплен, открыть в my-courses
+      navigate(`/my-courses/${course.id}`);
     } else {
-      // Переводим на детальную страницу курса
+      // Если не куплен, показать детали курса с замочками
       navigate(`/courses/${course.id}`);
     }
   };
