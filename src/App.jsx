@@ -12,6 +12,7 @@ import { requestNotificationPermission, setupForegroundMessageListener } from '.
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
 const Courses = lazy(() => import('./pages/Courses'));
+const CourseDetail = lazy(() => import('./pages/CourseDetail'));
 const MyCourses = lazy(() => import('./pages/MyCourses'));
 const TestUBT = lazy(() => import('./pages/TestUBT'));
 const Shop = lazy(() => import('./pages/Shop'));
@@ -27,7 +28,6 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 // Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
-const CoursesManagement = lazy(() => import('./pages/admin/CoursesManagement'));
 const SecurityAlerts = lazy(() => import('./pages/admin/SecurityAlerts'));
 import AdminGuard from './components/AdminGuard';
 import { storage } from './utils/storage';
@@ -413,6 +413,20 @@ function App() {
                 }
               />
               <Route
+                path="/courses/:id"
+                element={
+                  user ? (
+                    user.emailVerified ? (
+                      <CourseDetail />
+                    ) : (
+                      <Navigate to="/email-verification-required" />
+                    )
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
                 path="/my-courses"
                 element={
                   user ? (
@@ -469,14 +483,6 @@ function App() {
                 element={
                   <AdminGuard>
                     <UsersManagement />
-                  </AdminGuard>
-                }
-              />
-              <Route
-                path="/admin/courses"
-                element={
-                  <AdminGuard>
-                    <CoursesManagement />
                   </AdminGuard>
                 }
               />

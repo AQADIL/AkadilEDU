@@ -108,10 +108,10 @@ export default function Courses() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-            {showAdminControls ? 'Управление Курсами' : t('sidebar.courses')}
+            {showAdminControls ? t('courses.management') : t('sidebar.courses')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {courses.length === 0 ? 'Курсов пока нет' : `Доступно курсов: ${courses.length}`}
+            {courses.length === 0 ? t('courses.noCourses') : `${t('courses.availableCourses')}: ${courses.length}`}
           </p>
         </div>
         
@@ -124,10 +124,10 @@ export default function Courses() {
               >
                 {previewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 <span className="hidden sm:inline">
-                  {previewMode ? 'Режим админа' : 'Превью для юзеров'}
+                  {previewMode ? t('courses.adminMode') : t('courses.previewMode')}
                 </span>
                 <span className="sm:hidden">
-                  {previewMode ? 'Админ' : 'Превью'}
+                  {previewMode ? t('courses.adminMode').split(' ')[0] : t('courses.preview')}
                 </span>
               </button>
               {!previewMode && (
@@ -250,9 +250,12 @@ export default function Courses() {
                   </div>
 
                   {/* Action Button */}
-                  <button className="w-full btn-primary py-2.5 flex items-center justify-center gap-2 text-sm font-medium">
+                  <button 
+                    onClick={() => window.location.href = `/courses/${course.id}`}
+                    className="w-full btn-primary py-2.5 flex items-center justify-center gap-2 text-sm font-medium"
+                  >
                     <Play className="w-4 h-4" />
-                    Начать обучение
+                    {t('courses.viewCourse')}
                   </button>
                 </div>
               </div>
