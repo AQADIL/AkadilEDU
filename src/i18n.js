@@ -291,6 +291,8 @@ const resources = {
       'courses.coverUrlHint': '📸 Рекомендуемый размер: 1920x480. Если не указать - сгенерируется красивый градиент автоматически',
       'courses.coverPreview': 'Превью',
       'courses.coverLoadError': '❌ Не удалось загрузить изображение. Проверьте URL.',
+      'courses.purchased': 'Приобретено',
+      'courses.openCourse': 'Открыть курс',
       
       // Course Detail
       'courseDetail.backToCourses': 'Вернуться к курсам',
@@ -537,6 +539,8 @@ const resources = {
       'courses.coverUrlHint': '📸 Recommended size: 1920x480. If not specified - a beautiful gradient will be generated automatically',
       'courses.coverPreview': 'Preview',
       'courses.coverLoadError': '❌ Failed to load image. Check URL.',
+      'courses.purchased': 'Purchased',
+      'courses.openCourse': 'Open Course',
       
       // Course Detail
       'courseDetail.backToCourses': 'Back to Courses',

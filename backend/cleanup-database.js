@@ -13,7 +13,7 @@ const serviceAccount = JSON.parse(
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://akadiledu-default-rtdb.firebaseio.com'
+  databaseURL: ' https://akadiledu-default-rtdb.europe-west1.firebasedatabase.app'
 });
 
 const db = admin.database();

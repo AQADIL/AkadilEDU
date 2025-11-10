@@ -58,6 +58,7 @@ export async function getCurrentSession(uid) {
 /**
  * Revoke (выкинуть) все другие активные сессии пользователя
  * Оставляет только текущую сессию активной
+ * 👑 ADMINS = UNLIMITED - админы могут заходить с любого количества устройств
  */
 export async function revokeOtherSessions(uid, currentSessionId) {
   if (!database) {
@@ -66,6 +67,18 @@ export async function revokeOtherSessions(uid, currentSessionId) {
   }
 
   try {
+    // 👑 Проверяем роль - админы могут заходить с бесконечного количества устройств
+    const userRef = ref(database, `users/${uid}`);
+    const userSnap = await get(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.val();
+      if (userData.role === 'admin') {
+        console.log('👑 Admin detected - allowing unlimited sessions');
+        return { revoked: 0, message: 'Admin - unlimited sessions allowed' };
+      }
+    }
+
     const sessionsRef = ref(database, `users/${uid}/sessions`);
     const snapshot = await get(sessionsRef);
 

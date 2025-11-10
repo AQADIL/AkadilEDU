@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2, BookOpen, Loader2, Eye, EyeOff, Play, Clock, Users } from 'lucide-react';
-import { fetchAllCourses, deleteCourse } from '../firebase/realtimeDb';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Edit, Trash2, BookOpen, Loader2, Eye, EyeOff, Play, Clock, Users, CheckCircle } from 'lucide-react';
+import { fetchAllCourses, deleteCourse, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 import { ref, get } from 'firebase/database';
 import { database } from '../firebase/realtimeDb';
@@ -27,16 +28,18 @@ const generateCoverGradient = (title) => {
 
 export default function Courses() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [previewMode, setPreviewMode] = useState(false);
+  const [userCourses, setUserCourses] = useState([]);
 
   useEffect(() => {
     checkAdminStatus();
     loadCourses();
+    loadUserCourses();
   }, []);
 
   const checkAdminStatus = async () => {
@@ -70,6 +73,31 @@ export default function Courses() {
     }
   };
 
+  const loadUserCourses = async () => {
+    if (!auth.currentUser) return;
+    
+    try {
+      const userCoursesData = await getUserCourses(auth.currentUser.uid);
+      setUserCourses(userCoursesData);
+    } catch (error) {
+      console.error('Error loading user courses:', error);
+    }
+  };
+
+  const isPurchased = (courseId) => {
+    return userCourses.some(c => c.id === courseId);
+  };
+
+  const handleCourseClick = (course) => {
+    if (isPurchased(course.id)) {
+      // Переводим на my-courses с этим курсом
+      navigate('/my-courses', { state: { selectedCourseId: course.id } });
+    } else {
+      // Переводим на детальную страницу курса
+      navigate(`/courses/${course.id}`);
+    }
+  };
+
   const handleDelete = async (courseId) => {
     if (!confirm('Вы уверены что хотите удалить этот курс?')) return;
     
@@ -100,7 +128,7 @@ export default function Courses() {
     );
   }
 
-  const showAdminControls = isAdmin && !previewMode;
+  const showAdminControls = isAdmin;
 
   return (
     <div className="space-y-6 pb-8">
@@ -117,45 +145,18 @@ export default function Courses() {
         
         <div className="flex gap-2 flex-wrap">
           {isAdmin && (
-            <>
-              <button
-                onClick={() => setPreviewMode(!previewMode)}
-                className="btn-secondary flex items-center gap-2"
-              >
-                {previewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                <span className="hidden sm:inline">
-                  {previewMode ? t('courses.adminMode') : t('courses.previewMode')}
-                </span>
-                <span className="sm:hidden">
-                  {previewMode ? t('courses.adminMode').split(' ')[0] : t('courses.preview')}
-                </span>
-              </button>
-              {!previewMode && (
-                <button
-                  onClick={handleCreate}
-                  className="btn-primary flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span className="hidden sm:inline">Создать курс</span>
-                  <span className="sm:hidden">Создать</span>
-                </button>
-              )}
-            </>
+            <button
+              onClick={handleCreate}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">Создать курс</span>
+              <span className="sm:hidden">Создать</span>
+            </button>
           )}
         </div>
       </div>
 
-      {/* Admin Info Banner */}
-      {isAdmin && previewMode && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <p className="text-sm text-blue-800 dark:text-blue-300">
-              <strong>Режим превью:</strong> Вы видите страницу так, как её видят обычные пользователи
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Courses Grid */}
       {courses.length > 0 ? (
@@ -217,11 +218,17 @@ export default function Courses() {
                     </div>
                   )}
                   
-                  {/* Status Badge */}
-                  <div className="absolute bottom-2 left-2">
+                  {/* Status Badges */}
+                  <div className="absolute bottom-2 left-2 flex gap-2">
                     <span className="px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-xs font-medium rounded-full">
                       {course.modules ? Object.keys(course.modules).length : 0} модулей
                     </span>
+                    {isPurchased(course.id) && (
+                      <span className="px-3 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-medium rounded-full flex items-center gap-1 animate-pulse">
+                        <CheckCircle className="w-3 h-3" />
+                        {t('courses.purchased')}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -251,11 +258,24 @@ export default function Courses() {
 
                   {/* Action Button */}
                   <button 
-                    onClick={() => window.location.href = `/courses/${course.id}`}
-                    className="w-full btn-primary py-2.5 flex items-center justify-center gap-2 text-sm font-medium"
+                    onClick={() => handleCourseClick(course)}
+                    className={`w-full py-2.5 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-colors ${
+                      isPurchased(course.id)
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'btn-primary'
+                    }`}
                   >
-                    <Play className="w-4 h-4" />
-                    {t('courses.viewCourse')}
+                    {isPurchased(course.id) ? (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        {t('courses.openCourse')}
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4" />
+                        {t('courses.viewCourse')}
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
