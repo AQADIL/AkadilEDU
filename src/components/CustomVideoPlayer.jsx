@@ -49,8 +49,19 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
   const [showSettings, setShowSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   
   const speeds = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+  
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Load YouTube IFrame API
   useEffect(() => {
@@ -254,15 +265,45 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
     }
   };
   
-  // Fullscreen
+  // Fullscreen - mobile-friendly
   const toggleFullscreen = () => {
+    // For local video on iOS/mobile
+    if (!isYouTube && videoRef.current) {
+      const video = videoRef.current;
+      
+      // iOS native fullscreen
+      if (video.webkitEnterFullscreen) {
+        if (video.webkitDisplayingFullscreen) {
+          video.webkitExitFullscreen();
+        } else {
+          video.webkitEnterFullscreen();
+        }
+        return;
+      }
+      
+      // Android/other mobile fullscreen
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+        return;
+      }
+    }
+    
+    // Desktop fullscreen
     if (!playerRef.current) return;
     
-    if (!document.fullscreenElement) {
-      playerRef.current.requestFullscreen();
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (playerRef.current.requestFullscreen) {
+        playerRef.current.requestFullscreen();
+      } else if (playerRef.current.webkitRequestFullscreen) {
+        playerRef.current.webkitRequestFullscreen();
+      }
       setIsFullscreen(true);
     } else {
-      document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
       setIsFullscreen(false);
     }
   };
@@ -298,7 +339,9 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
   return (
     <div 
       ref={playerRef}
-      className="relative w-full aspect-video bg-gradient-to-br from-[#0f1724] via-[#132033] to-[#0f1724] rounded-xl overflow-hidden shadow-2xl group"
+      className={`relative w-full aspect-video bg-gradient-to-br from-[#0f1724] via-[#132033] to-[#0f1724] overflow-hidden group ${
+        isMobile ? 'rounded-lg shadow-xl' : 'rounded-xl shadow-2xl'
+      }`}
       style={{ maxWidth: '100%' }}
     >
       {/* Video Container */}
@@ -314,7 +357,11 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
             ref={videoRef}
             src={src}
             className="w-full h-full object-contain"
-            onClick={togglePlay}
+            onClick={isMobile ? undefined : togglePlay}
+            playsInline
+            preload="metadata"
+            webkit-playsinline="true"
+            x-webkit-airplay="allow"
           />
         )}
         
@@ -325,103 +372,126 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
           </div>
         )}
         
-        {/* Center Play Button */}
+        {/* Center Play Button - крупнее на мобильных */}
         {!isPlaying && !isLoading && (
           <button
             onClick={togglePlay}
-            className="absolute inset-0 m-auto w-20 h-20 flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full shadow-2xl transform transition-all duration-300 hover:scale-110 hover:shadow-cyan-500/50"
+            className={`absolute inset-0 m-auto flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full shadow-2xl transform transition-all duration-300 hover:scale-110 hover:shadow-cyan-500/50 active:scale-95 ${
+              isMobile ? 'w-24 h-24' : 'w-20 h-20'
+            }`}
           >
-            <Play className="w-10 h-10 text-white ml-1" fill="white" />
+            <Play className={`text-white ml-1 ${isMobile ? 'w-12 h-12' : 'w-10 h-10'}`} fill="white" />
           </button>
+        )}
+        
+        {/* Tap для play/pause на всём экране - под контролами */}
+        {!isLoading && isMobile && isPlaying && (
+          <div 
+            className="absolute inset-0"
+            onClick={togglePlay}
+            style={{ background: 'transparent', zIndex: 5 }}
+          />
         )}
       </div>
       
       {/* Custom Controls */}
       <div 
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent transition-all duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent transition-all duration-300 z-10 ${
           showControls || !isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
         }`}
       >
-        {/* Progress Bar */}
+        {/* Progress Bar - крупнее на мобильных */}
         <div 
           ref={progressRef}
-          className="h-2 bg-white/20 cursor-pointer group/progress hover:h-3 transition-all"
+          className={`bg-white/20 cursor-pointer group/progress transition-all ${
+            isMobile ? 'h-3' : 'h-2 hover:h-3'
+          }`}
           onClick={handleSeek}
         >
           <div 
             className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 relative transition-all"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+            <div className={`absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-lg transition-opacity ${
+              isMobile ? 'w-5 h-5 opacity-100' : 'w-4 h-4 opacity-0 group-hover/progress:opacity-100'
+            }`}></div>
           </div>
         </div>
         
-        {/* Controls Panel */}
-        <div className="px-4 py-3 flex items-center gap-4">
-          {/* Play/Pause */}
+        {/* Controls Panel - адаптивный для мобильных */}
+        <div className={`flex items-center ${isMobile ? 'px-3 py-2 gap-2' : 'px-4 py-3 gap-4'}`}>
+          {/* Play/Pause - крупнее на мобильных */}
           <button
             onClick={togglePlay}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+            className={`flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all ${
+              isMobile ? 'w-12 h-12' : 'w-10 h-10'
+            }`}
           >
             {isPlaying ? (
-              <Pause className="w-6 h-6 text-white" fill="white" />
+              <Pause className={`text-white ${isMobile ? 'w-7 h-7' : 'w-6 h-6'}`} fill="white" />
             ) : (
-              <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+              <Play className={`text-white ml-0.5 ${isMobile ? 'w-7 h-7' : 'w-6 h-6'}`} fill="white" />
             )}
           </button>
           
-          {/* Time */}
-          <div className="text-sm text-white font-medium">
+          {/* Time - меньше на мобильных */}
+          <div className={`text-white font-medium whitespace-nowrap ${isMobile ? 'text-xs' : 'text-sm'}`}>
             {formatTime(currentTime)} / {formatTime(duration)}
           </div>
           
           <div className="flex-1"></div>
           
-          {/* Volume */}
-          <div className="flex items-center gap-2 group/volume">
-            <button
-              onClick={toggleMute}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5 text-white" />
-              ) : (
-                <Volume2 className="w-5 h-5 text-white" />
-              )}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="w-0 group-hover/volume:w-20 transition-all opacity-0 group-hover/volume:opacity-100"
-              style={{
-                background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%, rgba(255,255,255,0.2) 100%)`
-              }}
-            />
-          </div>
+          {/* Volume - скрыт на мобильных (системная громкость) */}
+          {!isMobile && (
+            <div className="flex items-center gap-2 group/volume">
+              <button
+                onClick={toggleMute}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+              >
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5 text-white" />
+                ) : (
+                  <Volume2 className="w-5 h-5 text-white" />
+                )}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                className="w-0 group-hover/volume:w-20 transition-all opacity-0 group-hover/volume:opacity-100"
+                style={{
+                  background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%, rgba(255,255,255,0.2) 100%)`
+                }}
+              />
+            </div>
+          )}
           
-          {/* Speed Settings */}
+          {/* Speed Settings - упрощен на мобильных */}
           <div className="relative">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+              className={`flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all ${
+                isMobile ? 'w-12 h-12' : 'w-10 h-10'
+              }`}
             >
-              <Settings className="w-5 h-5 text-white" />
+              <Settings className={`text-white ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
             </button>
             
             {showSettings && (
-              <div className="absolute bottom-full right-0 mb-2 bg-[#132033] rounded-lg shadow-xl p-2 min-w-[120px]">
-                <div className="text-xs text-gray-400 px-2 py-1 font-semibold">Жылдамдық</div>
+              <div className={`absolute bottom-full right-0 mb-2 bg-[#132033] rounded-lg shadow-xl ${
+                isMobile ? 'p-1 min-w-[100px]' : 'p-2 min-w-[120px]'
+              }`}>
+                <div className={`text-gray-400 px-2 py-1 font-semibold ${isMobile ? 'text-xs' : 'text-xs'}`}>Жылдамдық</div>
                 {speeds.map(speed => (
                   <button
                     key={speed}
                     onClick={() => changeSpeed(speed)}
-                    className={`w-full px-3 py-2 text-sm rounded hover:bg-cyan-500/20 transition-colors text-left ${
-                      playbackRate === speed ? 'text-cyan-400 font-semibold' : 'text-white'
-                    }`}
+                    className={`w-full rounded hover:bg-cyan-500/20 active:scale-95 transition-all text-left ${
+                      isMobile ? 'px-2 py-2 text-sm' : 'px-3 py-2 text-sm'
+                    } ${playbackRate === speed ? 'text-cyan-400 font-semibold' : 'text-white'}`}
                   >
                     {speed === 1 ? 'Қалыпты' : `${speed}x`}
                   </button>
@@ -430,12 +500,14 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
             )}
           </div>
           
-          {/* Fullscreen */}
+          {/* Fullscreen - крупнее на мобильных */}
           <button
             onClick={toggleFullscreen}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+            className={`flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all ${
+              isMobile ? 'w-12 h-12' : 'w-10 h-10'
+            }`}
           >
-            <Maximize className="w-5 h-5 text-white" />
+            <Maximize className={`text-white ${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
           </button>
         </div>
       </div>
