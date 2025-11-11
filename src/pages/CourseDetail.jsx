@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calcul
 import { ref, get } from 'firebase/database';
 import { database, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
+import CustomVideoPlayer from '../components/CustomVideoPlayer';
 
 // Функция для преобразования Google Drive ссылки в embed
 const getGoogleDriveEmbedUrl = (url) => {
@@ -22,18 +23,6 @@ const getGoogleDriveEmbedUrl = (url) => {
   }
   
   return null;
-};
-
-// Функция для YouTube embed
-const getYouTubeEmbedUrl = (url) => {
-  if (!url) return null;
-  
-  const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?]+)/);
-  if (videoIdMatch && videoIdMatch[1]) {
-    return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
-  }
-  
-  return url;
 };
 
 
@@ -460,20 +449,13 @@ export default function CourseDetail() {
 
   const renderLessonContent = (lesson) => {
     if (!lesson) return null;
-
-    const embedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
     
     return (
       <div className="space-y-4">
-        {/* Видео */}
+        {/* Видео с CustomVideoPlayer */}
         <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
-          {embedUrl ? (
-            <iframe
-              src={embedUrl}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          {lesson.videoUrl ? (
+            <CustomVideoPlayer videoUrl={lesson.videoUrl} />
           ) : (
             <div className="flex items-center justify-center h-full text-white">
               <div className="text-center">
