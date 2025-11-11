@@ -164,21 +164,33 @@ export default function Courses() {
           {courses.map((course) => {
             const gradient = generateCoverGradient(course.title);
             const coverUrl = course.coverUrl;
+            const purchased = isPurchased(course.id);
             
             return (
-              <div
-                key={course.id}
-                className="group bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+              <div key={course.id} className={`group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col ${
+                purchased 
+                  ? 'border-2 border-green-500 ring-2 ring-green-500/20 animate-pulse-slow' 
+                  : 'border border-gray-200 dark:border-gray-700'
+              }`}
               >
-                {/* Cover Image */}
-                <div className="relative h-48 sm:h-56 overflow-hidden">
+                {/* Purchased Badge */}
+                {purchased && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <div className="bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg animate-bounce-slow">
+                      <CheckCircle className="w-4 h-4" />
+                      {t('courses.purchased')}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Image Container */}
+                <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-100 dark:bg-gray-700">
                   {coverUrl ? (
-                    <img
-                      src={coverUrl}
-                      alt={course.title}
+                    <img 
+                      src={coverUrl} 
+                      alt={course.title} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        // Fallback to gradient if image fails to load
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
                       }}
@@ -186,16 +198,11 @@ export default function Courses() {
                   ) : null}
                   
                   {/* Gradient Fallback */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${gradient} ${coverUrl ? 'hidden' : 'flex'} items-center justify-center`}
-                    style={{ display: coverUrl ? 'none' : 'flex' }}
+                  <div 
+                    className={`absolute inset-0 bg-gradient-to-br ${gradient} ${coverUrl ? 'hidden' : 'flex'} items-center justify-center text-white flex-col p-4`}
                   >
-                    <div className="text-center text-white p-6">
-                      <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-90" />
-                      <h3 className="text-xl font-bold opacity-90 line-clamp-2">
-                        {course.title}
-                      </h3>
-                    </div>
+                    <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-90" />
+                    <h3 className="text-xl font-bold opacity-90 line-clamp-2 text-center">{course.title}</h3>
                   </div>
 
                   {/* Admin Controls Overlay */}
@@ -204,14 +211,14 @@ export default function Courses() {
                       <button
                         onClick={() => handleEdit(course)}
                         className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors"
-                        title="Редактировать"
+                        title={t('courses.edit')}
                       >
                         <Edit className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       </button>
                       <button
                         onClick={() => handleDelete(course.id)}
                         className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
-                        title="Удалить"
+                        title={t('courses.delete')}
                       >
                         <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                       </button>
@@ -221,7 +228,7 @@ export default function Courses() {
                   {/* Status Badges */}
                   <div className="absolute bottom-2 left-2 flex gap-2">
                     <span className="px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-xs font-medium rounded-full">
-                      {course.modules ? Object.keys(course.modules).length : 0} модулей
+                      {course.modules ? Object.keys(course.modules).length : 0} {t('courses.modules')}
                     </span>
                     {isPurchased(course.id) && (
                       <span className="px-3 py-1.5 bg-green-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg">
@@ -251,7 +258,7 @@ export default function Courses() {
                     {course.enrolledCount && (
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
-                        <span>{course.enrolledCount} студентов</span>
+                        <span>{course.enrolledCount} {t('courses.students')}</span>
                       </div>
                     )}
                   </div>
@@ -286,10 +293,10 @@ export default function Courses() {
         <div className="text-center py-16 sm:py-24 bg-white dark:bg-gray-800 rounded-xl">
           <BookOpen className="w-20 h-20 text-gray-400 mx-auto mb-6" />
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Курсов пока нет
+            {t('courses.noCourses')}
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            {isAdmin ? 'Создайте первый курс для ваших студентов' : 'Скоро здесь появятся интересные курсы'}
+            {isAdmin ? t('courses.adminNoCoursesMessage') : t('courses.noCoursesMessage')}
           </p>
           {showAdminControls && (
             <button
@@ -297,7 +304,7 @@ export default function Courses() {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Создать первый курс
+              {t('courses.createFirst')}
             </button>
           )}
         </div>

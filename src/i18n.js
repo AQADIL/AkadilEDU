@@ -80,6 +80,7 @@ const resources = {
       'courseEditor.save': 'Сақтау',
       'courseEditor.saving': 'Сақталуда...',
       'courseEditor.cancel': 'Болдырмау',
+      'courseEditor.noModules': 'Модульдер жоқ. Бірінші модульді қосыңыз!',
       'courseEditor.lessonTypes': {
         'video': 'Бейне сабақ',
         'homework': 'Үй жұмысы',
@@ -328,6 +329,7 @@ const resources = {
       'courseEditor.save': 'Сохранить',
       'courseEditor.saving': 'Сохранение...',
       'courseEditor.cancel': 'Отмена',
+      'courseEditor.noModules': 'Нет модулей. Добавьте первый модуль!',
       'courseEditor.lessonTypes': {
         'video': 'Видео урок',
         'homework': 'Домашнее задание',
@@ -576,6 +578,7 @@ const resources = {
       'courseEditor.save': 'Save',
       'courseEditor.saving': 'Saving...',
       'courseEditor.cancel': 'Cancel',
+      'courseEditor.noModules': 'No modules. Add the first module!',
       'courseEditor.lessonTypes': {
         'video': 'Video Lesson',
         'homework': 'Homework',

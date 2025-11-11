@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { X, Save, Plus, Trash2, Youtube, GripVertical, FileText, Calculator } from 'lucide-react';
 import { createCourse, updateCourse } from '../../firebase/realtimeDb';
 import { auth } from '../../firebase/config';
+import { useTranslation } from 'react-i18next';
 
 export default function CourseEditor({ course, isOpen, onClose }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -161,7 +163,7 @@ export default function CourseEditor({ course, isOpen, onClose }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {course ? 'Редактировать курс' : 'Создать новый курс'}
+              {course ? t('courseEditor.editCourse') : t('courseEditor.createCourse')}
             </h2>
             <button
               onClick={onClose}
@@ -176,13 +178,13 @@ export default function CourseEditor({ course, isOpen, onClose }) {
             {/* Course Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Название курса *
+                {t('courseEditor.courseName')}
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Введите название курса"
+                placeholder={t('courseEditor.courseNamePlaceholder')}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
               />
             </div>
@@ -377,7 +379,7 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                 {Object.keys(formData.modules).length === 0 && (
                   <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <p className="text-gray-500 dark:text-gray-400">
-                      Нет модулей. Добавьте первый модуль!
+                      {t('courseEditor.noModules')}
                     </p>
                   </div>
                 )}

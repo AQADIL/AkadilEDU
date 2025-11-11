@@ -110,29 +110,22 @@ async function getFCMToken(userId) {
   }
 }
 
+let messageListenerSetup = false; // Флаг для предотвращения повторной подписки
+
 /**
  * Listen for foreground messages
  */
 export function setupForegroundMessageListener() {
-  if (!messaging) return;
+  if (!messaging || messageListenerSetup) return;
+  
+  messageListenerSetup = true; // Устанавливаем флаг
   
   onMessage(messaging, (payload) => {
     console.log('📱 Foreground message received:', payload);
     
-    const notificationTitle = payload.notification?.title || 'AkadilEDU';
-    const notificationOptions = {
-      body: payload.notification?.body || 'Новое уведомление',
-      icon: payload.notification?.icon || '/icons/icon-192.png',
-      badge: '/icons/icon-192.png',
-      image: payload.notification?.image || payload.data?.image, // Большое фото
-      tag: 'akadiledu-push', // Предотвращает дубликаты
-      renotify: false
-    };
-    
-    // Show notification even when app is open
-    if (Notification.permission === 'granted') {
-      new Notification(notificationTitle, notificationOptions);
-    }
+    // НЕ показываем уведомление здесь, т.к. service worker уже покажет
+    // Просто логируем для отладки
+    console.log('ℹ️ Service Worker will handle notification display');
   });
 }
 
