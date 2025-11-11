@@ -25,8 +25,8 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
   const parseVideoUrl = (url) => {
     if (!url) return { videoId: propVideoId, src: propSrc };
     
-    // Check if YouTube URL
-    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)/);
+    // Check if YouTube URL (including live streams)
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/live\/)([^&\?\/]+)/);
     if (youtubeMatch && youtubeMatch[1]) {
       return { videoId: youtubeMatch[1], src: null };
     }
@@ -116,7 +116,7 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
           rel: 0,
           iv_load_policy: 3,
           disablekb: 1,
-          fs: 0,
+          fs: 1,  // Enable fullscreen for mobile
           playsinline: 1,
           enablejsapi: 1,
           origin: window.location.origin
@@ -267,6 +267,44 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
   
   // Fullscreen - mobile-friendly
   const toggleFullscreen = () => {
+    // For YouTube - use iframe container fullscreen
+    if (isYouTube && iframeRef.current) {
+      const iframeContainer = iframeRef.current.parentElement;
+      
+      if (isMobile) {
+        // Try YouTube player API fullscreen method first
+        if (player && player.getIframe) {
+          const iframe = player.getIframe();
+          if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+          } else if (iframe.webkitRequestFullscreen) {
+            iframe.webkitRequestFullscreen();
+          } else if (iframe.webkitEnterFullscreen) {
+            iframe.webkitEnterFullscreen();
+          }
+          return;
+        }
+      }
+      
+      // Fallback to container fullscreen
+      if (iframeContainer) {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (iframeContainer.requestFullscreen) {
+            iframeContainer.requestFullscreen();
+          } else if (iframeContainer.webkitRequestFullscreen) {
+            iframeContainer.webkitRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+        return;
+      }
+    }
+    
     // For local video on iOS/mobile
     if (!isYouTube && videoRef.current) {
       const video = videoRef.current;
@@ -288,7 +326,7 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
       }
     }
     
-    // Desktop fullscreen
+    // Desktop fullscreen for player container
     if (!playerRef.current) return;
     
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -350,7 +388,7 @@ const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title
           <div 
             ref={iframeRef} 
             className="w-full h-full"
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: isMobile ? 'auto' : 'none' }}
           />
         ) : (
           <video
