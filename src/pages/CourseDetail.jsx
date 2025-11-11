@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X, Clock } from 'lucide-react';
 import { ref, get } from 'firebase/database';
 import { database, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
@@ -1014,6 +1014,63 @@ export default function CourseDetail() {
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
                   Барлық материалдарға толық қол жеткізу
                 </p>
+              </div>
+              
+              {/* Список уроков с замочками для МОБИЛЬНЫХ */}
+              <div className="lg:hidden mt-8 space-y-4">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 justify-center">
+                  <BookOpen className="w-5 h-5 text-primary-600" />
+                  Курс мазмұны
+                </h4>
+                {modulesList.map((module, moduleIndex) => {
+                  const lessons = module.lessons || {};
+                  const lessonsList = Object.keys(lessons).map(key => ({
+                    id: key,
+                    ...lessons[key]
+                  }));
+                  
+                  return (
+                    <div key={module.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+                      {/* Module Header */}
+                      <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 dark:from-primary-500/20 dark:to-purple-500/20 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h5 className="font-semibold text-gray-900 dark:text-white text-sm">
+                          {module.title}
+                        </h5>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          {lessonsList.length} сабақ
+                        </p>
+                      </div>
+                      
+                      {/* Lessons List */}
+                      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                        {lessonsList.map((lesson, lessonIndex) => (
+                          <div 
+                            key={lesson.id}
+                            className="px-4 py-3 flex items-center gap-3 opacity-60"
+                          >
+                            {/* Lock Icon */}
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            </div>
+                            
+                            {/* Lesson Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                                {lesson.title}
+                              </p>
+                              {lesson.duration && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+                                  <Clock className="w-3 h-3" />
+                                  {lesson.duration} мин
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
