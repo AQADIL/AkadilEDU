@@ -230,12 +230,6 @@ export default function Courses() {
                     <span className="px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-xs font-medium rounded-full">
                       {course.modules ? Object.keys(course.modules).length : 0} {t('courses.modules')}
                     </span>
-                    {isPurchased(course.id) && (
-                      <span className="px-3 py-1.5 bg-green-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg">
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        {t('courses.purchased')}
-                      </span>
-                    )}
                   </div>
                 </div>
 

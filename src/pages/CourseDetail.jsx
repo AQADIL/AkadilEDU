@@ -36,8 +36,42 @@ const getYouTubeEmbedUrl = (url) => {
   return url;
 };
 
-// Мотивационные цитаты на казахском - сильные, вдохновляющие, иногда жесткие
+// Мотивационные цитаты на казахском - сильные, жесткие, мотивирующие
 const motivationalQuotes = [
+  // Цитаты от Ақәділ ағай
+  {
+    text: "Оқымасаң - табыс жоқ, табыс жоқ болса - құрмет жоқ. Таңда: оқу немесе кедейлік",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Сен өзіңе ақыл айтатын адамдарды тыңдамайсың, ал өмір саған қатал сабақпен үйретеді",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Білім - жалғыз нәрсе, оны сенен ешкім ала алмайды. Ақшаны алады, денсаулықты алады, бірақ білімді - ешқашан",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Ертең деп жүрген адамның ертеңі ешқашан келмейді. Бүгін бастамасаң - мәңгі бастамайсың",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Табысты адамдар мен табыссыз адамдардың айырмашылығы - бірі істейді, екіншісі жоспарлайды",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Шаршадым деп жүрген адам әлі өз шынайы күшін көрмеген. Адам шегі - өзіне өзі қойған шек",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Оқу қиын ба? Кедейлікте өмір сүру одан да қиын. Таңдау сенде",
+    author: "Ақәділ ағай"
+  },
+  {
+    text: "Жолдастарыңмен уақытты ысырып жүрген сәтте, басқалар сенің орныңды алып жатыр",
+    author: "Ақәділ ағай"
+  },
+  // Жесткие и мотивирующие цитаты
   {
     text: "Білім - күш, білім - қуат. Білімсіз адам - соқыр адам",
     author: "Қазақ мақалы"
@@ -47,23 +81,11 @@ const motivationalQuotes = [
     author: "Өмір шындығы"
   },
   {
-    text: "Табысқа жетудің жалғыз жолы - үздіксіз білім алу",
-    author: "Стив Джобс"
-  },
-  {
-    text: "Ештеңе істемеген адам ештеңеге жетпейді. Әрекет ет!",
+    text: "Ештеңе істемеген адам ештеңеге жетпейді. Әрекет ет қазір!",
     author: "Даналық"
   },
   {
-    text: "Сенің болашағың бүгінгі әрекетіңе байланысты",
-    author: "Жігер сөзі"
-  },
-  {
-    text: "Білім алмай отырған әр минут - жоғалған мүмкіндік",
-    author: "Бенджамин Франклин"
-  },
-  {
-    text: "Үйренбеген адам - артта қалған адам. Дамы немесе қал артта",
+    text: "Үйренбеген адам - артта қалған адам. Дамы немесе өл",
     author: "Заман талабы"
   },
   {
@@ -79,10 +101,6 @@ const motivationalQuotes = [
     author: "Өмір ережесі"
   },
   {
-    text: "Жетістік үшін жұмыс істе, тыныштық үшін түсінік іздеме",
-    author: "Альберт Эйнштейн"
-  },
-  {
     text: "Сәтсіздік - жеңістің бөлшегі. Тоқтама, алға жүр!",
     author: "Томас Эдисон"
   },
@@ -95,10 +113,6 @@ const motivationalQuotes = [
     author: "Қазақ даналығы"
   },
   {
-    text: "Бір сабақ - болашаққа бір қадам. Әр күн маңызды",
-    author: "Мотивация"
-  },
-  {
     text: "Шынайы күш білімде. Күш тапқың келсе - үйрен",
     author: "Фрэнсис Бэкон"
   },
@@ -107,15 +121,43 @@ const motivationalQuotes = [
     author: "Паоло Коэльо"
   },
   {
-    text: "Мақсатқа жету үшін күн сайын қадам жаса",
-    author: "Зиг Зиглар"
-  },
-  {
     text: "Үйренуден басқа жол жоқ. Білім - жалғыз инвестиция",
     author: "Уоррен Баффет"
   },
   {
     text: "Қиындық - құдайдың сыйы. Оны бас тарт демеді, күшей деді",
+    author: "Даналық"
+  },
+  {
+    text: "Сенің болашағың бүгінгі әрекетіңе байланысты. Әрекет ет!",
+    author: "Жігер сөзі"
+  },
+  {
+    text: "Мақсатсыз адам - жел ұшыратын қағаз. Мақсат қой, жол тап",
+    author: "Өмір шындығы"
+  },
+  {
+    text: "Табыс - бұл жұмыс пен уақыттың көбейтіндісі. Еріншектікке орын жоқ",
+    author: "Заманауи даналық"
+  },
+  {
+    text: "Білмегенің үшін ұялма, үйренгің келмейтініңе ұялма",
+    author: "Қазақ мақалы"
+  },
+  {
+    text: "Әр сабақ - болашаққа инвестиция. Босқа уақыт жоқ",
+    author: "Білім философиясы"
+  },
+  {
+    text: "Өкініш - өткен күнге, оқу - келер күнге",
+    author: "Ақыл-ой"
+  },
+  {
+    text: "Жетістік өздігінен келмейді. Тер төгесің, нәтиже аласың",
+    author: "Өмір шындығы"
+  },
+  {
+    text: "Уақыт - ең қымбат ресурс. Оны білімге жұмса",
     author: "Даналық"
   }
 ];
@@ -137,16 +179,75 @@ export default function CourseDetail() {
   const [hoveredLesson, setHoveredLesson] = useState(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false); // Мобильный sidebar
   const [completedLessons, setCompletedLessons] = useState(new Set()); // Просмотренные уроки
-  const [currentQuote] = useState(getRandomQuote()); // Случайная цитата
+  const [currentQuote, setCurrentQuote] = useState(getRandomQuote()); // Случайная цитата
+  const [pullStartY, setPullStartY] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [showInstagramHint, setShowInstagramHint] = useState(false);
   
   // Определяем, открыт ли курс из my-courses
   const isFromMyCourses = location.pathname.startsWith('/my-courses');
+  
+  // Проверяем, показывали ли подсказку
+  useEffect(() => {
+    const hintShown = localStorage.getItem('instagram_hint_shown');
+    if (!hintShown && isPurchased && !selectedLesson) {
+      setTimeout(() => {
+        setShowInstagramHint(true);
+        localStorage.setItem('instagram_hint_shown', 'true');
+        // Скрываем через 8 секунд
+        setTimeout(() => setShowInstagramHint(false), 8000);
+      }, 2000);
+    }
+  }, [isPurchased, selectedLesson]);
+  
+  // Pull to refresh для смены цитаты на мобильном
+  const handleTouchStart = (e) => {
+    if (!isPurchased || selectedLesson) return;
+    const touch = e.touches[0];
+    setPullStartY(touch.clientY);
+  };
+  
+  const handleTouchMove = (e) => {
+    if (!isPurchased || selectedLesson || pullStartY === 0) return;
+    const touch = e.touches[0];
+    const distance = touch.clientY - pullStartY;
+    
+    // Только если тянем вниз и скролл в самом верху
+    if (distance > 0 && window.scrollY === 0) {
+      setPullDistance(Math.min(distance, 120));
+      setIsPulling(true);
+    }
+  };
+  
+  const handleTouchEnd = () => {
+    if (pullDistance > 80) {
+      // Смена цитаты
+      setCurrentQuote(getRandomQuote());
+    }
+    setPullStartY(0);
+    setPullDistance(0);
+    setIsPulling(false);
+  };
 
   useEffect(() => {
     loadCourse();
     checkPurchaseStatus();
     loadCompletedLessons();
-  }, [id]);
+    
+    // Добавляем обработчики для pull-to-refresh только на мобильных
+    if (window.innerWidth < 1024) {
+      document.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+      
+      return () => {
+        document.removeEventListener('touchstart', handleTouchStart);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [id, pullStartY, pullDistance, isPurchased, selectedLesson]);
 
   const loadCompletedLessons = () => {
     // Загрузить из localStorage
@@ -539,18 +640,108 @@ export default function CourseDetail() {
               </div>
             </div>
           ) : isPurchased ? (
-            // Мотивационная цитата для купленного курса
-            <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-8 sm:p-12 text-center border-2 border-primary-200 dark:border-primary-900">
-              <div className="max-w-md mx-auto">
-                <div className="relative inline-block mb-6">
-                  <div className="text-6xl sm:text-7xl mb-4 animate-bounce">📚</div>
+            // Мотивационная цитата для купленного курса - минимализм
+            <div className="relative">
+              {/* Pull indicator for mobile */}
+              {isPulling && (
+                <div 
+                  className="lg:hidden absolute -top-20 left-1/2 transform -translate-x-1/2 transition-all duration-300"
+                  style={{ opacity: pullDistance / 120 }}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="animate-bounce">
+                      <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    </div>
+                    <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">
+                      Жаңа цитата үшін тартыңыз
+                    </span>
+                  </div>
                 </div>
-                <blockquote className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">
-                  "{currentQuote.text}"
-                </blockquote>
-                <p className="text-sm sm:text-base text-primary-600 dark:text-primary-400 font-semibold">
-                  — {currentQuote.author}
-                </p>
+              )}
+              
+              {/* Instagram Hint - показывается один раз */}
+              {showInstagramHint && (
+                <div className="fixed top-20 right-4 left-4 md:left-auto md:w-96 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-2xl p-4 z-50 animate-fade-in">
+                  <button 
+                    onClick={() => setShowInstagramHint(false)}
+                    className="absolute top-2 right-2 p-1 hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">📸</div>
+                    <div className="flex-1">
+                      <p className="font-bold text-sm mb-1">Мотивацияны бөлісіңіз!</p>
+                      <p className="text-xs opacity-90">
+                        Скриншот жасап, Instagram Stories-те бөлісіп, <span className="font-bold">@aqdlsh</span> белгілеңіз
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Минималистичная страница с цитатой */}
+              <div className="min-h-[60vh] flex items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-12 relative overflow-hidden">
+                {/* Декоративный фон */}
+                <div className="absolute inset-0 opacity-5 dark:opacity-10">
+                  <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{stopColor: 'rgb(59, 130, 246)', stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: 'rgb(147, 51, 234)', stopOpacity: 1}} />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="10" cy="10" r="40" fill="url(#grad)" />
+                    <circle cx="90" cy="90" r="40" fill="url(#grad)" />
+                  </svg>
+                </div>
+                
+                {/* Контент */}
+                <div className="relative max-w-3xl mx-auto text-center space-y-8">
+                  {/* Иконка книги */}
+                  <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 shadow-lg">
+                    <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                  
+                  {/* Цитата */}
+                  <blockquote className="space-y-6">
+                    <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+                      "{currentQuote.text}"
+                    </p>
+                    <footer className="flex items-center justify-center gap-3">
+                      <div className="h-px w-12 bg-gradient-to-r from-transparent via-primary-600 to-transparent"></div>
+                      <cite className="text-base sm:text-lg text-primary-600 dark:text-primary-400 font-semibold not-italic">
+                        {currentQuote.author}
+                      </cite>
+                      <div className="h-px w-12 bg-gradient-to-r from-transparent via-primary-600 to-transparent"></div>
+                    </footer>
+                  </blockquote>
+                  
+                  {/* Hint для мобильного */}
+                  <div className="lg:hidden pt-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-full text-xs text-gray-500 dark:text-gray-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                      <span>Жаңа цитата үшін төменнен тартыңыз</span>
+                    </div>
+                  </div>
+                  
+                  {/* Hint для desktop - можно обновить */}
+                  <div className="hidden lg:block pt-4">
+                    <button
+                      onClick={() => setCurrentQuote(getRandomQuote())}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Басқа цитата
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
