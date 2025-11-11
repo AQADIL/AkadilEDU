@@ -5,19 +5,37 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from 'lucide-react'
  * CustomVideoPlayer - Modern video player without YouTube branding
  * Supports both YouTube (via no-cookie iframe) and local MP4 files
  * 
+ * @param {string} videoUrl - Video URL (YouTube or direct MP4)
  * @param {string} videoId - YouTube video ID (e.g., "dQw4w9WgXcQ")
  * @param {string} src - Local video file path (e.g., "/videos/lesson1.mp4")
  * @param {string} title - Video title for accessibility
  * 
  * Examples:
+ * <CustomVideoPlayer videoUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
  * <CustomVideoPlayer videoId="dQw4w9WgXcQ" title="Intro to React" />
  * <CustomVideoPlayer src="/videos/lesson1.mp4" title="Getting Started" />
  */
-const CustomVideoPlayer = ({ videoId, src, title = 'Video Player' }) => {
+const CustomVideoPlayer = ({ videoUrl, videoId: propVideoId, src: propSrc, title = 'Video Player' }) => {
   const playerRef = useRef(null);
   const iframeRef = useRef(null);
   const videoRef = useRef(null);
   const progressRef = useRef(null);
+  
+  // Parse videoUrl to extract videoId or src
+  const parseVideoUrl = (url) => {
+    if (!url) return { videoId: propVideoId, src: propSrc };
+    
+    // Check if YouTube URL
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)/);
+    if (youtubeMatch && youtubeMatch[1]) {
+      return { videoId: youtubeMatch[1], src: null };
+    }
+    
+    // Otherwise treat as direct video source (MP4, etc)
+    return { videoId: null, src: url };
+  };
+  
+  const { videoId, src } = videoUrl ? parseVideoUrl(videoUrl) : { videoId: propVideoId, src: propSrc };
   
   const [isYouTube] = useState(!!videoId);
   const [player, setPlayer] = useState(null);
@@ -36,56 +54,84 @@ const CustomVideoPlayer = ({ videoId, src, title = 'Video Player' }) => {
   
   // Load YouTube IFrame API
   useEffect(() => {
-    if (!isYouTube) return;
+    if (!isYouTube || !videoId) return;
     
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-    
-    window.onYouTubeIframeAPIReady = () => {
-      initYouTubePlayer();
+    const loadYouTubeAPI = () => {
+      if (window.YT && window.YT.Player) {
+        initYouTubePlayer();
+        return;
+      }
+      
+      if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        tag.async = true;
+        
+        tag.onerror = () => {
+          console.error('Failed to load YouTube IFrame API');
+          setIsLoading(false);
+        };
+        
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+        window.onYouTubeIframeAPIReady = () => {
+          initYouTubePlayer();
+        };
+      }
     };
     
-    if (window.YT && window.YT.Player) {
-      initYouTubePlayer();
-    }
-  }, [videoId]);
+    // Delay to ensure DOM is ready
+    const timer = setTimeout(loadYouTubeAPI, 100);
+    
+    return () => clearTimeout(timer);
+  }, [videoId, isYouTube]);
   
   // Initialize YouTube Player
   const initYouTubePlayer = () => {
-    if (!iframeRef.current) return;
+    if (!iframeRef.current || !videoId) {
+      console.error('Cannot initialize YouTube player: missing ref or videoId');
+      setIsLoading(false);
+      return;
+    }
     
-    const ytPlayer = new window.YT.Player(iframeRef.current, {
-      videoId: videoId,
-      host: 'https://www.youtube-nocookie.com',
-      playerVars: {
-        controls: 0,
-        modestbranding: 1,
-        rel: 0,
-        iv_load_policy: 3,
-        disablekb: 1,
-        fs: 0,
-        playsinline: 1,
-        enablejsapi: 1,
-        origin: window.location.origin
-      },
-      events: {
-        onReady: (event) => {
-          setPlayer(event.target);
-          setDuration(event.target.getDuration());
-          setIsLoading(false);
+    try {
+      const ytPlayer = new window.YT.Player(iframeRef.current, {
+        videoId: videoId,
+        host: 'https://www.youtube-nocookie.com',
+        playerVars: {
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          iv_load_policy: 3,
+          disablekb: 1,
+          fs: 0,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
         },
-        onStateChange: (event) => {
-          setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
-          if (event.data === window.YT.PlayerState.PLAYING) {
-            startTimeUpdate();
+        events: {
+          onReady: (event) => {
+            setPlayer(event.target);
+            setDuration(event.target.getDuration());
+            setIsLoading(false);
+          },
+          onStateChange: (event) => {
+            setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              startTimeUpdate();
+            }
+          },
+          onError: (event) => {
+            console.error('YouTube player error:', event.data);
+            setIsLoading(false);
           }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Failed to create YouTube player:', error);
+      setIsLoading(false);
+    }
   };
   
   // Time update interval for YouTube
@@ -101,7 +147,7 @@ const CustomVideoPlayer = ({ videoId, src, title = 'Video Player' }) => {
   
   // Initialize Local Video
   useEffect(() => {
-    if (isYouTube || !videoRef.current) return;
+    if (isYouTube || !videoRef.current || !src) return;
     
     const video = videoRef.current;
     
@@ -118,11 +164,17 @@ const CustomVideoPlayer = ({ videoId, src, title = 'Video Player' }) => {
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => setIsPlaying(false);
     
+    const handleError = () => {
+      console.error('Video load error');
+      setIsLoading(false);
+    };
+    
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('error', handleError);
     
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -130,8 +182,9 @@ const CustomVideoPlayer = ({ videoId, src, title = 'Video Player' }) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('error', handleError);
     };
-  }, [isYouTube]);
+  }, [isYouTube, src]);
   
   // Play/Pause
   const togglePlay = () => {
