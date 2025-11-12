@@ -109,13 +109,17 @@ export default function UsersManagement() {
   
   const handleTogglePushNotifications = async (uid) => {
     try {
-      const currentStatus = pushStatuses[uid] || false;
-      await toggleUserPushNotifications(uid, !currentStatus, auth.currentUser.uid);
+      const currentStatus = pushStatuses[uid] || { enabled: false };
+      const newEnabled = !currentStatus.enabled;
+      await toggleUserPushNotifications(uid, newEnabled, auth.currentUser.uid);
+      
+      // Получаем обновленный статус
+      const updatedStatus = await getUserPushStatus(uid);
       
       // Обновляем локальное состояние
       setPushStatuses(prev => ({
         ...prev,
-        [uid]: !currentStatus
+        [uid]: updatedStatus
       }));
       
     } catch (error) {

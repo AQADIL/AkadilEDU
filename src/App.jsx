@@ -56,7 +56,7 @@ function App() {
     const storedVersion = localStorage.getItem('app_version');
     
     if (storedVersion !== APP_VERSION) {
-      console.log(' New version detected:', APP_VERSION);
+      console.log('🔄 New version detected:', APP_VERSION);
       // Clear localStorage but preserve session and device IDs
       const sessionId = localStorage.getItem('akadil_current_session');
       const deviceId = localStorage.getItem('akadil_device_id');
@@ -70,7 +70,7 @@ function App() {
       localStorage.setItem('app_version', APP_VERSION);
       
       // Service Worker will auto-update via sw.js version change
-      console.log(' Version updated, PWA cache preserved');
+      console.log('✅ Version updated, PWA cache preserved');
     }
   }, []);
 
@@ -100,7 +100,7 @@ function App() {
 
     // Set maximum loading time (10 seconds)
     const loadingTimeout = setTimeout(() => {
-      console.warn(' Loading timeout - forcing app to show');
+      console.warn('⚠️ Loading timeout - forcing app to show');
       setLoading(false);
     }, 10000);
 
@@ -117,19 +117,19 @@ function App() {
             profile = await getUserProfile(firebaseUser.uid);
             setUserProfile(profile);
           } catch (firestoreError) {
-            console.warn(' Firestore unavailable (offline?):', firestoreError.message);
+            console.warn('⚠️ Firestore unavailable (offline?):', firestoreError.message);
             // Continue without Firestore profile
           }
 
           // Check/Create Realtime DB profile
           try {
-            console.log(' Checking Realtime DB profile for:', firebaseUser.email);
+            console.log('🔍 Checking Realtime DB profile for:', firebaseUser.email);
             let rtdbProfile = await getRTDBProfile(firebaseUser.uid);
             
             if (!rtdbProfile) {
-              console.log(' Creating new Realtime DB profile...');
+              console.log('📝 Creating new Realtime DB profile...');
               const isAdmin = firebaseUser.email === 'youtub.maj@gmail.com';
-              console.log(' Role will be:', isAdmin ? 'admin' : 'student');
+              console.log('👤 Role will be:', isAdmin ? 'admin' : 'student');
               
               rtdbProfile = await createUserProfile(firebaseUser.uid, {
                 email: firebaseUser.email,
@@ -137,28 +137,23 @@ function App() {
                 role: isAdmin ? 'admin' : 'student'
               });
               
-              console.log(' Realtime DB profile created:', rtdbProfile);
+              console.log('✅ Realtime DB profile created:', rtdbProfile);
             } else {
-              console.log(' Realtime DB profile exists:', rtdbProfile);
+              console.log('✅ Realtime DB profile exists:', rtdbProfile);
               
-              // Check if user is blocked - сразу проверяем блокировку
+              // Проверяем блокировку пользователя
               if (rtdbProfile.status === 'suspended') {
                 console.warn('🚨 User account is blocked!');
                 setIsUserBlocked(true);
                 setBlockReason(rtdbProfile.suspensionReason || null);
-                
-                // Если пользователь заблокирован, прекращаем дальнейшие проверки
-                // Это нужно, чтобы показать экран блокировки и не продолжать дальнейшую логику
-                setLoading(false);
-                return;
               } else {
                 setIsUserBlocked(false);
                 setBlockReason(null);
               }
             }
           } catch (rtdbError) {
-            console.error(' Realtime DB Error:', rtdbError);
-            console.error(' Make sure Realtime Database is created in Firebase Console!');
+            console.error('❌ Realtime DB Error:', rtdbError);
+            console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
           }
 
           // Log session with IP tracking AND smart security analysis
@@ -174,49 +169,51 @@ function App() {
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
-            // SINGLE ACTIVE SESSION - только один может смотреть!
+            // 🔒 SINGLE ACTIVE SESSION - только один может смотреть!
             const { getCurrentSession, checkSessionRevoked } = await import('./firebase/sessionManager');
             const localStoredSession = localStorage.getItem('akadil_current_session');
             
-            // Проверяем сценарий 1: Если мы уже имеем сохраненную локально сессию
+            // Проверка сессии
             if (localStoredSession) {
-              // Проверим, действительна ли она или была выкинута
+              // Проверим, не была ли наша сессия отозвана
               const isRevoked = await checkSessionRevoked(firebaseUser.uid, localStoredSession);
               
               if (isRevoked) {
-                // Нашу сессию выкинули с другого устройства
-                console.warn('🚨 Our session was revoked by another device!');
+                // Нашу сессию отозвали, показываем модальное окно
+                console.warn('🚨 Old session was revoked by another device!');
                 setShowSessionRevokedModal(true);
                 setTimeout(() => {
                   localStorage.removeItem('akadil_current_session');
                   window.location.href = '/login';
                 }, 3000);
-                return; // Прекращаем дальнейшую обработку
+                return; // Прекращаем дальнейшее выполнение
               } else {
-                // Эта сессия действительна, продолжаем использовать её без обновления
-                console.log('🟢 Continuing with existing valid session: ' + localStoredSession);
+                // Если сессия действительна, просто используем ее
+                console.log('🟢 Using existing valid session:', localStoredSession);
                 setLocalSessionId(localStoredSession);
+                
+                // Не выполняем отзыв других сессий, так как сессия уже существует
               }
             } else {
-              // У нас нет сохраненной сессии, создаем новую и отменяем другие сессии
-              console.log('🆕 Creating new session: ' + sessionProfile.sessionId);
+              // Если сессия не сохранена локально, создаем новую
+              console.log('🆕 Creating new session:', sessionProfile.sessionId);
               
-              // Выкидываем других
+              // Отзываем другие сессии
               const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
               if (revokeResult.revoked > 0) {
                 console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);
               }
               
-              // Сохраняем новую сессию
+              // Сохраняем сессию локально
               localStorage.setItem('akadil_current_session', sessionProfile.sessionId);
               setLocalSessionId(sessionProfile.sessionId);
             }
             
-            // SMART SECURITY CHECK: Calculate risk score
+            // 🔒 SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
             const riskAssessment = calculateRiskScore(userSessions, sessionProfile, []);
             
-            console.log(' Risk Assessment:', {
+            console.log('🔒 Risk Assessment:', {
               score: riskAssessment.score,
               level: riskAssessment.level,
               action: riskAssessment.action,
@@ -226,7 +223,7 @@ function App() {
             // Handle based on risk level
             if (riskAssessment.action === 'soft_verify') {
               // Soft response: notify but allow access with limitations
-              console.warn(' Medium risk detected - soft verification required');
+              console.warn('⚠️ Medium risk detected - soft verification required');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'medium_risk_login',
@@ -243,7 +240,7 @@ function App() {
               
             } else if (riskAssessment.action === 'strong_verify') {
               // Strong response: require verification, limit content
-              console.error(' HIGH RISK detected - strong verification required');
+              console.error('🚨 HIGH RISK detected - strong verification required');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'high_risk_login',
@@ -261,7 +258,7 @@ function App() {
               
             } else if (riskAssessment.action === 'limit_sessions') {
               // Session limit reached
-              console.warn(' Session limit reached');
+              console.warn('⚠️ Session limit reached');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'session_limit',
@@ -278,14 +275,12 @@ function App() {
             
             // Always create alert if requiresReview
             if (riskAssessment.requiresReview) {
-              console.log(' Alert created for admin review');
+              console.log('📋 Alert created for admin review');
             }
             
           } catch (error) {
-            console.warn(' Session logging error:', error.message);
+            console.warn('⚠️ Session logging error:', error.message);
           }
-
-          // Проверка блокировки перенесена выше, сразу после загрузки профиля
 
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
@@ -293,10 +288,9 @@ function App() {
           // Request push notification permission after 2 seconds (give time for app to load)
           setTimeout(async () => {
             try {
-              console.log(' Requesting push notification permission...');
+              console.log('📱 Requesting push notification permission...');
               const token = await requestNotificationPermission(firebaseUser.uid);
               if (token) {
-                console.log(' Push notifications enabled');
                 console.log('✅ Push notifications enabled');
               } else {
                 console.warn('⚠️ User denied notification permission');

@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next';
 import { LockKeyhole, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Overlay component to show when a user's account is blocked
@@ -15,11 +15,11 @@ export default function BlockedAccountOverlay({ reason = null }) {
         </div>
         
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {t('admin.accountBlocked')}
+          {t('security.accountBlocked')}
         </h2>
         
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          {reason || t('admin.contactSupport')}
+          {reason || t('security.contactSupport')}
         </p>
         
         <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 text-left mb-6">
@@ -27,10 +27,10 @@ export default function BlockedAccountOverlay({ reason = null }) {
             <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-                {t('admin.blockedExplanation')}
+                {t('security.blockedExplanation')}
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                {t('admin.blockedInstructions')}
+                {t('security.blockedInstructions')}
               </p>
             </div>
           </div>
@@ -41,7 +41,7 @@ export default function BlockedAccountOverlay({ reason = null }) {
             href="mailto:support@akadil.edu" 
             className="btn-secondary flex-1 py-2.5 flex items-center justify-center gap-2"
           >
-            {t('admin.contactEmail')}
+            {t('security.contactEmail')}
           </a>
           <a 
             href="https://wa.me/+77471234567" 
@@ -49,7 +49,7 @@ export default function BlockedAccountOverlay({ reason = null }) {
             rel="noopener noreferrer"
             className="btn-primary flex-1 py-2.5 flex items-center justify-center gap-2"
           >
-            {t('admin.contactWhatsApp')}
+            {t('security.contactWhatsApp')}
           </a>
         </div>
       </div>

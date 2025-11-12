@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, MapPin, Clock, Monitor, Wifi, Smartphone, AlertTriangle, Shield, BookOpen, Plus, Bell, BellOff, Trash2, Edit2, Calendar } from 'lucide-react';
+import { X, Save, MapPin, Clock, Monitor, Wifi, Smartphone, AlertTriangle, Shield, BookOpen, Plus, Bell, BellOff, Trash2, Edit2, Calendar, PlusCircle, MinusCircle } from 'lucide-react';
 import { updateUserProfile, getUserSessions, getUserCourses, getUserPushStatus, removeUserCourse, updateUserCourse, toggleUserPushNotifications } from '../../firebase/realtimeDb';
 import { useTranslation } from 'react-i18next';
 import { auth } from '../../firebase/config';
@@ -60,16 +60,27 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
     }
   };
   
-  const handleUpdateCourseExpiry = async (courseId) => {
-    if (!newExpiryDays || isNaN(parseInt(newExpiryDays))) {
-      alert(t('admin.enterValidDuration'));
-      return;
+  const handleUpdateCourseExpiry = async (courseId, course, action = 'add') => {
+    // Получим текущую дату истечения курса или текущую дату, если курс истек
+    let currentExpiry = course.enrollment?.expiryDate || Date.now();
+    
+    // Если значение не указано или не является числом, используем значение по умолчанию (7 дней)
+    const daysToChange = newExpiryDays && !isNaN(parseInt(newExpiryDays)) ? parseInt(newExpiryDays) : 7;
+    
+    // Рассчитываем новую дату истечения
+    let newExpiryTimestamp;
+    
+    if (action === 'add') {
+      // Добавляем дни к текущей дате истечения
+      newExpiryTimestamp = parseInt(currentExpiry) + (daysToChange * 24 * 60 * 60 * 1000);
+    } else {
+      // Отнимаем дни от текущей даты истечения, но не меньше текущей даты
+      const minTimestamp = Date.now() + (24 * 60 * 60 * 1000); // Минимум 1 день от текущей даты
+      newExpiryTimestamp = Math.max(minTimestamp, parseInt(currentExpiry) - (daysToChange * 24 * 60 * 60 * 1000));
     }
     
     try {
-      // Новая дата истечения через указанное количество дней
-      const expiryTimestamp = Date.now() + (parseInt(newExpiryDays) * 24 * 60 * 60 * 1000);
-      await updateUserCourse(user.uid, courseId, expiryTimestamp, auth.currentUser.uid);
+      await updateUserCourse(user.uid, courseId, newExpiryTimestamp, auth.currentUser.uid);
       await loadUserCourses();
       setEditingCourseId(null);
     } catch (error) {
@@ -79,14 +90,14 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
   };
   
   const handleRemoveCourse = async (courseId) => {
-    if (!confirm(t('admin.confirmRemove'))) return;
+    if (!confirm(t('course.confirmDelete'))) return;
     
     try {
       await removeUserCourse(user.uid, courseId, auth.currentUser.uid);
       await loadUserCourses();
     } catch (error) {
       console.error('Error removing course:', error);
-      alert(t('common.error'));
+      alert('Ошибка при удалении курса');
     }
   };
   
@@ -97,7 +108,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       await loadPushStatus();
     } catch (error) {
       console.error('Error toggling push notifications:', error);
-      alert(t('common.error'));
+      alert('Ошибка при переключении уведомлений');
     }
   };
 
@@ -126,7 +137,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${colors[status]}`}>
         <AlertTriangle className="w-3 h-3" />
-        {t('security.alert')}: {status.toUpperCase()}
+        Уровень риска: {status.toUpperCase()}
       </span>
     );
   };
@@ -174,7 +185,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {t('admin.userDetails')}
+                Детали пользователя
               </h2>
               <button
                 onClick={onClose}
@@ -183,7 +194,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap mb-4">
               {getSecurityBadge()}
               
               {/* Push уведомления */}
@@ -191,22 +202,22 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                 <button
                   onClick={togglePushNotifications}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${getPushStatusStyles()}`}
-                  title={pushStatus.enabled ? t('admin.disablePush') : t('admin.enablePush')}
+                  title={pushStatus.enabled ? 'Отключить уведомления' : 'Включить уведомления'}
                 >
                   {pushStatus.enabled ? (
                     <>
                       <Bell className="w-3.5 h-3.5" />
-                      {t('admin.pushNotifications')}
+                      Push-уведомления
                     </>
                   ) : (
                     <>
                       <BellOff className="w-3.5 h-3.5" />
                       {pushStatus.status === 'declined' ? (
                         <span className="flex items-center">
-                          {t('admin.pushNotifications')} 
+                          Push-уведомления
                           <span className="ml-1 w-2 h-2 bg-red-500 rounded-full"></span>
                         </span>
-                      ) : t('admin.pushNotifications')}
+                      ) : 'Push-уведомления'}
                     </>
                   )}
                 </button>
@@ -509,47 +520,57 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                                 </span>
                               )}
                             </div>
-                            
                             {/* Действия с курсом */}
                             {editingCourseId === course.id ? (
-                              <div className="mt-2 flex items-center gap-2">
-                                <input
-                                  type="number"
-                                  value={newExpiryDays}
-                                  onChange={(e) => setNewExpiryDays(e.target.value)}
-                                  placeholder="Дней"
-                                  min="1"
-                                  className="w-20 p-1 text-xs border border-gray-300 dark:border-gray-600 rounded"
-                                />
-                                <button 
-                                  onClick={() => handleUpdateCourseExpiry(course.id)}
-                                  className="px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded"
-                                >
-                                  {t('admin.save')}
-                                </button>
-                                <button 
-                                  onClick={() => setEditingCourseId(null)}
-                                  className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
-                                >
-                                  {t('admin.cancel')}
-                                </button>
+                              <div className="mt-2 flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    value={newExpiryDays}
+                                    onChange={(e) => setNewExpiryDays(e.target.value)}
+                                    placeholder={t('course.days')}
+                                    min="1"
+                                    className="w-20 p-1 text-xs border border-gray-300 dark:border-gray-600 rounded"
+                                  />
+                                  <span className="text-xs text-gray-500">{t('course.days')}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    onClick={() => handleUpdateCourseExpiry(course.id, course, 'add')}
+                                    className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded flex items-center gap-1"
+                                  >
+                                    <PlusCircle className="w-3 h-3" /> {t('course.addDays')}
+                                  </button>
+                                  <button 
+                                    onClick={() => handleUpdateCourseExpiry(course.id, course, 'remove')}
+                                    className="px-2 py-1 text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded flex items-center gap-1"
+                                  >
+                                    <MinusCircle className="w-3 h-3" /> {t('course.removeDays')}
+                                  </button>
+                                  <button 
+                                    onClick={() => setEditingCourseId(null)}
+                                    className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+                                  >
+                                    {t('course.cancel')}
+                                  </button>
+                                </div>
                               </div>
                             ) : (
                               <div className="mt-2 flex items-center gap-2">
                                 <button 
                                   onClick={() => {
                                     setEditingCourseId(course.id);
-                                    setNewExpiryDays('');
+                                    setNewExpiryDays('7'); // Значение по умолчанию - 7 дней
                                   }}
                                   className="p-1 text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded"
-                                  title={t('admin.updateCourse')}
+                                  title={t('course.editExpiry')}
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button 
                                   onClick={() => handleRemoveCourse(course.id)}
                                   className="p-1 text-xs bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded"
-                                  title={t('admin.removeCourse')}
+                                  title={t('course.delete')}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -558,7 +579,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                           </div>
                           {isExpired && (
                             <span className="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-full text-xs font-medium">
-                              {t('admin.expired')}
+                              {t('course.expired')}
                             </span>
                           )}
                         </div>
