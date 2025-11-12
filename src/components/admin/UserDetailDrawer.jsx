@@ -97,12 +97,12 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       ></div>
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-white dark:bg-gray-800 z-50 shadow-2xl overflow-y-auto">
-        <div className="p-6">
+      <div className="fixed right-0 top-0 bottom-0 w-full md:max-w-2xl bg-white dark:bg-gray-800 z-50 shadow-2xl overflow-y-auto">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                 Детали пользователя
               </h2>
               <button
@@ -116,7 +116,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setActiveTab('info')}
               className={`px-4 py-2 font-medium transition ${

@@ -60,7 +60,17 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
 
   if (!isOpen) return null;
 
-  const isEnrolled = (courseId) => userCourses.some(c => c.id === courseId);
+  const isEnrolled = (courseId) => {
+    const userCourse = userCourses.find(c => c.id === courseId);
+    if (!userCourse) return false;
+    
+    // Проверяем, не истек ли срок
+    const isExpired = userCourse.enrollment?.expiryDate && userCourse.enrollment.expiryDate < Date.now();
+    
+    // Если срок не истек - считаем курс записанным
+    // Если срок истек - считаем что можно снова назначить
+    return !isExpired;
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">

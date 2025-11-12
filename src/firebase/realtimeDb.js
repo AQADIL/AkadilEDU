@@ -594,3 +594,47 @@ export async function getUserAuthLogs(uid) {
     return [];
   }
 }
+
+/**
+ * Toggle user's push notification settings
+ */
+export async function toggleUserPushNotifications(uid, enabled, adminUid) {
+  if (!database) throw new Error('Database not initialized');
+  
+  // Update user's push notification settings
+  await update(ref(database, `users/${uid}`), {
+    pushNotificationsEnabled: enabled,
+    updatedAt: new Date().toISOString()
+  });
+  
+  // Log admin action
+  await push(ref(database, 'adminLogs'), {
+    adminUid,
+    action: enabled ? 'enablePushNotifications' : 'disablePushNotifications',
+    targetUid: uid,
+    ts: new Date().toISOString()
+  });
+  
+  return true;
+}
+
+/**
+ * Get user's push notification status
+ */
+export async function getUserPushStatus(uid) {
+  if (!database) return null;
+  
+  try {
+    const userRef = ref(database, `users/${uid}`);
+    const snapshot = await get(userRef);
+    
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      return userData.pushNotificationsEnabled === true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error fetching user push status:', error);
+    return false;
+  }
+}
