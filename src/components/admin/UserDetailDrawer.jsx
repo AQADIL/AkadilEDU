@@ -61,8 +61,13 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
   };
   
   const handleUpdateCourseExpiry = async (courseId, course, action = 'add') => {
-    // Обрабатываем количество дней
-    const daysToChange = newExpiryDays && !isNaN(parseInt(newExpiryDays)) ? parseInt(newExpiryDays) : 7;
+    // Проверяем, что количество дней указано
+    if (!newExpiryDays || isNaN(parseInt(newExpiryDays))) {
+      alert('Пожалуйста, укажите количество дней');
+      return;
+    }
+    
+    const daysToChange = parseInt(newExpiryDays);
     
     // Получим текущую дату истечения или текущую дату
     let currentExpiry;
@@ -567,7 +572,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                                 <button 
                                   onClick={() => {
                                     setEditingCourseId(course.id);
-                                    setNewExpiryDays('7'); // Значение по умолчанию - 7 дней
+                                    setNewExpiryDays(''); // Пустое значение, требуется ввод
                                   }}
                                   className="p-1 text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded"
                                   title={t('course.editExpiry')}
