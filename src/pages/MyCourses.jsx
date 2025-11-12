@@ -92,17 +92,17 @@ export default function MyCourses() {
         <div className="text-center py-16 sm:py-24 bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-dashed border-primary-300 dark:border-primary-700">
           <BookOpen className="w-20 h-20 text-primary-400 mx-auto mb-6 animate-pulse" />
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-            Әзірге курстар жоқ
+            {t('courses.noCourses')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-            Курстарды сатып алыңыз немесе оқытушы сізге тағайындағанша күтіңіз
+            {t('courses.buyCourses')}
           </p>
           <button
             onClick={() => navigate('/courses')}
             className="btn-primary inline-flex items-center gap-2"
           >
             <BookOpen className="w-5 h-5" />
-            Барлық курстарды көру
+            {t('courses.viewAllCourses')}
           </button>
         </div>
       </div>
@@ -174,17 +174,17 @@ export default function MyCourses() {
                     {expired ? (
                       <span className="px-3 py-1.5 bg-red-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg">
                         <Clock className="w-3.5 h-3.5" />
-                        Мерзімі өтті
+                        {t('course.expiredStatus')}
                       </span>
                     ) : daysLeft !== null && daysLeft <= 7 ? (
                       <span className="px-3 py-1.5 bg-orange-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg animate-pulse">
                         <Zap className="w-3.5 h-3.5" />
-                        {daysLeft} күн қалды
+                        {daysLeft} {t('course.daysLeft')}
                       </span>
                     ) : (
                       <span className="px-3 py-1.5 bg-green-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg">
                         <CheckCircle className="w-3.5 h-3.5" />
-                        Белсенді
+                        {t('course.active')}
                       </span>
                     )}
                   </div>
@@ -230,19 +230,25 @@ export default function MyCourses() {
                 </h3>
                 
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed">
-                  {course.description || 'Курс сипаттамасы жоқ'}
+                  {course.description || t('course.noDescription')}
                 </p>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
-                    <span>{course.modules ? Object.keys(course.modules).length : 0} модуль</span>
+                    <span>{course.modules ? Object.keys(course.modules).length : 0} {t('course.modules')}</span>
                   </div>
                   {course.enrollment?.enrolledAt && (
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(course.enrollment.enrolledAt).toLocaleDateString('kk-KZ')}</span>
+                      <span>{t('course.receivedOn')}: {new Date(course.enrollment.enrolledAt).toLocaleDateString('kk-KZ')}</span>
+                    </div>
+                  )}
+                  {course.enrollment?.expiryDate && !expired && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{t('course.validUntil')}: {new Date(course.enrollment.expiryDate).toLocaleDateString('kk-KZ')}</span>
                     </div>
                   )}
                 </div>
@@ -251,7 +257,7 @@ export default function MyCourses() {
                 {progress > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      <span>Прогресс</span>
+                      <span>{t('course.progress')}</span>
                       <span className="font-semibold">{progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
@@ -276,12 +282,12 @@ export default function MyCourses() {
                   {expired ? (
                     <>
                       <Clock className="w-5 h-5" />
-                      <span>Мерзімі өткен</span>
+                      <span>{t('course.expiredStatus')}</span>
                     </>
                   ) : (
                     <>
                       <Play className="w-5 h-5" />
-                      <span>Оқуды жалғастыру</span>
+                      <span>{t('course.continueLearning')}</span>
                     </>
                   )}
                 </button>

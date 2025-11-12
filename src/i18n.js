@@ -21,7 +21,14 @@ const resources = {
       // Courses Page
       'courses.title': 'Курстар',
       'courses.availableCourses': 'Қолжетімді курстар',
-      'courses.noCourses': 'Курстар әлі жоқ',
+      'courses.all': 'Барлық курстар',
+      'courses.featured': 'Үздік курстар',
+      'courses.enrollIn': 'Курсқа жазылу',
+      'courses.enroll': 'Жазылу',
+      'courses.noCourses': 'Әзірге курстар жоқ',
+      'courses.buyCourses': 'Курстарды сатып алыңыз немесе оқытушы сізге тағайындағанша күтіңіз',
+      'courses.viewAllCourses': 'Барлық курстарды көру',
+      'courses.youHave': 'Сізде {count} курс бар',
       'courses.noCoursesMessage': 'Жақында қызықты курстар пайда болады',
       'courses.adminNoCoursesMessage': 'Студенттеріңіз үшін бірінші курсты жасаңыз',
       'courses.createFirst': 'Бірінші курсты жасау',
@@ -269,7 +276,16 @@ const resources = {
       'course.expiresOn': 'Аяқталу күні',
       'course.editExpiry': 'Мерзімді өзгерту',
       'course.delete': 'Курсты жою',
-      'course.confirmDelete': 'Сіз шынымен курсты жойғыңыз келе ме?'
+      'course.confirmDelete': 'Сіз шынымен курсты жойғыңыз келе ме?',
+      'course.active': 'Белсенді',
+      'course.expiredStatus': 'Мерзімі өтті',
+      'course.daysLeft': 'күн қалды',
+      'course.noDescription': 'Курс сипаттамасы жоқ',
+      'course.modules': 'модуль',
+      'course.progress': 'Прогресс',
+      'course.continueLearning': 'Оқуды жалғастыру',
+      'course.receivedOn': 'Алынған',
+      'course.validUntil': 'Дейін'
     }
   },
   ru: {
@@ -291,6 +307,9 @@ const resources = {
       'courses.title': 'Курсы',
       'courses.availableCourses': 'Доступно курсов',
       'courses.noCourses': 'Курсов пока нет',
+      'courses.buyCourses': 'Купите курсы или подождите, пока преподаватель назначит их вам',
+      'courses.viewAllCourses': 'Посмотреть все курсы',
+      'courses.youHave': 'У вас {count} курсов',
       'courses.noCoursesMessage': 'Скоро здесь появятся интересные курсы',
       'courses.adminNoCoursesMessage': 'Создайте первый курс для ваших студентов',
       'courses.createFirst': 'Создать первый курс',
@@ -538,7 +557,16 @@ const resources = {
       'course.expiresOn': 'Срок действия до',
       'course.editExpiry': 'Изменить срок',
       'course.delete': 'Удалить курс',
-      'course.confirmDelete': 'Вы действительно хотите удалить этот курс?'
+      'course.confirmDelete': 'Вы действительно хотите удалить этот курс?',
+      'course.active': 'Активен',
+      'course.expiredStatus': 'Срок истек',
+      'course.daysLeft': 'дней осталось',
+      'course.noDescription': 'Нет описания курса',
+      'course.modules': 'модулей',
+      'course.progress': 'Прогресс',
+      'course.continueLearning': 'Продолжить обучение',
+      'course.receivedOn': 'Получен',
+      'course.validUntil': 'До'
     }
   },
   en: {
@@ -560,6 +588,9 @@ const resources = {
       'courses.title': 'Courses',
       'courses.availableCourses': 'Available courses',
       'courses.noCourses': 'No courses yet',
+      'courses.buyCourses': 'Buy courses or wait for your teacher to assign them to you',
+      'courses.viewAllCourses': 'View all courses',
+      'courses.youHave': 'You have {count} courses',
       'courses.noCoursesMessage': 'Interesting courses will appear here soon',
       'courses.adminNoCoursesMessage': 'Create the first course for your students',
       'courses.createFirst': 'Create first course',
@@ -807,7 +838,16 @@ const resources = {
       'course.expiresOn': 'Expires on',
       'course.editExpiry': 'Edit expiry',
       'course.delete': 'Delete course',
-      'course.confirmDelete': 'Are you sure you want to delete this course?'
+      'course.confirmDelete': 'Are you sure you want to delete this course?',
+      'course.active': 'Active',
+      'course.expiredStatus': 'Expired',
+      'course.daysLeft': 'days left',
+      'course.noDescription': 'No course description',
+      'course.modules': 'modules',
+      'course.progress': 'Progress',
+      'course.continueLearning': 'Continue learning',
+      'course.receivedOn': 'Received on',
+      'course.validUntil': 'Valid until'
     }
   }
 };

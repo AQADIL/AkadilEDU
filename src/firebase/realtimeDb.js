@@ -652,23 +652,48 @@ export async function getUserPushStatus(uid) {
 export async function updateUserCourse(uid, courseId, expiryTimestamp, adminUid) {
   if (!database) throw new Error('Database not initialized');
   
-  // Обновляем срок действия курса
-  await update(ref(database, `users/${uid}/courses/${courseId}/enrollment`), {
-    expiryDate: expiryTimestamp,
-    updatedAt: new Date().toISOString(),
-    updatedBy: adminUid
-  });
+  // Конвертируем в число и проверяем валидность
+  const numericExpiryTimestamp = Number(expiryTimestamp);
   
-  // Записываем действие в лог
-  await push(ref(database, 'adminLogs'), {
-    adminUid,
-    action: 'updateCourseEnrollment',
-    targetUid: uid,
-    payload: { courseId, expiryDate: expiryTimestamp },
-    ts: new Date().toISOString()
-  });
-  
-  return true;
+  try {
+    // Получим текущую структуру курса чтобы обновить все возможные expiryDate поля
+    const enrollmentRef = ref(database, `users/${uid}/courses/${courseId}`);
+    const snapshot = await get(enrollmentRef);
+    
+    // Если курса нет, нечего обновлять
+    if (!snapshot.exists()) {
+      throw new Error('Курс не найден');
+    }
+    
+    // Обновляем все необходимые поля
+    const updates = {};
+    
+    // Обновляем основное поле expiryDate в enrollment
+    updates[`/enrollment/expiryDate`] = numericExpiryTimestamp;
+    updates[`/enrollment/updatedAt`] = new Date().toISOString();
+    updates[`/enrollment/updatedBy`] = adminUid;
+    
+    // Если есть корневой expiryDate, обновляем и его
+    if (snapshot.val().expiryDate !== undefined) {
+      updates[`/expiryDate`] = numericExpiryTimestamp;
+    }
+    
+    // Применяем все обновления
+    await update(enrollmentRef, updates);
+    
+    // Записываем действие в лог
+    await push(ref(database, 'adminLogs'), {
+      adminUid,
+      action: 'updateCourseEnrollment',
+      targetUid: uid,
+      payload: { courseId, expiryDate: numericExpiryTimestamp },
+      ts: new Date().toISOString()
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**

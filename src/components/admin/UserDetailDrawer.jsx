@@ -61,22 +61,30 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
   };
   
   const handleUpdateCourseExpiry = async (courseId, course, action = 'add') => {
-    // Получим текущую дату истечения курса или текущую дату, если курс истек
-    let currentExpiry = course.enrollment?.expiryDate || Date.now();
-    
-    // Если значение не указано или не является числом, используем значение по умолчанию (7 дней)
+    // Обрабатываем количество дней
     const daysToChange = newExpiryDays && !isNaN(parseInt(newExpiryDays)) ? parseInt(newExpiryDays) : 7;
     
-    // Рассчитываем новую дату истечения
+    // Получим текущую дату истечения или текущую дату
+    let currentExpiry;
+    
+    if (course.enrollment && course.enrollment.expiryDate) {
+      // Используем существующую дату
+      currentExpiry = Number(course.enrollment.expiryDate);
+    } else {
+      // Если даты нет, используем текущую дату + 1 день
+      currentExpiry = Date.now() + (24 * 60 * 60 * 1000);
+    }
+    
+    const msPerDay = 24 * 60 * 60 * 1000;
+    
+    // Рассчитываем новую дату
     let newExpiryTimestamp;
     
     if (action === 'add') {
-      // Добавляем дни к текущей дате истечения
-      newExpiryTimestamp = parseInt(currentExpiry) + (daysToChange * 24 * 60 * 60 * 1000);
+      newExpiryTimestamp = currentExpiry + (daysToChange * msPerDay);
     } else {
-      // Отнимаем дни от текущей даты истечения, но не меньше текущей даты
-      const minTimestamp = Date.now() + (24 * 60 * 60 * 1000); // Минимум 1 день от текущей даты
-      newExpiryTimestamp = Math.max(minTimestamp, parseInt(currentExpiry) - (daysToChange * 24 * 60 * 60 * 1000));
+      const minTimestamp = Date.now() + msPerDay; // Минимум 1 день вперед
+      newExpiryTimestamp = Math.max(minTimestamp, currentExpiry - (daysToChange * msPerDay));
     }
     
     try {
@@ -85,7 +93,6 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       setEditingCourseId(null);
     } catch (error) {
       console.error('Error updating course expiry:', error);
-      alert(t('common.error'));
     }
   };
   
