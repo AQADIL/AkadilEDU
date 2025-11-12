@@ -604,6 +604,7 @@ export async function toggleUserPushNotifications(uid, enabled, adminUid) {
   // Update user's push notification settings
   await update(ref(database, `users/${uid}`), {
     pushNotificationsEnabled: enabled,
+    pushStatus: enabled ? 'enabled' : 'disabled', // Поле для хранения статуса: enabled, disabled, declined
     updatedAt: new Date().toISOString()
   });
   
@@ -630,11 +631,63 @@ export async function getUserPushStatus(uid) {
     
     if (snapshot.exists()) {
       const userData = snapshot.val();
-      return userData.pushNotificationsEnabled === true;
+      
+      // Возвращаем статус уведомлений с дополнительной информацией
+      return { 
+        enabled: userData.pushNotificationsEnabled === true,
+        status: userData.pushStatus || 'unknown', // enabled, disabled, declined, unknown
+        lastUpdated: userData.updatedAt
+      };
     }
-    return false;
+    return { enabled: false, status: 'unknown', lastUpdated: null };
   } catch (error) {
     console.error('Error fetching user push status:', error);
-    return false;
+    return { enabled: false, status: 'error', lastUpdated: null };
   }
+}
+
+/**
+ * Update user's course enrollment
+ */
+export async function updateUserCourse(uid, courseId, expiryTimestamp, adminUid) {
+  if (!database) throw new Error('Database not initialized');
+  
+  // Обновляем срок действия курса
+  await update(ref(database, `users/${uid}/courses/${courseId}/enrollment`), {
+    expiryDate: expiryTimestamp,
+    updatedAt: new Date().toISOString(),
+    updatedBy: adminUid
+  });
+  
+  // Записываем действие в лог
+  await push(ref(database, 'adminLogs'), {
+    adminUid,
+    action: 'updateCourseEnrollment',
+    targetUid: uid,
+    payload: { courseId, expiryDate: expiryTimestamp },
+    ts: new Date().toISOString()
+  });
+  
+  return true;
+}
+
+/**
+ * Remove user's course
+ */
+export async function removeUserCourse(uid, courseId, adminUid) {
+  if (!database) throw new Error('Database not initialized');
+  
+  // Удаляем курс у пользователя
+  await remove(ref(database, `users/${uid}/courses/${courseId}`));
+  
+  // Записываем действие в лог
+  await push(ref(database, 'adminLogs'), {
+    adminUid,
+    action: 'removeCourseEnrollment',
+    targetUid: uid,
+    payload: { courseId },
+    ts: new Date().toISOString()
+  });
+  
+  return true;
 }

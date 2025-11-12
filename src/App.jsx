@@ -6,6 +6,7 @@ import ProfileModal from './components/ProfileModal';
 import CookieConsent from './components/CookieConsent';
 import EmailVerificationBanner from './components/EmailVerificationBanner';
 import SessionRevokedModal from './components/SessionRevokedModal';
+import BlockedAccountOverlay from './components/BlockedAccountOverlay';
 import { useSessionValidator } from './hooks/useSessionValidator';
 import { requestNotificationPermission, setupForegroundMessageListener } from './firebase/messaging';
 
@@ -46,6 +47,8 @@ function App() {
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
   const [showSessionRevokedModal, setShowSessionRevokedModal] = useState(false);
   const [localSessionId, setLocalSessionId] = useState(null);
+  const [isUserBlocked, setIsUserBlocked] = useState(false);
+  const [blockReason, setBlockReason] = useState(null);
 
   // Version check (without clearing PWA cache)
   useEffect(() => {
@@ -53,7 +56,7 @@ function App() {
     const storedVersion = localStorage.getItem('app_version');
     
     if (storedVersion !== APP_VERSION) {
-      console.log('🔄 New version detected:', APP_VERSION);
+      console.log(' New version detected:', APP_VERSION);
       // Clear localStorage but preserve session and device IDs
       const sessionId = localStorage.getItem('akadil_current_session');
       const deviceId = localStorage.getItem('akadil_device_id');
@@ -67,7 +70,7 @@ function App() {
       localStorage.setItem('app_version', APP_VERSION);
       
       // Service Worker will auto-update via sw.js version change
-      console.log('✅ Version updated, PWA cache preserved');
+      console.log(' Version updated, PWA cache preserved');
     }
   }, []);
 
@@ -97,7 +100,7 @@ function App() {
 
     // Set maximum loading time (10 seconds)
     const loadingTimeout = setTimeout(() => {
-      console.warn('⚠️ Loading timeout - forcing app to show');
+      console.warn(' Loading timeout - forcing app to show');
       setLoading(false);
     }, 10000);
 
@@ -114,19 +117,19 @@ function App() {
             profile = await getUserProfile(firebaseUser.uid);
             setUserProfile(profile);
           } catch (firestoreError) {
-            console.warn('⚠️ Firestore unavailable (offline?):', firestoreError.message);
+            console.warn(' Firestore unavailable (offline?):', firestoreError.message);
             // Continue without Firestore profile
           }
 
           // Check/Create Realtime DB profile
           try {
-            console.log('🔍 Checking Realtime DB profile for:', firebaseUser.email);
+            console.log(' Checking Realtime DB profile for:', firebaseUser.email);
             let rtdbProfile = await getRTDBProfile(firebaseUser.uid);
             
             if (!rtdbProfile) {
-              console.log('📝 Creating new Realtime DB profile...');
+              console.log(' Creating new Realtime DB profile...');
               const isAdmin = firebaseUser.email === 'youtub.maj@gmail.com';
-              console.log('👤 Role will be:', isAdmin ? 'admin' : 'student');
+              console.log(' Role will be:', isAdmin ? 'admin' : 'student');
               
               rtdbProfile = await createUserProfile(firebaseUser.uid, {
                 email: firebaseUser.email,
@@ -134,13 +137,13 @@ function App() {
                 role: isAdmin ? 'admin' : 'student'
               });
               
-              console.log('✅ Realtime DB profile created:', rtdbProfile);
+              console.log(' Realtime DB profile created:', rtdbProfile);
             } else {
-              console.log('✅ Realtime DB profile exists:', rtdbProfile);
+              console.log(' Realtime DB profile exists:', rtdbProfile);
             }
           } catch (rtdbError) {
-            console.error('❌ Realtime DB Error:', rtdbError);
-            console.error('⚠️ Make sure Realtime Database is created in Firebase Console!');
+            console.error(' Realtime DB Error:', rtdbError);
+            console.error(' Make sure Realtime Database is created in Firebase Console!');
           }
 
           // Log session with IP tracking AND smart security analysis
@@ -156,7 +159,7 @@ function App() {
             await logAuthEvent(firebaseUser.uid, sessionProfile.ip).catch(() => {});
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
-            // 🚨 SINGLE ACTIVE SESSION - только один может смотреть!
+            // SINGLE ACTIVE SESSION - только один может смотреть!
             // Проверяем: может эта сессия уже была revoked?
             const { getCurrentSession } = await import('./firebase/sessionManager');
             const dbCurrentSession = await getCurrentSession(firebaseUser.uid);
@@ -164,7 +167,7 @@ function App() {
             
             // Если у нас уже есть старая сессия и она не совпадает с DB - значит нас выкинули
             if (localStoredSession && dbCurrentSession && localStoredSession !== dbCurrentSession) {
-              console.warn('🚨 Old session detected - was revoked by another device!');
+              console.warn(' Old session detected - was revoked by another device!');
               // Показать модалку и НЕ выкидывать других
               setShowSessionRevokedModal(true);
               setTimeout(() => {
@@ -177,18 +180,18 @@ function App() {
             // Только если это НОВАЯ сессия - выкидываем других
             const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
             if (revokeResult.revoked > 0) {
-              console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);
+              console.log(` Revoked ${revokeResult.revoked} other sessions - only one active now!`);
             }
             
             // Сохранить sessionId локально для проверки
             localStorage.setItem('akadil_current_session', sessionProfile.sessionId);
             setLocalSessionId(sessionProfile.sessionId);
             
-            // 🔒 SMART SECURITY CHECK: Calculate risk score
+            // SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
             const riskAssessment = calculateRiskScore(userSessions, sessionProfile, []);
             
-            console.log('🔒 Risk Assessment:', {
+            console.log(' Risk Assessment:', {
               score: riskAssessment.score,
               level: riskAssessment.level,
               action: riskAssessment.action,
@@ -198,7 +201,7 @@ function App() {
             // Handle based on risk level
             if (riskAssessment.action === 'soft_verify') {
               // Soft response: notify but allow access with limitations
-              console.warn('⚠️ Medium risk detected - soft verification required');
+              console.warn(' Medium risk detected - soft verification required');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'medium_risk_login',
@@ -215,7 +218,7 @@ function App() {
               
             } else if (riskAssessment.action === 'strong_verify') {
               // Strong response: require verification, limit content
-              console.error('🚨 HIGH RISK detected - strong verification required');
+              console.error(' HIGH RISK detected - strong verification required');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'high_risk_login',
@@ -233,7 +236,7 @@ function App() {
               
             } else if (riskAssessment.action === 'limit_sessions') {
               // Session limit reached
-              console.warn('⚠️ Session limit reached');
+              console.warn(' Session limit reached');
               
               await createSecurityAlert(firebaseUser.uid, {
                 type: 'session_limit',
@@ -250,11 +253,21 @@ function App() {
             
             // Always create alert if requiresReview
             if (riskAssessment.requiresReview) {
-              console.log('📋 Alert created for admin review');
+              console.log(' Alert created for admin review');
             }
             
           } catch (error) {
-            console.warn('⚠️ Session logging error:', error.message);
+            console.warn(' Session logging error:', error.message);
+          }
+
+          // Check if user is blocked
+          if (rtdbProfile && rtdbProfile.status === 'suspended') {
+            console.warn(' User account is blocked!');
+            setIsUserBlocked(true);
+            setBlockReason(rtdbProfile.suspensionReason || null);
+          } else {
+            setIsUserBlocked(false);
+            setBlockReason(null);
           }
 
           // Check email verification
@@ -263,9 +276,10 @@ function App() {
           // Request push notification permission after 2 seconds (give time for app to load)
           setTimeout(async () => {
             try {
-              console.log('📱 Requesting push notification permission...');
+              console.log(' Requesting push notification permission...');
               const token = await requestNotificationPermission(firebaseUser.uid);
               if (token) {
+                console.log(' Push notifications enabled');
                 console.log('✅ Push notifications enabled');
               } else {
                 console.warn('⚠️ User denied notification permission');
@@ -342,6 +356,11 @@ function App() {
       }}
     >
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        {/* Account blocked overlay */}
+        {user && isUserBlocked && (
+          <BlockedAccountOverlay reason={blockReason} />
+        )}
+        
         {/* Session Revoked Modal */}
         {showSessionRevokedModal && (
           <SessionRevokedModal

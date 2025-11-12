@@ -310,6 +310,28 @@ export default function UsersManagement() {
                             <CheckCircle className="w-4 h-4" />
                           </button>
                         )}
+                        {/* Кнопка push-уведомлений */}
+                        <button
+                          onClick={() => handleTogglePushNotifications(user.uid)}
+                          className={`${pushStatuses[user.uid]?.enabled 
+                              ? 'text-purple-600 hover:text-purple-800 dark:text-purple-400' 
+                              : pushStatuses[user.uid]?.status === 'declined'
+                                ? 'text-red-600 hover:text-red-800 dark:text-red-400'
+                                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                          }`}
+                          title={pushStatuses[user.uid]?.enabled ? 'Отключить уведомления' : 'Включить уведомления'}
+                        >
+                          {pushStatuses[user.uid]?.enabled ? (
+                            <Bell className="w-4 h-4" />
+                          ) : (
+                            <div className="relative">
+                              <BellOff className="w-4 h-4" />
+                              {pushStatuses[user.uid]?.status === 'declined' && (
+                                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                              )}
+                            </div>
+                          )}
+                        </button>
                         <button
                           onClick={() => handleSoftDelete(user.uid)}
                           className="text-red-600 hover:text-red-800 dark:text-red-400"
