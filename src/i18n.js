@@ -265,6 +265,10 @@ const resources = {
       'security.blockedInstructions': 'Көмек алу үшін төмендегі байланыс мәліметтерін қолданыңыз',
       'security.contactEmail': 'Email арқылы байланысу',
       'security.contactWhatsApp': 'WhatsApp арқылы байланысу',
+      'security.threatLevel': 'Қауіп деңгейі: ЖОҒАРЫ',
+      'security.blockedForSecurity': 'Аккаунт қауіпсіздік мәселелері бойынша бұғатталды',
+      'security.contactViaWhatsApp': 'WhatsApp арқылы байланысу',
+      'security.contactViaTelegram': 'Telegram арқылы байланысу',
       
       // Course Management
       'course.addDays': 'Күн қосу',
@@ -546,6 +550,10 @@ const resources = {
       'security.blockedInstructions': 'Используйте контактную информацию ниже, чтобы получить помощь',
       'security.contactEmail': 'Связаться по Email',
       'security.contactWhatsApp': 'Связаться через WhatsApp',
+      'security.threatLevel': 'Уровень угрозы: ВЫСОКИЙ',
+      'security.blockedForSecurity': 'Аккаунт заблокирован по соображениям безопасности',
+      'security.contactViaWhatsApp': 'Связаться через WhatsApp',
+      'security.contactViaTelegram': 'Связаться через Telegram',
       
       // Course Management
       'course.addDays': 'Добавить дни',
@@ -827,6 +835,10 @@ const resources = {
       'security.blockedInstructions': 'Use the contact information below to get help',
       'security.contactEmail': 'Contact via Email',
       'security.contactWhatsApp': 'Contact via WhatsApp',
+      'security.threatLevel': 'Threat Level: HIGH',
+      'security.blockedForSecurity': 'Account blocked for security reasons',
+      'security.contactViaWhatsApp': 'Contact via WhatsApp',
+      'security.contactViaTelegram': 'Contact via Telegram',
       
       // Course Management
       'course.addDays': 'Add days',
