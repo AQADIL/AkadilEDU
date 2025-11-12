@@ -47,7 +47,7 @@ export default function BlockedAccountOverlay({ reason = null }) {
         
         <div className="flex flex-row gap-4 justify-center">
           <a 
-            href="https://wa.me/+77762349535?text=Саламатсыз%20ба,%20аккаунтым%20блокқа%20түсті" 
+            href="https://wa.me/+77762349535?text=Саламатсыз%20ба,%20аккаунтым%20блокқа%20түсіп қалды." 
             target="_blank" 
             rel="noopener noreferrer"
             className="btn-primary py-3 px-4 flex items-center justify-center gap-3 flex-1"
@@ -58,7 +58,7 @@ export default function BlockedAccountOverlay({ reason = null }) {
             WhatsApp
           </a>
           <a 
-            href="https://t.me/wellpussy?text=Саламатсыз%20ба,%20аккаунтым%20блокқа%20түсті" 
+            href="https://t.me/wellpussy?text=Саламатсыз%20ба,%20аккаунтым%20блокқа%20түсіп қалды." 
             target="_blank" 
             rel="noopener noreferrer"
             className="btn-primary py-3 px-4 flex items-center justify-center gap-3 flex-1"
