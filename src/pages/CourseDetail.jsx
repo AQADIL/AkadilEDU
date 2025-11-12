@@ -411,9 +411,17 @@ export default function CourseDetail() {
 
     try {
       const userCourses = await getUserCourses(auth.currentUser.uid);
-      const purchased = userCourses.some(c => c.id === id);
+      const userCourse = userCourses.find(c => c.id === id);
+      
+      // Проверяем истек ли срок курса
+      const isExpired = userCourse && 
+                        userCourse.enrollment?.expiryDate && 
+                        userCourse.enrollment.expiryDate < Date.now();
+      
+      // Если курс куплен и не истек срок - показываем как купленный
+      const purchased = userCourse !== undefined && !isExpired;
       setIsPurchased(purchased);
-      console.log('✅ Purchase check:', { courseId: id, purchased });
+      console.log('✅ Purchase check:', { courseId: id, purchased, expired: isExpired });
     } catch (error) {
       console.error('Error checking purchase status:', error);
       setIsPurchased(false);

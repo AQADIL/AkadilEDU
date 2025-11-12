@@ -18,7 +18,7 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "!(/assets/**|/icons/**|/manifest.json|/robots.txt)",
         "destination": "/index.html"
       }
     ],

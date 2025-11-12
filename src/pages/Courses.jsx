@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, BookOpen, Loader2, Eye, EyeOff, Play, Clock, Users, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Loader2, Eye, EyeOff, Play, Clock, Users, CheckCircle, RefreshCcw } from 'lucide-react';
 import { fetchAllCourses, deleteCourse, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 import { ref, get } from 'firebase/database';
@@ -85,15 +85,21 @@ export default function Courses() {
   };
 
   const isPurchased = (courseId) => {
-    return userCourses.some(c => c.id === courseId);
+    const userCourse = userCourses.find(c => c.id === courseId);
+    return userCourse !== undefined;
+  };
+  
+  const isExpired = (courseId) => {
+    const userCourse = userCourses.find(c => c.id === courseId);
+    return userCourse && userCourse.enrollment?.expiryDate && userCourse.enrollment.expiryDate < Date.now();
   };
 
   const handleCourseClick = (course) => {
-    if (isPurchased(course.id)) {
-      // Если курс куплен, открыть в my-courses
+    // Если курс куплен и не истек срок - открыть в my-courses
+    if (isPurchased(course.id) && !isExpired(course.id)) {
       navigate(`/my-courses/${course.id}`);
     } else {
-      // Если не куплен, показать детали курса с замочками
+      // Если не куплен или истек срок - показать детали курса с замочками
       navigate(`/courses/${course.id}`);
     }
   };
@@ -166,19 +172,33 @@ export default function Courses() {
             const coverUrl = course.coverUrl;
             const purchased = isPurchased(course.id);
             
+            const expired = isExpired(course.id);
+            
             return (
               <div key={course.id} className={`group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col ${
-                purchased 
-                  ? 'border-2 border-green-500 ring-2 ring-green-500/20 animate-pulse-slow' 
-                  : 'border border-gray-200 dark:border-gray-700'
+                expired
+                  ? 'border-2 border-dashed border-primary-500' 
+                  : purchased 
+                    ? 'border-2 border-green-500 ring-2 ring-green-500/20 animate-pulse-slow' 
+                    : 'border border-gray-200 dark:border-gray-700'
               }`}
               >
                 {/* Purchased Badge */}
-                {purchased && (
+                {purchased && !expired && (
                   <div className="absolute top-2 left-2 z-10">
                     <div className="bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg animate-bounce-slow">
                       <CheckCircle className="w-4 h-4" />
                       {t('courses.purchased')}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Expired Badge */}
+                {expired && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <div className="bg-primary-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                      <Clock className="w-4 h-4" />
+                      {t('courses.expired')}
                     </div>
                   </div>
                 )}
@@ -261,12 +281,19 @@ export default function Courses() {
                   <button 
                     onClick={() => handleCourseClick(course)}
                     className={`w-full py-2.5 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all duration-300 ${
-                      isPurchased(course.id)
-                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-2 border-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 shadow-lg shadow-green-500/20'
-                        : 'btn-primary'
+                      isExpired(course.id)
+                        ? 'border-2 border-dashed border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:scale-105'
+                        : isPurchased(course.id)
+                          ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-2 border-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 shadow-lg shadow-green-500/20'
+                          : 'btn-primary'
                     }`}
                   >
-                    {isPurchased(course.id) ? (
+                    {isExpired(course.id) ? (
+                      <>
+                        <RefreshCcw className="w-5 h-5" />
+                        <span className="font-semibold">{t('courses.buyAgain')}</span>
+                      </>
+                    ) : isPurchased(course.id) ? (
                       <>
                         <CheckCircle className="w-5 h-5" />
                         <span className="font-semibold">{t('courses.openCourse')}</span>

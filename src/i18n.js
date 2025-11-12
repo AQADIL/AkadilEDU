@@ -47,6 +47,8 @@ const resources = {
       'courses.coverLoadError': '❌ Суретті жүктеу мүмкін болмады. URL тексеріңіз.',
       'courses.purchased': 'Сатып алынған',
       'courses.openCourse': 'Курсты ашу',
+      'courses.expired': 'Мерзімі өтті',
+      'courses.buyAgain': 'Қайтадан сатып алу',
       
       // Course Detail
       'courseDetail.backToCourses': 'Курстарға оралу',
@@ -296,6 +298,8 @@ const resources = {
       'courses.coverLoadError': '❌ Не удалось загрузить изображение. Проверьте URL.',
       'courses.purchased': 'Приобретено',
       'courses.openCourse': 'Открыть курс',
+      'courses.expired': 'Срок истек',
+      'courses.buyAgain': 'Купить снова',
       
       // Course Detail
       'courseDetail.backToCourses': 'Вернуться к курсам',
@@ -545,6 +549,8 @@ const resources = {
       'courses.coverLoadError': '❌ Failed to load image. Check URL.',
       'courses.purchased': 'Purchased',
       'courses.openCourse': 'Open Course',
+      'courses.expired': 'Expired',
+      'courses.buyAgain': 'Buy Again',
       
       // Course Detail
       'courseDetail.backToCourses': 'Back to Courses',
