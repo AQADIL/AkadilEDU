@@ -140,6 +140,21 @@ function App() {
               console.log(' Realtime DB profile created:', rtdbProfile);
             } else {
               console.log(' Realtime DB profile exists:', rtdbProfile);
+              
+              // Check if user is blocked - сразу проверяем блокировку
+              if (rtdbProfile.status === 'suspended') {
+                console.warn('🚨 User account is blocked!');
+                setIsUserBlocked(true);
+                setBlockReason(rtdbProfile.suspensionReason || null);
+                
+                // Если пользователь заблокирован, прекращаем дальнейшие проверки
+                // Это нужно, чтобы показать экран блокировки и не продолжать дальнейшую логику
+                setLoading(false);
+                return;
+              } else {
+                setIsUserBlocked(false);
+                setBlockReason(null);
+              }
             }
           } catch (rtdbError) {
             console.error(' Realtime DB Error:', rtdbError);
@@ -160,32 +175,42 @@ function App() {
             await logUserSession(firebaseUser.uid, sessionProfile).catch(() => {});
             
             // SINGLE ACTIVE SESSION - только один может смотреть!
-            // Проверяем: может эта сессия уже была revoked?
-            const { getCurrentSession } = await import('./firebase/sessionManager');
-            const dbCurrentSession = await getCurrentSession(firebaseUser.uid);
+            const { getCurrentSession, checkSessionRevoked } = await import('./firebase/sessionManager');
             const localStoredSession = localStorage.getItem('akadil_current_session');
             
-            // Если у нас уже есть старая сессия и она не совпадает с DB - значит нас выкинули
-            if (localStoredSession && dbCurrentSession && localStoredSession !== dbCurrentSession) {
-              console.warn(' Old session detected - was revoked by another device!');
-              // Показать модалку и НЕ выкидывать других
-              setShowSessionRevokedModal(true);
-              setTimeout(() => {
-                localStorage.removeItem('akadil_current_session');
-                window.location.href = '/login';
-              }, 3000);
-              return; // Не продолжаем дальше
+            // Проверяем сценарий 1: Если мы уже имеем сохраненную локально сессию
+            if (localStoredSession) {
+              // Проверим, действительна ли она или была выкинута
+              const isRevoked = await checkSessionRevoked(firebaseUser.uid, localStoredSession);
+              
+              if (isRevoked) {
+                // Нашу сессию выкинули с другого устройства
+                console.warn('🚨 Our session was revoked by another device!');
+                setShowSessionRevokedModal(true);
+                setTimeout(() => {
+                  localStorage.removeItem('akadil_current_session');
+                  window.location.href = '/login';
+                }, 3000);
+                return; // Прекращаем дальнейшую обработку
+              } else {
+                // Эта сессия действительна, продолжаем использовать её без обновления
+                console.log('🟢 Continuing with existing valid session: ' + localStoredSession);
+                setLocalSessionId(localStoredSession);
+              }
+            } else {
+              // У нас нет сохраненной сессии, создаем новую и отменяем другие сессии
+              console.log('🆕 Creating new session: ' + sessionProfile.sessionId);
+              
+              // Выкидываем других
+              const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
+              if (revokeResult.revoked > 0) {
+                console.log(`🔒 Revoked ${revokeResult.revoked} other sessions - only one active now!`);
+              }
+              
+              // Сохраняем новую сессию
+              localStorage.setItem('akadil_current_session', sessionProfile.sessionId);
+              setLocalSessionId(sessionProfile.sessionId);
             }
-            
-            // Только если это НОВАЯ сессия - выкидываем других
-            const revokeResult = await revokeOtherSessions(firebaseUser.uid, sessionProfile.sessionId);
-            if (revokeResult.revoked > 0) {
-              console.log(` Revoked ${revokeResult.revoked} other sessions - only one active now!`);
-            }
-            
-            // Сохранить sessionId локально для проверки
-            localStorage.setItem('akadil_current_session', sessionProfile.sessionId);
-            setLocalSessionId(sessionProfile.sessionId);
             
             // SMART SECURITY CHECK: Calculate risk score
             const userSessions = await getUserSessions(firebaseUser.uid);
@@ -260,15 +285,7 @@ function App() {
             console.warn(' Session logging error:', error.message);
           }
 
-          // Check if user is blocked
-          if (rtdbProfile && rtdbProfile.status === 'suspended') {
-            console.warn(' User account is blocked!');
-            setIsUserBlocked(true);
-            setBlockReason(rtdbProfile.suspensionReason || null);
-          } else {
-            setIsUserBlocked(false);
-            setBlockReason(null);
-          }
+          // Проверка блокировки перенесена выше, сразу после загрузки профиля
 
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
