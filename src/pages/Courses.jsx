@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, BookOpen, Loader2, Eye, EyeOff, Play, Clock, Users, CheckCircle, RefreshCcw } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Eye, EyeOff, Play, Clock, Users, CheckCircle, RefreshCcw, Calendar } from 'lucide-react';
+import AppLoader from '../components/AppLoader';
 import { fetchAllCourses, deleteCourse, getUserCourses } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 import { ref, get } from 'firebase/database';
@@ -26,6 +27,24 @@ const generateCoverGradient = (title) => {
   return gradients[hash % gradients.length];
 };
 
+// Подсчет суммарной длительности курса (в минутах)
+const getTotalDurationMinutes = (course) => {
+  if (!course || !course.modules) return 0;
+
+  let total = 0;
+  Object.values(course.modules).forEach((module) => {
+    if (!module.lessons) return;
+    Object.values(module.lessons).forEach((lesson) => {
+      const minutes = Number(lesson.duration) || 0;
+      if (minutes > 0) {
+        total += minutes;
+      }
+    });
+  });
+
+  return total;
+};
+
 export default function Courses() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -35,6 +54,21 @@ export default function Courses() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [userCourses, setUserCourses] = useState([]);
+
+  const formatDuration = (totalMinutes) => {
+    if (!totalMinutes || totalMinutes <= 0) return null;
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+      return t('duration.hoursAndMinutes', { hours, minutes });
+    }
+    if (hours > 0) {
+      return t('duration.hoursOnly', { hours });
+    }
+    return t('duration.minutesOnly', { minutes });
+  };
 
   useEffect(() => {
     checkAdminStatus();
@@ -105,14 +139,14 @@ export default function Courses() {
   };
 
   const handleDelete = async (courseId) => {
-    if (!confirm('Вы уверены что хотите удалить этот курс?')) return;
+    if (!confirm(t('courses.deleteConfirm'))) return;
     
     try {
       await deleteCourse(courseId, auth.currentUser.uid);
       await loadCourses();
     } catch (error) {
       console.error('Error deleting course:', error);
-      alert('Ошибка при удалении курса');
+      alert(t('courses.deleteError'));
     }
   };
 
@@ -127,11 +161,7 @@ export default function Courses() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-      </div>
-    );
+    return <AppLoader text={t('common.loading')} />;
   }
 
   const showAdminControls = isAdmin;
@@ -156,8 +186,8 @@ export default function Courses() {
               className="btn-primary flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Создать курс</span>
-              <span className="sm:hidden">Создать</span>
+              <span className="hidden sm:inline">{t('courses.createCourse')}</span>
+              <span className="sm:hidden">{t('courses.create')}</span>
             </button>
           )}
         </div>
@@ -173,13 +203,15 @@ export default function Courses() {
             const purchased = isPurchased(course.id);
             
             const expired = isExpired(course.id);
+            const totalDurationMinutes = getTotalDurationMinutes(course);
+            const formattedDuration = formatDuration(totalDurationMinutes);
             
             return (
               <div key={course.id} className={`group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col ${
                 expired
                   ? 'border-2 border-dashed border-primary-500' 
                   : purchased 
-                    ? 'border-2 border-green-500 ring-2 ring-green-500/20 animate-pulse-slow' 
+                    ? 'border-2 border-green-500 ring-2 ring-green-500/20' 
                     : 'border border-gray-200 dark:border-gray-700'
               }`}
               >
@@ -260,15 +292,21 @@ export default function Courses() {
                   </h3>
                   
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed">
-                    {course.description || 'Нет описания курса'}
+                    {course.description || t('courses.noDescription')}
                   </p>
 
                   {/* Stats */}
                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
+                      <Calendar className="w-4 h-4" />
                       <span>{new Date(course.createdAt).toLocaleDateString('ru-RU')}</span>
                     </div>
+                    {formattedDuration && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{formattedDuration}</span>
+                      </div>
+                    )}
                     {course.enrolledCount && (
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />

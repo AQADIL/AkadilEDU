@@ -1,480 +1,700 @@
-# AkadilEDU v2.0 - Educational Platform
-
-Modern, responsive educational platform built with React, Vite, Tailwind CSS, and progressive web app capabilities.
-
-## 🚀 Features (Prompt 1 - Completed)
-
-### ✅ Implemented
-- **Modern UI Framework**: React 18 + Vite + Tailwind CSS
-- **Responsive Layout**: Mobile-first design with collapsible sidebar
-- **Header Component**: Logo, language selector (kk/ru/en), theme toggle (light/dark), profile button
-- **Sidebar Navigation**: 
-  - Desktop: Icon-only collapsed by default, expands on hover
-  - Mobile: Full-screen drawer with hamburger menu
-  - Routes: Home, Courses, My Courses, UBT Test, Shop, Admin (hidden by default)
-- **Profile Modal**: 
-  - Edit profile fields (name, email, phone)
-  - Password change placeholders
-  - Avatar upload UI with progress indicator
-  - Calls placeholder functions ready for Firebase integration
-- **Internationalization (i18n)**: 
-  - Three languages: Kazakh (kk), Russian (ru), English (en)
-  - React-i18next integration
-  - Language persists to localStorage
-- **Theme System**:
-  - Light/Dark mode toggle
-  - Smooth transitions
-  - Theme persists to localStorage
-- **Cookie Consent**:
-  - Banner for essential cookies only
-  - Settings dialog to manage stored data
-  - Clear all data option
-- **PWA Support**:
-  - Manifest.json configured
-  - Service worker for offline caching
-  - "Add to Home Screen" ready
-- **Routing**: React Router v6 with clean URLs (no .html files)
-- **Storage Policy**: localStorage with consent management for theme, language, and profile data
-
-### ✅ Prompt 2 Completed - Firebase Integration
-- Firebase Authentication (Email/Password + Google) ✅
-- Email verification enforcement ✅
-- Firebase Storage for avatar uploads ✅
-- Firestore for user profiles and courses ✅
-- Login/Signup pages ✅
-- Auth state management ✅
-- Admin initialization system ✅
-
-### 🔜 Coming in Prompt 3
-- Admin panel
-- User management
-- Course administration
-- Login history tracking
-
-## 📁 Project Structure
-
-```
-akadiledu-v2/
-├── public/
-│   ├── icons/               # PWA icons (placeholders - replace with real icons)
-│   ├── manifest.json        # PWA manifest
-│   └── sw.js               # Service worker
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx       # Top navigation bar
-│   │   ├── Sidebar.jsx      # Responsive sidebar menu
-│   │   ├── ProfileModal.jsx # User profile editor
-│   │   └── CookieConsent.jsx # Cookie consent banner
-│   ├── pages/
-│   │   ├── Home.jsx         # Landing page
-│   │   ├── Courses.jsx      # Course catalog (placeholder)
-│   │   ├── MyCourses.jsx    # User's enrolled courses (placeholder)
-│   │   ├── TestUBT.jsx      # UBT practice tests (placeholder)
-│   │   └── Shop.jsx         # Course shop (placeholder)
-│   ├── styles/
-│   │   └── index.css        # Tailwind base styles + custom CSS
-│   ├── utils/
-│   │   ├── storage.js       # localStorage wrapper with consent management
-│   │   └── placeholders.js  # Placeholder functions for Firebase (Prompt 2)
-│   ├── App.jsx              # Main app component with routing
-│   ├── main.jsx             # Entry point
-│   └── i18n.js              # i18next configuration
-├── index.html               # Single HTML entry point
-├── package.json             # Dependencies and scripts
-├── vite.config.js           # Vite configuration
-├── tailwind.config.cjs      # Tailwind CSS configuration
-├── postcss.config.cjs       # PostCSS configuration
-├── vercel.json              # Deployment config (SPA fallback)
-└── README.md                # This file
-```
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-- Node.js 18+ and npm
-- Modern web browser
-
-### Step 1: Install Dependencies
-
-```bash
-cd C:\Users\ACER\WebstormProjects\akadiledu-v2
-npm install
-```
-
-### Step 2: Run Development Server
-
-```bash
-npm run dev
-```
-
-The app will open at `http://localhost:3000`
-
-### Step 3: Build for Production
-
-```bash
-npm run build
-```
-
-Output will be in the `dist/` directory.
-
-### Step 4: Preview Production Build
-
-```bash
-npm run preview
-```
-
-## 🎨 Customization
-
-### Theme Colors
-Edit `tailwind.config.cjs` to customize the primary color palette:
-
-```js
-colors: {
-  primary: {
-    500: '#5b8cc9', // Main brand color (from legacy AkadilEDU)
-    // ... other shades
-  }
-}
-```
-
-### Icons
-Replace placeholder icons in `public/icons/` with actual PNG files:
-- Use https://realfavicongenerator.net/ to generate all sizes
-- Or create manually: 72x72, 96x96, 128x128, 144x144, 152x152, 192x192, 384x384, 512x512
-
-### Translations
-Add or modify translations in `src/i18n.js`:
-
-```js
-const resources = {
-  en: { translation: { ... } },
-  ru: { translation: { ... } },
-  kk: { translation: { ... } }
-};
-```
-
-## 🔥 Firebase Integration (Completed)
-
-### Firebase Modules Implemented
-
-#### 1. Authentication (`src/firebase/auth.js`)
-- **`signupWithEmail(email, password, profileData)`** - Create account with email/password
-- **`loginWithEmail(email, password)`** - Sign in with email/password
-- **`loginWithGoogle()`** - Sign in with Google popup
-- **`logout()`** - Sign out current user
-- **`sendVerificationEmail(user)`** - Send email verification
-- **`onAuthStateChanged(callback)`** - Listen to auth state
-
-#### 2. Storage (`src/firebase/storage.js`)
-- **`uploadUserAvatar(uid, file, onProgress)`** - Upload avatar (max 5MB)
-- **`deleteUserAvatar(avatarUrl)`** - Delete avatar from Storage
-- **`uploadCourseCover(courseId, file, onProgress)`** - Upload course cover (admin only)
-
-#### 3. Firestore (`src/firebase/firestore.js`)
-- **`createOrUpdateUserProfile(uid, profileData)`** - Save user profile
-- **`getUserProfile(uid)`** - Get user profile
-- **`checkAdminStatus(uid)`** - Check if user is admin
-- **`createAdmin(uid, displayName, createdByUid)`** - Create admin
-- **`listCourses()`** - Get all courses
-- **`getCourse(courseId)`** - Get single course
-- **`saveCourse(courseId, data)`** - Create/update course
-- **`getAllUsers()`** - Get all users (admin only)
-- **`logAuthEvent(uid, ip, ua)`** - Log login events
-
-### Firebase Configuration
-
-The app is configured with your Firebase project:
-
-```javascript
-Project ID: akadiledu
-Auth Domain: akadiledu.firebaseapp.com
-Storage Bucket: akadiledu.firebasestorage.app
-```
-
-**Authentication Methods Enabled:**
-- ✅ Email/Password
-- ✅ Google Sign-In
-- ✅ Apple Sign-In
-
-### Admin Account Setup
-
-**Admin Email**: `youtub.maj@gmail.com`  
-**Password**: `Admin123@`
-
-⚠️ **IMPORTANT**: After first login, immediately:
-1. Change your password via Profile modal
-2. Verify the admin document exists in Firestore
-3. Test admin panel access (Prompt 3)
-
-### Security Rules Required
-
-**See `FIREBASE_RULES.md` for complete security rules.**
-
-You must apply these rules in Firebase Console:
-
-1. **Firestore Rules**: Database → Rules → Copy from FIREBASE_RULES.md
-2. **Storage Rules**: Storage → Rules → Copy from FIREBASE_RULES.md
-
-### Pages Added
-
-- **`/`** - Public home page (accessible without login) 🆕
-- **`/login`** - Email/Password + Google + Apple sign-in
-- **`/signup`** - Registration with email verification + Google/Apple
-- **Email Verification Banner** - Appears when email not verified
-- **Sign In Button** - Shows in header when not logged in 🆕
-- **Logout Button** - In header dropdown when logged in
-
-### IP Logging
-
-**Visible Console Logging** 🆕
-- IP address detection logs appear in browser console
-- Format: `🌐 IP Address detected: xxx.xxx.xxx.xxx`
-- Login events logged: `📝 Login event logged for user: email@example.com IP: xxx.xxx.xxx.xxx`
-- Fallback message if IP unavailable: `⚠️ Could not fetch IP address`
-- All login events saved to Firestore `auth_logs` collection
-
-## 📱 PWA Testing
-
-### Test "Add to Home Screen"
-
-1. **Chrome Desktop**: Open DevTools → Application → Manifest → "Update on reload"
-2. **Chrome Mobile**: Menu → "Add to Home screen"
-3. **iOS Safari**: Share → "Add to Home Screen"
-
-### Service Worker Status
-Check in DevTools → Application → Service Workers
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-
-```bash
-npm install -g vercel
-vercel
-```
-
-The `vercel.json` is already configured for SPA routing.
-
-### Other Platforms
-Ensure the hosting platform redirects all routes to `/index.html` for client-side routing.
-
-## 📝 Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-
-## 🔒 Privacy & Data Storage
-
-### Essential Cookies
-The app stores only essential data in localStorage:
-- `ak_consent` - User consent status
-- `ak_theme` - Theme preference (light/dark)
-- `ak_lang` - Language preference (kk/ru/en)
-
-### Profile Data (with consent)
-- `users.profile` - User profile information (name, email, phone, avatar)
-
-### No Tracking
-- No analytics cookies
-- No third-party tracking
-- No cookies sent to external servers (until Firebase is added in Prompt 2)
-
-## 🧪 Testing Checklist
-
-### Visual Tests
-- [ ] Header displays correctly on mobile and desktop
-- [ ] Sidebar collapses/expands on desktop hover
-- [ ] Sidebar opens as drawer on mobile
-- [ ] Theme toggle switches between light/dark
-- [ ] Language selector changes UI language
-- [ ] Profile modal opens and closes
-- [ ] Avatar upload shows progress
-- [ ] Cookie consent banner appears on first visit
-- [ ] All routes navigate correctly
-
-### Functional Tests
-- [ ] Theme preference persists after reload
-- [ ] Language preference persists after reload
-- [ ] Profile data saves to localStorage (with consent)
-- [ ] Avatar upload calls placeholder function
-- [ ] Cookie settings dialog allows clearing data
-- [ ] Service worker registers successfully
-- [ ] App works offline (cached assets)
-
-### Accessibility Tests
-- [ ] All interactive elements are keyboard accessible
-- [ ] Focus rings visible on tab navigation
-- [ ] ARIA labels present on icon buttons
-- [ ] Color contrast meets WCAG standards
-
-## 🐛 Known Limitations
-
-1. **Icons**: Placeholder icons need to be replaced with actual PWA icons
-2. **Avatar Upload**: Currently uses object URLs (temporary) - will be replaced with Firebase Storage in Prompt 2
-3. **Auth**: No authentication yet - coming in Prompt 2
-4. **Admin Panel**: Admin route exists but requires Prompt 3 implementation
-5. **Courses**: Course data is placeholder - will use Firestore in Prompt 2
-
-## 📚 Tech Stack
-
-- **Framework**: React 18.2
-- **Build Tool**: Vite 5.0
-- **Styling**: Tailwind CSS 3.3
-- **Routing**: React Router 6.20
-- **i18n**: react-i18next 13.5
-- **UI Components**: Headless UI 1.7
-- **Icons**: Lucide React 0.294
-- **Language**: JavaScript (ES2020+)
-
-## 🤝 Contributing
-
-This is a private educational platform. Code structure follows:
-- Component-based architecture
-- Tailwind utility-first styling
-- Modular file organization
-- Clear separation of concerns
-
-## 📄 License
-
-Private project for AkadilEDU platform.
+# AkadilEdu v2 - Comprehensive Educational Platform
+
+## 📋 Table of Contents
+
+- [Project Overview](#project-overview)
+- [Technology Stack](#technology-stack)
+  - [Frontend Technologies](#frontend-technologies)
+  - [Backend Technologies](#backend-technologies)
+  - [Development Tools](#development-tools)
+  - [Deployment & Hosting](#deployment--hosting)
+- [Architecture](#architecture)
+  - [Frontend Architecture](#frontend-architecture)
+  - [Backend Architecture](#backend-architecture)
+- [Project Structure](#project-structure)
+  - [Root Directory Files](#root-directory-files)
+  - [Source Directory (`src/`)](#source-directory-src)
+  - [Public Directory (`public/`)](#public-directory-public)
+  - [Configuration Files](#configuration-files)
+- [Key Features](#key-features)
+- [Installation & Setup](#installation--setup)
+- [Environment Variables](#environment-variables)
+- [Firebase Configuration](#firebase-configuration)
+- [Authentication System](#authentication-system)
+- [Role-Based Access Control](#role-based-access-control)
+- [Internationalization (i18n)](#internationalization-i18n)
+- [PWA Features](#pwa-features)
+- [Deployment](#deployment)
+- [Admin Account Setup](#admin-account-setup)
+- [Security & Privacy](#security--privacy)
+- [Available Scripts](#available-scripts)
+- [Testing](#testing)
+- [Known Limitations](#known-limitations)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
 
 ---
 
-## ✅ Prompt 1 Completion Status
+## 📖 Project Overview
 
-All requirements from Prompt 1 have been implemented:
-- ✅ React + Vite project structure
-- ✅ Tailwind CSS configuration
-- ✅ Header with logo, language, theme, profile
-- ✅ Responsive sidebar (desktop hover, mobile drawer)
-- ✅ Profile modal with avatar upload UI
-- ✅ i18n with kk/ru/en languages
-- ✅ Theme toggle (light/dark)
-- ✅ Cookie consent banner
-- ✅ PWA manifest and service worker
-- ✅ Clean routing (no .html files)
-- ✅ localStorage with consent management
-- ✅ Placeholder functions for Firebase
-- ✅ Production-quality code
-- ✅ README with setup instructions
+AkadilEdu v2 is a modern, comprehensive educational platform built with React and Firebase. It provides a complete learning management system with course management, user authentication, role-based access control, multilingual support, and PWA capabilities. The platform is designed to support both administrators and students with distinct interfaces and functionalities.
 
-# AkadilEDU v2 🎓
+---
 
-Modern educational platform with Firebase integration, role-based access, and multi-language support.
+## 🛠 Technology Stack
 
-## ✨ Features
+### Frontend Technologies
 
-- 🔐 **Authentication System**
-  - Email/Password registration with email verification
-  - Google Sign-In integration
-  - Password reset functionality
-  - Protected routes
+- **React 18.2.0** - Core JavaScript library for building user interfaces
+- **Vite 4.4.5** - Fast build tool and development server
+- **React Router DOM 6.15.0** - Client-side routing for single-page applications
+- **Tailwind CSS 3.3.3** - Utility-first CSS framework for styling
+- **Headless UI 1.7.13** - Unstyled, fully accessible UI components
+- **Lucide React 0.263.1** - Beautiful & consistent icon toolkit
+- **React-i18next 13.0.2** - Internationalization framework for React
+- **i18next 23.4.4** - Core internationalization library
+- **i18next-browser-languagedetector 7.1.0** - Browser language detection for i18next
+- **React Hot Toast 2.4.1** - Lightweight notification system
+- **React Hook Form 7.45.4** - Performant, flexible and extensible forms
+- **React Player 2.13.0** - React component for playing video and audio
+- **Firebase 10.1.0** - Client-side Firebase SDK for web applications
 
-- 👥 **Role-Based Access Control**
-  - **Admin**: Full control (youtub.maj@gmail.com)
-  - **Student**: Course access, tests, progress tracking
+### Backend Technologies
 
-- 📄 **Profile Management**
-  - Editable user profiles
-  - Avatar upload
-  - Personal information management
+- **Firebase Authentication** - User authentication service (Email/Password, Google, Apple Sign-In)
+- **Firebase Firestore** - NoSQL document database for data storage
+- **Firebase Storage** - Cloud storage for files and media
+- **Firebase Realtime Database** - Real-time database for live data synchronization
+- **Firebase Cloud Functions** - Serverless backend functions (if needed)
+- **Firebase Hosting** - Static site hosting and CDN
 
-- 🌐 **Multi-Language Support**
-  - Russian (Русский)
-  - Kazakh (Қазақ)
-  - English
+### Development Tools
 
-- 🎨 **Modern UI/UX**
-  - Responsive design (mobile-first)
-  - Dark mode support
-  - Smooth animations
-  - Gradient effects
+- **ESLint 8.47.0** - JavaScript linting utility for code quality
+- **PostCSS 8.4.27** - CSS transformation tool with plugins
+- **Autoprefixer 10.4.15** - PostCSS plugin to parse CSS and add vendor prefixes
+- **Git** - Version control system
+- **Node.js** - JavaScript runtime environment
 
-- ⚡ **Performance Optimizations**
-  - Lazy loading pages
-  - Code splitting
-  - Optimized bundle size
-  - Service Worker (PWA ready)
+### Deployment & Hosting
 
-## 🛠️ Tech Stack
+- **Vercel** - Platform for frontend frameworks and static sites
+- **Firebase Hosting** - Google's hosting service for web applications
+- **Vercel Analytics** - Performance monitoring and analytics
 
-- **Frontend**: React 18 + Vite
-- **Styling**: Tailwind CSS
-- **Backend**: Firebase
-  - Authentication
-  - Firestore Database
-  - Cloud Storage
-- **Icons**: Lucide React
-- **i18n**: react-i18next
-- **Routing**: React Router v6
+---
 
-## 📦 Installation
+## 🏗 Architecture
 
-```bash
-# Clone repository
-git clone https://github.com/AQADIL/akadiledu-v2-1.git
-cd akadiledu-v2-1
+### Frontend Architecture
 
-# Install dependencies
-npm install
+The frontend follows a component-based architecture with clear separation of concerns:
 
-# Run development server
-npm run dev
+- **Component-Driven Development**: Reusable UI components in `src/components/`
+- **Page-Based Routing**: Individual page components in `src/pages/`
+- **Custom Hooks**: Reusable logic in `src/hooks/`
+- **Utility Functions**: Helper functions in `src/utils/`
+- **Service Layer**: Firebase integration in `src/firebase/`
+- **State Management**: Local state with React hooks and Firebase real-time listeners
+- **Routing**: Client-side routing with React Router
+- **Styling**: Utility-first approach with Tailwind CSS
+- **Internationalization**: Multi-language support with react-i18next
 
-# Build for production
-npm run build
-```
+### Backend Architecture
 
-## 🔧 Configuration
+The backend leverages Firebase's serverless architecture:
 
-Create `.env` file in root:
+- **Firebase Authentication**: Handles user authentication and authorization
+- **Firestore Database**: Stores application data (courses, users, progress)
+- **Firebase Storage**: Manages file uploads (videos, documents, images)
+- **Realtime Database**: Handles real-time features like live updates
+- **Security Rules**: Enforces data access control and validation
+- **Cloud Functions**: Server-side logic for complex operations (if needed)
 
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
+---
 
 ## 📁 Project Structure
 
+### Root Directory Files
+
+| File | Purpose |
+|------|---------|
+| `package.json` | Project metadata, dependencies, and npm scripts |
+| `package-lock.json` | Lock file for exact dependency versions |
+| `vite.config.js` | Vite build tool configuration |
+| `tailwind.config.cjs` | Tailwind CSS configuration and custom theme |
+| `postcss.config.cjs` | PostCSS configuration with Autoprefixer |
+| `.eslintrc.cjs` | ESLint configuration for code linting |
+| `.gitignore` | Git ignore patterns for version control |
+| `index.html` | Main HTML entry point for the application |
+| `firebase.json` | Firebase project configuration |
+| `.firebaserc` | Firebase project alias configuration |
+| `vercel.json` | Vercel deployment configuration |
+| `.vercelignore` | Files to ignore during Vercel deployment |
+| `.env.example` | Environment variables template |
+| `database-import.json` | Sample database structure for import |
+| `firebase-realtime-rules.json` | Realtime database security rules |
+| `firebase-rtdb-rules.json` | Additional RTDB security rules |
+| `TEMP_RULES_FOR_TESTING.json` | Temporary security rules for testing |
+| `MIGRATE_NOW.bat` | Windows batch script for migration |
+| `BACKEND_HOSTING.md` | Backend hosting documentation |
+| `UBT_TEST_SYSTEM_README.md` | UBT test system documentation |
+
+### Source Directory (`src/`)
+
+| Directory/File | Purpose |
+|----------------|---------|
+| `main.jsx` | Application entry point and React initialization |
+| `App.jsx` | Main application component with routing setup |
+| `i18n.js` | Internationalization configuration and translations |
+| `components/` | Reusable UI components |
+| `pages/` | Page-level components for routing |
+| `hooks/` | Custom React hooks for reusable logic |
+| `firebase/` | Firebase configuration and service functions |
+| `utils/` | Utility functions and helpers |
+| `styles/` | Global styles and CSS files |
+
+#### Components Directory (`src/components/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `AdminGuard.jsx` | HOC for admin-only route protection |
+| `BlockedAccountOverlay.jsx` | UI for blocked account notification |
+| `CookieConsent.jsx` | Cookie consent management component |
+| `CustomVideoPlayer.jsx` | Custom video player with controls |
+| `EmailVerificationBanner.jsx` | Banner for email verification reminder |
+| `Header.jsx` | Main navigation header component |
+| `ProfileModal.jsx` | User profile modal component |
+| `SessionRevokedModal.jsx` | Modal for session revocation notification |
+| `Sidebar.jsx` | Navigation sidebar component |
+| `admin/` | Admin-specific components |
+| `test/` | Test-related components |
+
+#### Pages Directory (`src/pages/`)
+
+| Page | Purpose |
+|------|---------|
+| `AuthAction.jsx` | Authentication action handler page |
+| `CourseDetail.jsx` | Individual course detail page |
+| `Courses.jsx` | Courses listing page |
+| `EmailVerificationRequired.jsx` | Email verification requirement page |
+| `ForgotPassword.jsx` | Password recovery page |
+| `Home.jsx` | Homepage/landing page |
+| `Login.jsx` | User login page |
+| `MyCourses.jsx` | User's enrolled courses page |
+| `NotFound.jsx` | 404 error page |
+| `Profile.jsx` | User profile page |
+| `ResetPassword.jsx` | Password reset page |
+| `Shop.jsx` | Course shop/marketplace page |
+| `Signup.jsx` | User registration page |
+| `TestUBT.jsx` | UBT test interface page |
+| `VerifyEmail.jsx` | Email verification page |
+| `admin/` | Admin-specific pages |
+
+### Public Directory (`public/`)
+
+| File/Directory | Purpose |
+|----------------|---------|
+| `firebase-messaging-sw.js` | Firebase messaging service worker for push notifications |
+| `manifest.json` | PWA manifest file for app installation |
+| `icons/` | Application icons for various sizes and platforms |
+
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `firebase.json` | Firebase project configuration and hosting settings |
+| `.firebaserc` | Firebase project aliases for multiple environments |
+| `vercel.json` | Vercel deployment configuration and build settings |
+| `.eslintrc.cjs` | ESLint rules and configuration for code quality |
+| `tailwind.config.cjs` | Tailwind CSS customization and theme configuration |
+| `postcss.config.cjs` | PostCSS plugin configuration |
+| `vite.config.js` | Vite build tool configuration and plugins |
+
+---
+
+## ✨ Key Features
+
+- **Multi-language Support**: Kazakh, Russian, and English languages
+- **Role-Based Access Control**: Admin and Student roles with different permissions
+- **Course Management**: Create, edit, and manage educational courses
+- **Video Streaming**: Custom video player with progress tracking
+- **Progress Tracking**: Monitor learning progress and completion
+- **PWA Capabilities**: Installable app with offline support
+- **Real-time Updates**: Live data synchronization
+- **Secure Authentication**: Multiple auth providers (Email, Google, Apple)
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **File Management**: Upload and manage course materials
+- **Test System**: Integrated testing and assessment tools
+- **Admin Dashboard**: Comprehensive admin interface
+- **User Profiles**: Detailed user management and profiles
+
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+
+- Node.js 16+ installed
+- Firebase project created
+- Git for version control
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd akadiledu-v2
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Firebase configuration
+   ```
+
+4. **Configure Firebase**
+   - Install Firebase CLI: `npm install -g firebase-tools`
+   - Login to Firebase: `firebase login`
+   - Initialize Firebase: `firebase init`
+   - Deploy security rules: `firebase deploy --only firestore:rules,storage`
+
+5. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 🔧 Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
-akadiledu-v2/
-├── src/
-│   ├── components/       # Reusable components
-│   ├── pages/           # Page components
-│   ├── firebase/        # Firebase configuration
-│   ├── utils/           # Utility functions
-│   ├── styles/          # Global styles
-│   └── i18n.js         # Translations
-├── public/              # Static assets
-└── .gitignore          # Git ignore rules
-```
+
+---
+
+## 🔥 Firebase Configuration
+
+### Firebase Services Used
+
+1. **Authentication**
+   - Email/Password authentication
+   - Google Sign-In
+   - Apple Sign-In
+   - Email verification
+
+2. **Firestore Database**
+   - Users collection
+   - Courses collection
+   - Progress tracking
+   - Test results
+
+3. **Firebase Storage**
+   - Course videos
+   - Document uploads
+   - User avatars
+   - Course materials
+
+4. **Realtime Database**
+   - Live updates
+   - Session management
+   - Real-time notifications
+
+### Security Rules
+
+- **Firestore Rules**: Control data access based on user roles and authentication
+- **Storage Rules**: Restrict file access to authorized users
+- **Realtime Database Rules**: Secure real-time data access
+
+---
+
+## 🔐 Authentication System
+
+### Supported Providers
+
+- **Email/Password**: Traditional authentication method
+- **Google Sign-In**: OAuth integration with Google
+- **Apple Sign-In**: OAuth integration with Apple
+
+### Authentication Flow
+
+1. User initiates login/signup
+2. Firebase Auth handles authentication
+3. User profile created/updated in Firestore
+4. JWT token generated and stored
+5. User redirected based on role and verification status
+
+### Session Management
+
+- JWT tokens for session management
+- Automatic token refresh
+- Session revocation handling
+- Secure logout functionality
+
+---
+
+## 👥 Role-Based Access Control
+
+### User Roles
+
+- **Admin**: Full access to all features and user management
+- **Student**: Access to courses, tests, and personal progress
+
+### Access Control Implementation
+
+- Route guards for protected pages
+- Component-level access control
+- Firestore security rules
+- Firebase Auth custom claims (if needed)
+
+### Admin Features
+
+- User management
+- Course creation and editing
+- Progress monitoring
+- Test management
+- System configuration
+
+### Student Features
+
+- Course enrollment
+- Video streaming
+- Progress tracking
+- Test participation
+- Profile management
+
+---
+
+## 🌍 Internationalization (i18n)
+
+### Supported Languages
+
+- **Kazakh (kk)**: Primary language
+- **Russian (ru)**: Secondary language
+- **English (en)**: International language
+
+### Implementation
+
+- **react-i18next**: React integration for i18next
+- **i18next-browser-languagedetector**: Automatic language detection
+- **Translation Files**: Organized by language in `i18n.js`
+- **Dynamic Language Switching**: Runtime language changes
+- **Fallback Support**: Graceful fallback to default language
+
+### Translation Structure
+
+Translations are organized by feature and component:
+- Navigation and UI elements
+- Form labels and messages
+- Error messages and notifications
+- Course content and descriptions
+- Test questions and answers
+
+---
+
+## 📱 PWA Features
+
+### Progressive Web App Capabilities
+
+- **Offline Support**: Caching strategies for offline usage
+- **App Installation**: Installable as native app
+- **Push Notifications**: Firebase Cloud Messaging integration
+- **Responsive Design**: Optimized for all screen sizes
+- **Fast Loading**: Optimized assets and lazy loading
+
+### Service Worker
+
+- **firebase-messaging-sw.js**: Handles push notifications
+- **Caching Strategy**: Network-first for critical assets
+- **Background Sync**: Sync data when connection restored
+
+### Manifest Configuration
+
+- **App Name**: AkadilEdu v2
+- **Icons**: Multiple sizes for various devices
+- **Theme Colors**: Consistent branding
+- **Display Mode**: Standalone app experience
+
+---
 
 ## 🚀 Deployment
 
-The project is configured for Vercel deployment with `vercel.json`.
+### Vercel Deployment
+
+1. **Connect Repository**
+   - Link GitHub repository to Vercel
+   - Configure build settings
+
+2. **Environment Variables**
+   - Add all required environment variables
+   - Configure Firebase settings
+
+3. **Build Configuration**
+   - Build command: `npm run build`
+   - Output directory: `dist`
+   - Install command: `npm install`
+
+4. **Deploy**
+   - Automatic deployment on push to main branch
+   - Preview deployments for pull requests
+
+### Firebase Hosting
+
+1. **Build Application**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to Firebase**
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+3. **Configure Security Rules**
+   ```bash
+   firebase deploy --only firestore:rules,storage
+   ```
+
+### Production Checklist
+
+- [ ] Environment variables configured
+- [ ] Firebase security rules deployed
+- [ ] SSL certificate configured
+- [ ] Domain settings updated
+- [ ] Analytics and monitoring set up
+- [ ] PWA manifest configured
+- [ ] Service worker registered
+
+---
+
+## 👤 Admin Account Setup
+
+### Default Admin Credentials
+
+- **Email**: `youtub.maj@gmail.com`
+- **Password**: `Admin123@`
+
+### Admin Setup Process
+
+1. Create admin account through signup
+2. Verify email address
+3. Set admin role in Firebase Console
+4. Configure admin-specific permissions
+5. Test admin functionality
+
+### Firebase Project Configuration
+
+- **Project ID**: `akadiledu`
+- **Auth Domain**: `akadiledu.firebaseapp.com`
+- **Storage Bucket**: `akadiledu.firebasestorage.app`
+
+---
+
+## 🔒 Security & Privacy
+
+### Security Measures
+
+- **Firebase Authentication**: Secure user authentication
+- **Security Rules**: Database and storage access control
+- **Input Validation**: Client and server-side validation
+- **HTTPS Enforcement**: Secure data transmission
+- **XSS Protection**: Content Security Policy headers
+- **CSRF Protection**: Token-based request validation
+
+### Privacy Features
+
+- **Data Minimization**: Collect only necessary data
+- **Cookie Consent**: GDPR-compliant cookie management
+- **Data Encryption**: Encrypted data storage and transmission
+- **User Consent**: Explicit consent for data processing
+- **Data Portability**: User data export functionality
+- **Right to Deletion**: Account and data deletion options
+
+### Local Storage Keys
+
+- `ak_consent`: Cookie consent preferences
+- `ak_theme`: Theme selection (light/dark)
+- `ak_lang`: Language preference
+
+---
+
+## 📜 Available Scripts
+
+### Development Scripts
 
 ```bash
-npm run build
-# Deploy to Vercel
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
 ```
 
-## 👨‍💻 Author
+### Firebase Scripts
 
-**AQADIL**
-- GitHub: [@AQADIL](https://github.com/AQADIL)
+```bash
+firebase deploy      # Deploy to Firebase
+firebase serve       # Local Firebase server
+firebase login       # Login to Firebase CLI
+```
+
+### Utility Scripts
+
+```bash
+npm audit            # Check for security vulnerabilities
+npm outdated         # Check for outdated packages
+```
+
+---
+
+## 🧪 Testing
+
+### Testing Strategy
+
+- **Unit Tests**: Component and utility function testing
+- **Integration Tests**: Feature and workflow testing
+- **E2E Tests**: End-to-end user journey testing
+- **Performance Tests**: Load and performance testing
+
+### Testing Tools
+
+- **Jest**: JavaScript testing framework
+- **React Testing Library**: React component testing
+- **Cypress**: End-to-end testing framework
+- **Lighthouse**: Performance and accessibility testing
+
+### Test Coverage
+
+- Authentication flows
+- Course management
+- Video playback
+- Progress tracking
+- Multi-language support
+- PWA functionality
+- Responsive design
+
+---
+
+## ⚠️ Known Limitations
+
+### Current Limitations
+
+- **Offline Mode**: Limited offline functionality
+- **Real-time Features**: Dependent on Firebase connection
+- **File Upload Size**: Limited by Firebase Storage quotas
+- **Concurrent Users**: Limited by Firebase pricing plan
+- **Video Streaming**: Bandwidth-dependent performance
+
+### Future Improvements
+
+- Enhanced offline capabilities
+- Advanced analytics dashboard
+- Mobile app development
+- API rate limiting
+- Advanced search functionality
+- Social learning features
+
+---
+
+## 🤝 Contributing
+
+### Contribution Guidelines
+
+1. Fork the repository
+2. Create feature branch
+3. Make changes with tests
+4. Submit pull request
+5. Code review process
+6. Merge to main branch
+
+### Code Standards
+
+- Follow ESLint configuration
+- Use TypeScript for new features
+- Write comprehensive tests
+- Update documentation
+- Follow Git commit conventions
+
+### Development Workflow
+
+1. Setup development environment
+2. Create feature branch from main
+3. Implement changes with tests
+4. Run linting and tests
+5. Submit pull request
+6. Address review feedback
+7. Merge to main branch
+
+---
 
 ## 📄 License
 
-MIT License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-**Ready for Prompt 2: Firebase Integration**
+---
 
-**Prompt 2 Complete!** Type `GO next` to proceed with Admin Panel implementation (Prompt 3).
+## 👨‍💻 Author
+
+**AkadilEdu Development Team**
+
+- **Project Lead**: Akadil
+- **Frontend Development**: React, Vite, Tailwind CSS
+- **Backend Development**: Firebase Services
+- **UI/UX Design**: Modern, responsive design
+- **DevOps**: Vercel, Firebase Hosting
+
+---
+
+## 📞 Support
+
+For support and inquiries:
+
+- **Email**: support@akadiledu.com
+- **Documentation**: This README file
+- **Issues**: GitHub Issues
+- **Community**: Developer forums
+
+---
+
+## 🔄 Version History
+
+### v2.0.0 (Current)
+- Complete rewrite with modern React
+- Firebase integration
+- PWA capabilities
+- Multi-language support
+- Admin dashboard
+- Enhanced security
+
+### v1.0.0 (Legacy)
+- Basic educational platform
+- Limited features
+- Single language support
+
+---
+
+*Last updated: [Current Date]*
+
+---
+
+*This README provides comprehensive documentation for the AkadilEdu v2 educational platform. For specific implementation details, refer to the source code and inline documentation.*

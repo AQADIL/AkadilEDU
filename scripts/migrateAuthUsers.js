@@ -1,15 +1,3 @@
-/**
- * МИГРАЦИЯ ПОЛЬЗОВАТЕЛЕЙ ИЗ FIREBASE AUTHENTICATION В REALTIME DATABASE
- * 
- * Этот скрипт переносит всех существующих пользователей из Firebase Auth
- * в Realtime Database с созданием полных профилей.
- * 
- * УСТАНОВКА:
- * npm install firebase-admin --save-dev
- * 
- * ЗАПУСК:
- * node scripts/migrateAuthUsers.js
- */
 
 import admin from 'firebase-admin';
 import { readFileSync } from 'fs';

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { User, Mail, Phone, Calendar, Edit2, Save, X, Camera, Shield } from 'lucide-react';
 import { auth } from '../firebase/config';
 import { getUserProfile, updateUserProfile } from '../firebase/firestore';
+import AppLoader from '../components/AppLoader';
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -83,11 +84,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <AppLoader text={t('common.loading')} />;
   }
 
   return (

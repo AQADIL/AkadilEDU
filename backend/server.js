@@ -2,10 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// Load service account from file or environment variable
 let serviceAccount;
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  // For Vercel/cloud deployment
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } else {
   // For local development

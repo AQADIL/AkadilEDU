@@ -10,6 +10,7 @@ import {
   Shield,
   Users,
   AlertTriangle,
+  FileText,
   X 
 } from 'lucide-react';
 import { auth } from '../firebase/config';
@@ -79,6 +80,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const adminMenuItems = [
     { icon: Shield, label: 'Админ Панель', path: '/admin' },
     { icon: Users, label: 'Пользователи', path: '/admin/users' },
+    { icon: FileText, label: 'Управление Тестами', path: '/admin/tests' },
     { icon: AlertTriangle, label: 'Безопасность', path: '/admin/security' },
   ];
 

@@ -8,6 +8,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getDatabase } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
@@ -26,6 +27,7 @@ const firebaseConfig = {
 let app;
 let auth;
 let db;
+let rtdb;
 let storage;
 let isInitialized = false;
 
@@ -37,6 +39,10 @@ try {
   db = null;
   console.log('ℹ️ Firestore disabled (using Realtime Database only)');
   
+  // Initialize Realtime Database
+  rtdb = getDatabase(app);
+  console.log('✅ Realtime Database initialized successfully');
+  
   storage = getStorage(app);
   isInitialized = true;
   console.log('✅ Firebase initialized successfully');
@@ -47,4 +53,4 @@ try {
 // Graceful degradation check
 export const isFirebaseConfigured = () => isInitialized;
 
-export { app, auth, db, storage };
+export { app, auth, db, rtdb, storage };

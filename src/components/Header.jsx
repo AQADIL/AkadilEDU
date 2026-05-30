@@ -41,11 +41,14 @@ export default function Header({ onMenuClick, onProfileClick, userAvatar, user }
             </button>
             
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:inline">
-                {t('header.logo')}
+              <img
+                src="/icons/logo-прозрачный.png"
+                alt="AkadilEDU logo"
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              />
+              <span className="text-xl font-bold hidden sm:inline">
+                <span className="text-gray-900 dark:text-white">Akadil</span>
+                <span style={{ color: 'rgb(3,78,145)' }}>EDU</span>
               </span>
             </div>
           </div>

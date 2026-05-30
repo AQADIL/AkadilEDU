@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Users, BookOpen, Shield, Settings, Bell, Send, AlertCircle } from 'lucide-react';
 import { ref, get } from 'firebase/database';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { database } from '../../firebase/realtimeDb';
 import { Link } from 'react-router-dom';
 import { auth } from '../../firebase/config';
+import AppLoader from '../../components/AppLoader';
 
 export default function AdminDashboard() {
   const user = auth.currentUser;
@@ -27,6 +29,8 @@ export default function AdminDashboard() {
   const [pushImageUrl, setPushImageUrl] = useState('');
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState(null);
+
+  const functions = getFunctions();
 
   useEffect(() => {
     loadStats();
@@ -95,25 +99,15 @@ export default function AdminDashboard() {
     setSendResult(null);
     
     try {
-      console.log('📱 Sending push notification to all users...');
-      
-      // Send to local backend instead of Cloud Functions
-      const BACKEND_URL = 'http://localhost:3001';
-      
-      const response = await fetch(`${BACKEND_URL}/api/send-push-to-all`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: pushTitle,
-          message: pushMessage,
-          imageUrl: pushImageUrl || undefined,
-          adminUid: user?.uid // Pass admin UID for logging
-        })
+      console.log('\ud83d\udcf1 Sending push notification to all users via Cloud Function...');
+
+      const sendPushToAll = httpsCallable(functions, 'sendPushToAll');
+      const { data: result } = await sendPushToAll({
+        title: pushTitle,
+        message: pushMessage,
+        imageUrl: pushImageUrl || undefined
       });
 
-      const result = await response.json();
       console.log('✅ Push result:', result);
 
       setSendResult({
@@ -132,10 +126,7 @@ export default function AdminDashboard() {
       console.error('❌ Error sending push:', error);
       
       let errorMessage = 'Ошибка отправки';
-      
-      if (error.message.includes('Failed to fetch')) {
-        errorMessage = '⚠️ Backend не запущен. Выполните: cd backend && npm start';
-      } else if (error.message) {
+      if (error.message) {
         errorMessage = error.message;
       }
       
@@ -174,11 +165,7 @@ export default function AdminDashboard() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <AppLoader text="Загрузка панели администратора..." />;
   }
 
   return (

@@ -104,14 +104,40 @@ export default function CourseEditor({ course, isOpen, onClose }) {
             [lessonId]: {
               title: 'Новый урок',
               videoUrl: '',
+              order: Object.keys(currentLessons).length,
               duration: 0,
               homeworkUrl: '',
-              formulasUrl: ''
+              formulasUrl: '',
+              materials: []
             }
           }
         }
       }
     });
+  };
+
+  // ─── Formula links helpers ───
+  const addFormulaLink = (moduleId, lessonId) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.formulaLinks) ? lesson.formulaLinks : (lesson.formulasUrl ? [lesson.formulasUrl] : []);
+    updateLesson(moduleId, lessonId, 'formulaLinks', [...current, '']);
+  };
+
+  const updateFormulaLink = (moduleId, lessonId, index, value) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.formulaLinks) ? [...lesson.formulaLinks] : (lesson.formulasUrl ? [lesson.formulasUrl] : []);
+    current[index] = value;
+    updateLesson(moduleId, lessonId, 'formulaLinks', current);
+  };
+
+  const removeFormulaLink = (moduleId, lessonId, index) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.formulaLinks) ? [...lesson.formulaLinks] : [];
+    current.splice(index, 1);
+    updateLesson(moduleId, lessonId, 'formulaLinks', current);
   };
 
   const updateLesson = (moduleId, lessonId, field, value) => {
@@ -142,6 +168,69 @@ export default function CourseEditor({ course, isOpen, onClose }) {
         [moduleId]: {
           ...formData.modules[moduleId],
           lessons: rest
+        }
+      }
+    });
+  };
+
+  const moveModule = (moduleId, direction) => {
+    const entries = Object.entries(formData.modules || {});
+    if (entries.length <= 1) return;
+
+    const sorted = [...entries].sort(([, a], [, b]) => (a.order || 0) - (b.order || 0));
+    const currentIndex = sorted.findIndex(([id]) => id === moduleId);
+    if (currentIndex === -1) return;
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= sorted.length) return;
+
+    const reordered = [...sorted];
+    const temp = reordered[currentIndex];
+    reordered[currentIndex] = reordered[targetIndex];
+    reordered[targetIndex] = temp;
+
+    const newModules = { ...formData.modules };
+    reordered.forEach(([id, module], index) => {
+      newModules[id] = { ...module, order: index };
+    });
+
+    setFormData({
+      ...formData,
+      modules: newModules
+    });
+  };
+
+  const moveLesson = (moduleId, lessonId, direction) => {
+    const module = formData.modules[moduleId];
+    if (!module || !module.lessons) return;
+
+    const entries = Object.entries(module.lessons);
+    if (entries.length <= 1) return;
+
+    const sorted = [...entries].sort(([, a], [, b]) => (a.order || 0) - (b.order || 0));
+    const currentIndex = sorted.findIndex(([id]) => id === lessonId);
+    if (currentIndex === -1) return;
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= sorted.length) return;
+
+    const reordered = [...sorted];
+    const temp = reordered[currentIndex];
+    reordered[currentIndex] = reordered[targetIndex];
+    reordered[targetIndex] = temp;
+
+    const newLessons = {};
+    reordered.forEach(([id, lesson], index) => {
+      newLessons[id] = { ...lesson, order: index };
+    });
+
+    setFormData({
+      ...formData,
+      modules: {
+        ...formData.modules,
+        [moduleId]: {
+          ...module,
+          lessons: newLessons
         }
       }
     });
@@ -252,7 +341,9 @@ export default function CourseEditor({ course, isOpen, onClose }) {
               </div>
 
               <div className="space-y-4">
-                {Object.entries(formData.modules).map(([moduleId, module]) => (
+                {Object.entries(formData.modules)
+                  .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0))
+                  .map(([moduleId, module], moduleIndex, modulesArray) => (
                   <div
                     key={moduleId}
                     className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
@@ -269,12 +360,32 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                           placeholder="Название модуля"
                         />
                       </div>
-                      <button
-                        onClick={() => deleteModule(moduleId)}
-                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      <div className="flex flex-col items-end gap-1">
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveModule(moduleId, 'up')}
+                            disabled={moduleIndex === 0}
+                            className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveModule(moduleId, 'down')}
+                            disabled={moduleIndex === (modulesArray.length - 1)}
+                            className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            ↓
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => deleteModule(moduleId)}
+                          className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Lessons */}
@@ -287,7 +398,9 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                         Добавить урок
                       </button>
 
-                      {module.lessons && Object.entries(module.lessons).map(([lessonId, lesson]) => (
+                      {module.lessons && Object.entries(module.lessons)
+                        .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0))
+                        .map(([lessonId, lesson], lessonIndex, lessonsArray) => (
                         <div
                           key={lessonId}
                           className="bg-white dark:bg-gray-600 rounded-lg p-3 sm:p-4"
@@ -347,28 +460,68 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                                   />
                                 </div>
 
-                                {/* Формулы */}
-                                <div className="space-y-1">
-                                  <label className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                                    <Calculator className="w-3 h-3" />
-                                    <span>Формулалар / Формулы (Google Drive)</span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={lesson.formulasUrl || ''}
-                                    onChange={(e) => updateLesson(moduleId, lessonId, 'formulasUrl', e.target.value)}
-                                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
-                                    placeholder="https://drive.google.com/file/d/.../view"
-                                  />
+                                {/* Формулалар / Формулы (несколько ссылок) */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <label className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                      <Calculator className="w-3 h-3" />
+                                      <span>{t('courseDetail.formulasTitle')}</span>
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => addFormulaLink(moduleId, lessonId)}
+                                      className="text-xs px-2 py-1 rounded bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200"
+                                    >
+                                      + {t('courseEditor.addModule').split(' ')[0]}
+                                    </button>
+                                  </div>
+                                  {(Array.isArray(lesson.formulaLinks) ? lesson.formulaLinks : (lesson.formulasUrl ? [lesson.formulasUrl] : [])).map((url, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                      <input
+                                        type="text"
+                                        value={url || ''}
+                                        onChange={(e) => updateFormulaLink(moduleId, lessonId, idx, e.target.value)}
+                                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                        placeholder="https://drive.google.com/file/d/.../view"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => removeFormulaLink(moduleId, lessonId, idx)}
+                                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                      </button>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
-                            <button
-                              onClick={() => deleteLesson(moduleId, lessonId)}
-                              className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
-                            >
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </button>
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => moveLesson(moduleId, lessonId, 'up')}
+                                  disabled={lessonIndex === 0}
+                                  className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-500 hover:bg-gray-200 dark:hover:bg-gray-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                  ↑
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveLesson(moduleId, lessonId, 'down')}
+                                  disabled={lessonIndex === (lessonsArray.length - 1)}
+                                  className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-500 hover:bg-gray-200 dark:hover:bg-gray-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                  ↓
+                                </button>
+                              </div>
+                              <button
+                                onClick={() => deleteLesson(moduleId, lessonId)}
+                                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-600" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}

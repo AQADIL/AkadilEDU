@@ -96,7 +96,6 @@ export const createUserProfileOnSignup = onAuthUserCreated(async (event) => {
       return;
     }
     
-    // Создаём профиль
     const userData = {
       uid: user.uid,
       email: user.email,
@@ -119,6 +118,5 @@ export const createUserProfileOnSignup = onAuthUserCreated(async (event) => {
     
   } catch (error) {
     console.error('❌ Error in auto-create trigger:', error);
-    // Не бросаем ошибку, чтобы не блокировать регистрацию
   }
 });

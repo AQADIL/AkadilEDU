@@ -1,7 +1,6 @@
 // Combined Service Worker: PWA + FCM Push Notifications
-const CACHE_NAME = 'akadiledu-v2.3.0';
+const CACHE_NAME = 'akadiledu-v2.4.0';
 const urlsToCache = [
-  '/',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
@@ -26,19 +25,27 @@ const messaging = firebase.messaging();
 
 // Handle background push messages
 messaging.onBackgroundMessage((payload) => {
-  console.log('📱 [SW] Received background message:', payload);
-  
+  console.log('\ud83d\udcf1 [SW] Received background message:', payload);
+
   const notificationTitle = payload.notification?.title || 'AkadilEDU';
   const notificationOptions = {
     body: payload.notification?.body || 'Новое уведомление',
     icon: payload.notification?.icon || '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
-    image: payload.notification?.image || payload.data?.image, // Большое фото
-    vibrate: [200, 100, 200],
-    tag: 'akadiledu-push', // Одинаковый tag предотвращает дубликаты
-    renotify: false, // Не показывать повторно если tag совпадает
-    requireInteraction: false,
-    data: payload.data || {}
+    // Большое изображение для rich уведомлений
+    image: payload.notification?.image || payload.data?.image,
+    // Агрессивная вибрация
+    vibrate: [200, 100, 200, 100, 200],
+    // Уведомление висит, пока пользователь не взаимодействует
+    requireInteraction: true,
+    // Постоянный тег для обновления одного уведомления
+    tag: 'akadiledu-urgent',
+    renotify: true,
+    data: {
+      ...(payload.data || {}),
+      // Best-effort канал для Android (если браузер поддерживает)
+      channelId: 'high_importance_channel'
+    }
   };
 
   return self.registration.showNotification(notificationTitle, notificationOptions);

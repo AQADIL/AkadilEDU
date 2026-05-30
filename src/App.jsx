@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ProfileModal from './components/ProfileModal';
@@ -7,29 +7,33 @@ import CookieConsent from './components/CookieConsent';
 import EmailVerificationBanner from './components/EmailVerificationBanner';
 import SessionRevokedModal from './components/SessionRevokedModal';
 import BlockedAccountOverlay from './components/BlockedAccountOverlay';
+import AppWrapper from './components/AppWrapper';
 import { useSessionValidator } from './hooks/useSessionValidator';
-import { requestNotificationPermission, setupForegroundMessageListener } from './firebase/messaging';
+import { setupForegroundMessageListener } from './firebase/messaging';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
 const Courses = lazy(() => import('./pages/Courses'));
 const CourseDetail = lazy(() => import('./pages/CourseDetail'));
+const Shop = lazy(() => import('./pages/Shop'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Login = lazy(() => import('./pages/Login'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Signup = lazy(() => import('./pages/Signup'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
+const Admin = lazy(() => import('./pages/Admin'));
 const MyCourses = lazy(() => import('./pages/MyCourses'));
 const TestUBT = lazy(() => import('./pages/TestUBT'));
-const Shop = lazy(() => import('./pages/Shop'));
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
-const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const AuthAction = lazy(() => import('./pages/AuthAction'));
-const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
 const SecurityAlerts = lazy(() => import('./pages/admin/SecurityAlerts'));
+const TestManager = lazy(() => import('./components/admin/TestManager'));
 import AdminGuard from './components/AdminGuard';
 import { storage } from './utils/storage';
 import { onAuthStateChanged, initializeAuth } from './firebase/auth';
@@ -37,6 +41,8 @@ import { getUserProfile, logAuthEvent } from './firebase/firestore';
 import { getUserProfile as getRTDBProfile, createUserProfile, logUserSession } from './firebase/realtimeDb';
 import { isFirebaseConfigured } from './firebase/config';
 import './i18n';
+import AppLoader from './components/AppLoader';
+import PushPermissionRequest from './components/PushPermissionRequest';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -284,21 +290,6 @@ function App() {
 
           // Check email verification
           setShowVerificationBanner(!firebaseUser.emailVerified);
-          
-          // Request push notification permission after 2 seconds (give time for app to load)
-          setTimeout(async () => {
-            try {
-              console.log('📱 Requesting push notification permission...');
-              const token = await requestNotificationPermission(firebaseUser.uid);
-              if (token) {
-                console.log('✅ Push notifications enabled');
-              } else {
-                console.warn('⚠️ User denied notification permission');
-              }
-            } catch (error) {
-              console.warn('⚠️ Push notification setup error:', error);
-            }
-          }, 2000);
         } catch (error) {
           console.error('❌ Error in auth flow:', error);
           // Don't block login completely
@@ -347,16 +338,9 @@ function App() {
     }
   };
 
-  // Show loading spinner while checking auth
+  // Show loading UI while checking auth (fullscreen)
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
+    return <AppLoader text="Loading..." fullScreen />;
   }
 
   return (
@@ -366,6 +350,7 @@ function App() {
         v7_relativeSplatPath: true
       }}
     >
+      <AppWrapper>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         {/* Account blocked overlay */}
         {user && isUserBlocked && (
@@ -407,11 +392,7 @@ function App() {
         {/* Main Content */}
         <main className="lg:pl-16 pt-20 sm:pt-24 pb-16 transition-all duration-300">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <Suspense fallback={
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              </div>
-            }>
+            <Suspense fallback={<AppLoader text="Loading page..." fullScreen={false} />}>
               <Routes>
               {/* Public routes - accessible without login */}
               <Route path="/" element={<Home />} />
@@ -499,6 +480,34 @@ function App() {
                 }
               />
               <Route
+                path="/test/:testId"
+                element={
+                  user ? (
+                    user.emailVerified ? (
+                      <TestUBT />
+                    ) : (
+                      <Navigate to="/email-verification-required" />
+                    )
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/test/:testId/question/:questionIndex"
+                element={
+                  user ? (
+                    user.emailVerified ? (
+                      <TestUBT />
+                    ) : (
+                      <Navigate to="/email-verification-required" />
+                    )
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
                 path="/shop"
                 element={
                   user ? (
@@ -538,7 +547,15 @@ function App() {
                   </AdminGuard>
                 }
               />
-              
+              <Route
+                path="/admin/tests"
+                element={
+                  <AdminGuard>
+                    <TestManager />
+                  </AdminGuard>
+                }
+              />
+
               {/* 404 Page - catch all */}
               <Route path="*" element={<NotFound />} />
               </Routes>
@@ -556,9 +573,13 @@ function App() {
           />
         )}
 
+        {/* Soft push permission prompt (only when notifications are not yet granted/denied) */}
+        {user && <PushPermissionRequest userId={user.uid} />}
+
         {/* Cookie Consent */}
         <CookieConsent />
       </div>
+      </AppWrapper>
     </BrowserRouter>
   );
 }

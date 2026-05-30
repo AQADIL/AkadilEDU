@@ -4,7 +4,7 @@
  * Handles all Realtime Database operations for the admin panel
  */
 
-import { getDatabase, ref, get, set, update, remove, push, query, orderByChild, equalTo, limitToFirst, startAt } from 'firebase/database';
+import { getDatabase, ref, get, set, update, remove, push, query, orderByChild, equalTo, limitToFirst, startAt, onValue } from 'firebase/database';
 import { app, isFirebaseConfigured } from './config';
 
 // Initialize Realtime Database
@@ -543,6 +543,109 @@ export async function getUserCourses(userId) {
   } catch (error) {
     console.error('Error fetching user courses:', error);
     return [];
+  }
+}
+
+/**
+ * Get per-course progress for all user's courses
+ * Structure: users/{uid}/progress/{courseId}
+ */
+export async function getUserCoursesProgress(uid) {
+  if (!database) return {};
+
+  try {
+    const progressRef = ref(database, `users/${uid}/progress`);
+    const snapshot = await get(progressRef);
+    return snapshot.exists() ? snapshot.val() : {};
+  } catch (error) {
+    console.error('Error fetching user course progress:', error);
+    return {};
+  }
+}
+
+/**
+ * Update lesson progress for smart resume
+ * Path: users/{uid}/progress/{courseId}
+ * Also updates lastActiveLessonId/lastActiveTimestamp for the course.
+ */
+export async function updateLessonProgress(uid, courseId, lessonId, progress) {
+  if (!database) return;
+  if (!uid || !courseId || !lessonId) return;
+
+  try {
+    const { completed = false, timestamp = 0, percent = 0 } = progress || {};
+    const safeTimestamp = Math.max(0, Math.floor(Number(timestamp) || 0));
+    const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+
+    // Skip writing completely empty progress records to avoid DB noise
+    if (!completed && safeTimestamp <= 0 && safePercent <= 0) {
+      return;
+    }
+
+    const basePath = `users/${uid}/progress/${courseId}`;
+    const updates = {};
+
+    updates[`${basePath}/lastActiveLessonId`] = lessonId;
+    updates[`${basePath}/lastActiveTimestamp`] = safeTimestamp;
+    updates[`${basePath}/lessons/${lessonId}`] = {
+      completed: !!completed,
+      timestamp: safeTimestamp,
+      percent: safePercent
+    };
+
+    await update(ref(database), updates);
+  } catch (error) {
+    console.error('Error updating lesson progress:', error);
+  }
+}
+
+/**
+ * Subscribe to course progress changes in real time
+ */
+export function subscribeToCourseProgress(uid, courseId, callback) {
+  if (!database || !uid || !courseId) {
+    if (typeof callback === 'function') callback(null);
+    return () => {};
+  }
+
+  const progressRef = ref(database, `users/${uid}/progress/${courseId}`);
+
+  const unsubscribe = onValue(
+    progressRef,
+    (snapshot) => {
+      const data = snapshot.exists() ? snapshot.val() : null;
+      if (typeof callback === 'function') {
+        callback(data);
+      }
+    },
+    (error) => {
+      console.error('Error subscribing to course progress:', error);
+      if (typeof callback === 'function') {
+        callback(null);
+      }
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Update order of user's courses
+ * orderedCourseIds: array of course IDs in the desired order (0 = first)
+ */
+export async function updateUserCoursesOrder(userId, orderedCourseIds) {
+  if (!database) throw new Error('Database not initialized');
+
+  try {
+    const updates = {};
+    orderedCourseIds.forEach((courseId, index) => {
+      updates[`users/${userId}/courses/${courseId}/order`] = index;
+    });
+
+    await update(ref(database), updates);
+  } catch (error) {
+    console.error('Error updating user courses order:', error);
+    throw error;
   }
 }
 

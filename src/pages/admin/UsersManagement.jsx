@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Edit, Ban, Trash2, BookOpen, Loader2, AlertTriangle, Mail, Phone, Bell, BellOff, CheckCircle } from 'lucide-react';
+import { Search, Filter, UserPlus, Edit, Ban, Trash2, BookOpen, AlertTriangle, Mail, Phone, Bell, BellOff, CheckCircle } from 'lucide-react';
 import { fetchAllUsers, suspendUser, unsuspendUser, softDeleteUser, toggleUserPushNotifications, getUserPushStatus } from '../../firebase/realtimeDb';
 import { auth } from '../../firebase/config';
 import UserDetailDrawer from '../../components/admin/UserDetailDrawer';
+import AppLoader from '../../components/AppLoader';
 
 export default function UsersManagement() {
   const [users, setUsers] = useState([]);
@@ -146,11 +147,7 @@ export default function UsersManagement() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-      </div>
-    );
+    return <AppLoader text="Загрузка пользователей..." />;
   }
 
   return (

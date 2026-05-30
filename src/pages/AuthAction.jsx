@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import AppLoader from '../components/AppLoader';
 
 /**
  * Firebase Auth Action Handler
@@ -48,16 +48,6 @@ export default function AuthAction() {
 
   // Show loading while redirecting
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-        <Loader2 className="w-16 h-16 text-primary-600 dark:text-primary-400 animate-spin mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Бағыттауда...
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Күте тұрыңыз
-        </p>
-      </div>
-    </div>
+    <AppLoader text="Бағыттауда..." />
   );
 }

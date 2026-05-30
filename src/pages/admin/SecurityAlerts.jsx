@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, Activity, MapPin, Smartphone, Wifi } from 'lucide-react';
 import { ref, onValue, update, get } from 'firebase/database';
 import { database } from '../../firebase/realtimeDb';
+import AppLoader from '../../components/AppLoader';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState([]);
@@ -94,11 +95,7 @@ export default function SecurityAlerts() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <AppLoader text="Загрузка оповещений безопасности..." />;
   }
 
   return (

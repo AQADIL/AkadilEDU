@@ -71,5 +71,6 @@ export default function BlockedAccountOverlay({ reason = null }) {
         </div>
       </div>
     </div>
+    
   );
 }

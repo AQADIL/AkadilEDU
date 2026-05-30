@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X, Clock } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X, Clock, Download, Presentation, ExternalLink, Target } from 'lucide-react';
 import { ref, get } from 'firebase/database';
-import { database, getUserCourses } from '../firebase/realtimeDb';
+import { database, getUserCourses, isUserAdmin } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
-import CustomVideoPlayer from '../components/CustomVideoPlayer';
+import VideoPlayer from '../components/VideoPlayer';
+import LessonQuizPlayer from '../components/LessonQuizPlayer';
+import AdminLessonQuizManager from '../components/AdminLessonQuizManager';
 
 // Функция для преобразования Google Drive ссылки в embed
+const getGoogleDriveFileId = (url) => {
+  if (!url) return null;
+  const match = url.match(/\/file\/d\/([^\/]+)/);
+  return match && match[1] ? match[1] : null;
+};
+
 const getGoogleDriveEmbedUrl = (url) => {
   if (!url) return null;
   
@@ -23,6 +31,20 @@ const getGoogleDriveEmbedUrl = (url) => {
   }
   
   return null;
+};
+
+const getGoogleDriveDownloadUrl = (url) => {
+  const fileId = getGoogleDriveFileId(url);
+  if (!fileId) return null;
+  return `https://drive.google.com/uc?export=download&id=${fileId}`;
+};
+
+const normalizeExternalUrl = (url) => {
+  const raw = (url || '').trim();
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  // best-effort: allow pasting without scheme
+  return `https://${raw}`;
 };
 
 
@@ -252,9 +274,10 @@ export default function CourseDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [isPurchased, setIsPurchased] = useState(null); // Куплен ли курс (null = загрузка)
-  const [hoveredLesson, setHoveredLesson] = useState(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false); // Мобильный sidebar
   const [completedLessons, setCompletedLessons] = useState(new Set()); // Просмотренные уроки
+  const [activeMaterial, setActiveMaterial] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(getRandomQuote()); // Текущая цитата
   const [nextQuote, setNextQuote] = useState(getRandomQuote()); // Следующая цитата для предпросмотра
   const [pullStartY, setPullStartY] = useState(0);
@@ -363,7 +386,33 @@ export default function CourseDetail() {
     loadCourse();
     checkPurchaseStatus();
     loadCompletedLessons();
+    checkAdminStatus();
   }, [id]);
+
+  // Auto-select lesson from URL param ?lesson=X (set by MyCourses "continue" button)
+  useEffect(() => {
+    if (!course || isPurchased === null) return;
+    if (!isPurchased) return;
+    const params = new URLSearchParams(location.search);
+    const lessonParam = params.get('lesson');
+    if (!lessonParam) return;
+    // Find lesson across all modules
+    if (!course.modules) return;
+    for (const mod of Object.values(course.modules)) {
+      if (mod.lessons && mod.lessons[lessonParam]) {
+        setSelectedLesson({ id: lessonParam, ...mod.lessons[lessonParam] });
+        return;
+      }
+    }
+  }, [course, isPurchased, location.search]);
+
+  const checkAdminStatus = async () => {
+    if (!auth.currentUser) return;
+    try {
+      const admin = await isUserAdmin(auth.currentUser.uid);
+      setIsAdmin(admin || auth.currentUser.email === 'youtub.maj@gmail.com');
+    } catch (e) { setIsAdmin(false); }
+  };
   
   // Отдельный useEffect для touch handlers
   useEffect(() => {
@@ -452,8 +501,61 @@ export default function CourseDetail() {
   };
 
   const hasAttachments = (lesson) => {
-    return !!(lesson.homeworkUrl || lesson.formulasUrl);
+    const hasLegacy = !!(lesson?.homeworkUrl || lesson?.formulasUrl);
+    const hasFormulaLinks = Array.isArray(lesson?.formulaLinks) && lesson.formulaLinks.some(u => (u || '').trim());
+    const hasMaterials = Array.isArray(lesson?.materials) && lesson.materials.some((m) => (m?.url || '').trim());
+    return hasLegacy || hasFormulaLinks || hasMaterials;
   };
+
+  const findModuleIdForLesson = (lessonId) => {
+    if (!course?.modules) return null;
+    for (const [mId, mod] of Object.entries(course.modules)) {
+      if (mod.lessons && mod.lessons[lessonId]) return mId;
+    }
+    return null;
+  };
+
+  const getMaterialIcon = (type) => {
+    if (type === 'wayground') return ExternalLink;
+    if (type === 'pptx') return Presentation;
+    return FileText;
+  };
+
+  const openMaterial = (material) => {
+    if (!material) return;
+    const url = typeof material === 'string' ? material : material.url;
+    if (!url) return;
+
+    // External quizzes (Wayground/Quizizz): open as-is inside iframe
+    if (typeof material === 'object' && material.type === 'wayground') {
+      const normalized = normalizeExternalUrl(url);
+      if (!normalized) return;
+      setActiveMaterial({
+        title: material.title || 'Wayground',
+        type: 'wayground',
+        url: normalized,
+        embedUrl: normalized,
+        downloadUrl: null
+      });
+      return;
+    }
+
+    const embedUrl = getGoogleDriveEmbedUrl(url);
+    if (!embedUrl) {
+      window.open(url, '_blank');
+      return;
+    }
+
+    setActiveMaterial({
+      title: typeof material === 'string' ? 'Материал' : (material.title || 'Материал'),
+      type: typeof material === 'string' ? 'file' : (material.type || 'file'),
+      url,
+      embedUrl,
+      downloadUrl: getGoogleDriveDownloadUrl(url)
+    });
+  };
+
+  const closeMaterial = () => setActiveMaterial(null);
 
   const renderLessonContent = (lesson) => {
     if (!lesson) return null;
@@ -463,7 +565,13 @@ export default function CourseDetail() {
         {/* Видео с CustomVideoPlayer */}
         <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
           {lesson.videoUrl ? (
-            <CustomVideoPlayer videoUrl={lesson.videoUrl} />
+            <VideoPlayer
+              key={lesson.id}
+              videoUrl={lesson.videoUrl}
+              courseId={id}
+              lessonId={lesson.id}
+              durationSeconds={typeof lesson.duration === 'number' ? lesson.duration * 60 : undefined}
+            />
           ) : (
             <div className="flex items-center justify-center h-full text-white">
               <div className="text-center">
@@ -475,11 +583,11 @@ export default function CourseDetail() {
         </div>
 
         {/* Дополнительные материалы */}
-        {(lesson.homeworkUrl || lesson.formulasUrl) && (
+        {hasAttachments(lesson) && (
           <div className="grid grid-cols-1 gap-3">
             {lesson.homeworkUrl && (
               <button
-                onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.homeworkUrl), '_blank')}
+                onClick={() => openMaterial({ title: 'Үй жұмысы', type: 'pdf', url: lesson.homeworkUrl })}
                 className="group p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/40 dark:hover:to-blue-800/40 border-2 border-blue-200 dark:border-blue-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
               >
                 <div className="flex items-center gap-3">
@@ -498,28 +606,63 @@ export default function CourseDetail() {
               </button>
             )}
 
-            {lesson.formulasUrl && (
-              <button
-                onClick={() => window.open(getGoogleDriveEmbedUrl(lesson.formulasUrl), '_blank')}
-                className="group p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/40 dark:hover:to-green-800/40 border-2 border-green-200 dark:border-green-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-green-600 dark:bg-green-500 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                    <Calculator className="w-5 h-5 text-white" />
+            {/* Formula links - support both legacy single URL and new array */}
+            {(() => {
+              const links = Array.isArray(lesson.formulaLinks)
+                ? lesson.formulaLinks.filter(u => (u || '').trim())
+                : lesson.formulasUrl ? [lesson.formulasUrl] : [];
+              return links.map((url, fi) => (
+                <button
+                  key={`formula-${fi}`}
+                  onClick={() => openMaterial({ title: `${t('courseDetail.formulasTitle')} ${links.length > 1 ? fi + 1 : ''}`.trim(), type: 'pdf', url })}
+                  className="group p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/40 dark:hover:to-green-800/40 border-2 border-green-200 dark:border-green-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-green-600 dark:bg-green-500 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Calculator className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left flex-1 min-w-0">
+                      <h4 className="font-bold text-green-900 dark:text-green-100 text-sm sm:text-base">
+                        {t('courseDetail.formulasTitle')}{links.length > 1 ? ` ${fi + 1}` : ''}
+                      </h4>
+                      <p className="text-xs text-green-700 dark:text-green-300 truncate">
+                        {t('courseDetail.formulasOpen')}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <h4 className="font-bold text-green-900 dark:text-green-100 text-sm sm:text-base">
-                      Формулалар жинағы
-                    </h4>
-                    <p className="text-xs text-green-700 dark:text-green-300 truncate">
-                      Барлық формулаларды көру
-                    </p>
-                  </div>
-                </div>
-              </button>
-            )}
+                </button>
+              ));
+            })()}
+
+            {Array.isArray(lesson.materials) && lesson.materials
+              .filter((m) => (m?.url || '').trim())
+              .map((m) => {
+                const Icon = getMaterialIcon(m.type);
+                return (
+                  <button
+                    key={m.id || m.url}
+                    onClick={() => openMaterial(m)}
+                    className="group p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/30 dark:to-slate-800/30 hover:from-slate-100 hover:to-slate-200 dark:hover:from-slate-900/40 dark:hover:to-slate-800/40 border-2 border-slate-200 dark:border-slate-700 rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-slate-700 dark:bg-slate-600 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="text-left flex-1 min-w-0">
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base truncate">
+                          {m.title || (m.type || 'file').toUpperCase()}
+                        </h4>
+                        <p className="text-xs text-slate-700 dark:text-slate-300 truncate">
+                          {m.type ? m.type.toUpperCase() : 'FILE'}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
           </div>
         )}
+
       </div>
     );
   };
@@ -620,7 +763,7 @@ export default function CourseDetail() {
                     const lessonsList = Object.keys(lessons).map(key => ({
                       id: key,
                       ...lessons[key]
-                    }));
+                    })).sort((a, b) => (a.order || 0) - (b.order || 0));
                     
                     const completedCount = lessonsList.filter(l => completedLessons.has(l.id)).length;
 
@@ -735,6 +878,7 @@ export default function CourseDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {selectedLesson && isPurchased ? (
+            <>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden animate-fade-in">
               <div className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -752,10 +896,22 @@ export default function CourseDetail() {
                         ҮЖ
                       </span>
                     )}
-                    {selectedLesson.formulasUrl && (
+                    {(selectedLesson.formulasUrl || (Array.isArray(selectedLesson.formulaLinks) && selectedLesson.formulaLinks.some(u => (u||'').trim()))) && (
                       <span className="px-2.5 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs font-medium flex items-center gap-1">
                         <Calculator className="w-3 h-3" />
-                        Формулы
+                        {t('courseDetail.formulas')}
+                      </span>
+                    )}
+                    {Array.isArray(selectedLesson.materials) && selectedLesson.materials.some((m) => (m?.url || '').trim()) && (
+                      <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium flex items-center gap-1">
+                        <FileText className="w-3 h-3" />
+                        {selectedLesson.materials.filter((m) => (m?.url || '').trim()).length}
+                      </span>
+                    )}
+                    {selectedLesson.quiz?.questions?.length > 0 && (
+                      <span className="px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-medium flex items-center gap-1">
+                        <Target className="w-3 h-3" />
+                        Квиз
                       </span>
                     )}
                   </div>
@@ -768,6 +924,27 @@ export default function CourseDetail() {
                 )}
               </div>
             </div>
+
+            {/* ── Quiz — separate card below player, same ternary branch ── */}
+            {selectedLesson.quiz?.questions?.length > 0 && (
+              <LessonQuizPlayer
+                quiz={selectedLesson.quiz}
+                courseId={id}
+                lessonId={selectedLesson.id}
+              />
+            )}
+
+            {/* ── Admin quiz manager ── */}
+            {isAdmin && (
+              <AdminLessonQuizManager
+                courseId={id}
+                lessonId={selectedLesson.id}
+                moduleId={findModuleIdForLesson(selectedLesson.id)}
+                quiz={selectedLesson.quiz}
+                onQuizUpdate={() => loadCourse()}
+              />
+            )}
+            </>
           ) : isPurchased === true ? (
             // Мотивационная цитата для купленного курса - минимализм
             <div className="relative">
@@ -1017,7 +1194,7 @@ export default function CourseDetail() {
                   const lessonsList = Object.keys(lessons).map(key => ({
                     id: key,
                     ...lessons[key]
-                  }));
+                  })).sort((a, b) => (a.order || 0) - (b.order || 0));
                   
                   return (
                     <div key={module.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
@@ -1085,7 +1262,7 @@ export default function CourseDetail() {
                   const lessonsList = Object.keys(lessons).map(key => ({
                     id: key,
                     ...lessons[key]
-                  }));
+                  })).sort((a, b) => (a.order || 0) - (b.order || 0));
                   
                   const completedCount = lessonsList.filter(l => completedLessons.has(l.id)).length;
 
@@ -1213,6 +1390,51 @@ export default function CourseDetail() {
           </div>
         </div>
       </div>
+
+      {activeMaterial && (
+        <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-3 sm:p-6" onClick={closeMaterial}>
+          <div
+            className="w-full max-w-5xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-800">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{activeMaterial.title}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{String(activeMaterial.type || 'file').toUpperCase()}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {activeMaterial.downloadUrl && (
+                  <a
+                    href={activeMaterial.downloadUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold"
+                  >
+                    <Download className="w-4 h-4" />
+                    Скачать
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={closeMaterial}
+                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </div>
+            </div>
+            <div className="bg-black">
+              <iframe
+                title={activeMaterial.title}
+                src={activeMaterial.embedUrl}
+                className="w-full h-[70vh]"
+                allow="autoplay"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -31,6 +31,7 @@ lerna-debug.log*
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.vs/
 .idea/
 .DS_Store
 *.suo
@@ -55,14 +56,3 @@ scripts/serviceAccountKey.json
 # OS files
 Thumbs.db
 Desktop.ini
-
-# Documentation (optional - remove if you want to commit)
-FIREBASE_EMAIL_SETUP.md
-FIREBASE_REDIRECT_SETUP.md
-FIREBASE_RULES.md
-NEW_PAGES_README.md
-REGISTRATION_FLOW_FINAL.md
-VERIFICATION_FLOW.md
-EMAIL_TEMPLATE_INSTRUCTIONS.md
-EMAIL_VERIFICATION_CHECKLIST.md
-FIREBASE_EMAIL_TEMPLATE.html

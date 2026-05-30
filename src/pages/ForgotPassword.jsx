@@ -70,9 +70,13 @@ export default function ForgotPassword() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">A</span>
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <img
+                src="/icons/logo-прозрачный.png"
+                alt="AkadilEDU logo"
+                className="w-10 h-10 object-contain"
+              />
             </div>
             <span className="text-3xl font-bold text-gray-900 dark:text-white">
               AkadilEDU

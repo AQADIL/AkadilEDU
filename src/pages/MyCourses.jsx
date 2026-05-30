@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Loader2, Play, Clock, CheckCircle, Calendar, Zap } from 'lucide-react';
-import { getUserCourses } from '../firebase/realtimeDb';
+import { BookOpen, Play, Clock, CheckCircle, Calendar, Zap } from 'lucide-react';
+import AppLoader from '../components/AppLoader';
+import { getUserCourses, updateUserCoursesOrder, getUserCoursesProgress } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 
 // Функция генерации красивой обложки на основе названия курса
@@ -22,6 +23,35 @@ const generateCoverGradient = (title) => {
   return gradients[hash % gradients.length];
 };
 
+const getLessonTitle = (course, lessonId) => {
+  if (!course || !course.modules || !lessonId) return null;
+
+  for (const module of Object.values(course.modules)) {
+    if (!module.lessons) continue;
+    for (const [id, lesson] of Object.entries(module.lessons)) {
+      if (id === lessonId) {
+        return lesson.title || null;
+      }
+    }
+  }
+
+  return null;
+};
+
+const formatTimeFromSeconds = (seconds) => {
+  const total = Math.max(0, Math.floor(Number(seconds) || 0));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  if (h > 0) {
+    return `${h}:${pad(m)}:${pad(s)}`;
+  }
+  return `${m}:${pad(s)}`;
+};
+
 export default function MyCourses() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -29,6 +59,7 @@ export default function MyCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCourseId, setSelectedCourseId] = useState(location.state?.selectedCourseId || null);
+  const [draggedCourseId, setDraggedCourseId] = useState(null);
 
   useEffect(() => {
     loadCourses();
@@ -52,6 +83,34 @@ export default function MyCourses() {
     
     try {
       const userCoursesData = await getUserCourses(auth.currentUser.uid);
+      const progressMap = await getUserCoursesProgress(auth.currentUser.uid);
+
+      if (progressMap) {
+        userCoursesData.forEach((course) => {
+          if (progressMap[course.id]) {
+            course.progressData = progressMap[course.id];
+          }
+        });
+      }
+      // Sort by explicit user-defined order if present, otherwise by enrollment date
+      userCoursesData.sort((a, b) => {
+        const orderA = a.enrollment?.order;
+        const orderB = b.enrollment?.order;
+
+        const hasOrderA = typeof orderA === 'number';
+        const hasOrderB = typeof orderB === 'number';
+
+        if (hasOrderA && hasOrderB) {
+          return orderA - orderB;
+        }
+        if (hasOrderA) return -1;
+        if (hasOrderB) return 1;
+
+        const enrolledA = a.enrollment?.enrolledAt || 0;
+        const enrolledB = b.enrollment?.enrolledAt || 0;
+        return enrolledA - enrolledB;
+      });
+
       setCourses(userCoursesData);
     } catch (error) {
       console.error('Error loading user courses:', error);
@@ -74,12 +133,79 @@ export default function MyCourses() {
     navigate(`/courses/${courseId}`);
   };
 
+  // Calculate total duration of a course (sum of lesson durations in minutes)
+  const getTotalDurationMinutes = (course) => {
+    if (!course.modules) return 0;
+
+    let total = 0;
+    Object.values(course.modules).forEach((module) => {
+      if (!module.lessons) return;
+      Object.values(module.lessons).forEach((lesson) => {
+        const minutes = Number(lesson.duration) || 0;
+        if (minutes > 0) {
+          total += minutes;
+        }
+      });
+    });
+    return total;
+  };
+
+  // Format duration in minutes using i18n
+  const formatDuration = (totalMinutes) => {
+    if (!totalMinutes || totalMinutes <= 0) return null;
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+      return t('duration.hoursAndMinutes', { hours, minutes });
+    }
+    if (hours > 0) {
+      return t('duration.hoursOnly', { hours });
+    }
+    return t('duration.minutesOnly', { minutes });
+  };
+
+  const reorderCourses = (list, sourceId, targetId) => {
+    if (!sourceId || !targetId || sourceId === targetId) return list;
+    const currentIndex = list.findIndex((c) => c.id === sourceId);
+    const targetIndex = list.findIndex((c) => c.id === targetId);
+    if (currentIndex === -1 || targetIndex === -1) return list;
+
+    const updated = [...list];
+    const [moved] = updated.splice(currentIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+    return updated;
+  };
+
+  const handleDragStart = (courseId) => {
+    setDraggedCourseId(courseId);
+  };
+
+  const handleDragOver = (event) => {
+    // Allow drop
+    event.preventDefault();
+  };
+
+  const handleDrop = async (event, targetCourseId) => {
+    event.preventDefault();
+    if (!draggedCourseId || draggedCourseId === targetCourseId) return;
+
+    const newOrder = reorderCourses(courses, draggedCourseId, targetCourseId);
+    setCourses(newOrder);
+    setDraggedCourseId(null);
+
+    if (auth.currentUser) {
+      try {
+        await updateUserCoursesOrder(auth.currentUser.uid, newOrder.map((c) => c.id));
+      } catch (error) {
+        console.error('Error updating user courses order:', error);
+      }
+    }
+  };
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-      </div>
-    );
+    return <AppLoader text={t('common.loading')} />;
   }
 
   if (courses.length === 0) {
@@ -118,7 +244,7 @@ export default function MyCourses() {
             {t('sidebar.myCourses')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Сізде {courses.length} курс бар
+            {t('courses.youHave', { count: courses.length })}
           </p>
         </div>
       </div>
@@ -132,12 +258,46 @@ export default function MyCourses() {
           const daysLeft = getDaysLeft(course.enrollment?.expiryDate);
           const progress = course.enrollment?.progress || 0;
           const isSelected = selectedCourseId === course.id;
+          const totalDurationMinutes = getTotalDurationMinutes(course);
+          const formattedDuration = formatDuration(totalDurationMinutes);
+
+          const progressData = course.progressData || null;
+          const lastLessonId = progressData?.lastActiveLessonId;
+          const lastTimestamp = progressData?.lastActiveTimestamp || 0;
+          const lastLessonTitle = getLessonTitle(course, lastLessonId);
+          const lastLessonProgress =
+            lastLessonId && progressData?.lessons
+              ? progressData.lessons[lastLessonId]
+              : null;
+          const resumePercent = lastLessonProgress?.percent || 0;
+          const smartProgress = resumePercent > 0 ? resumePercent : progress;
+          const hasResumePoint = !!lastLessonId && lastTimestamp > 0;
+
+          const handleSmartContinue = () => {
+            if (expired) return;
+
+            if (lastLessonId) {
+              const params = new URLSearchParams();
+              params.set('lesson', lastLessonId);
+              const seek = Math.floor(lastTimestamp || 0);
+              if (seek > 0) {
+                params.set('t', String(seek));
+              }
+              navigate(`/courses/${course.id}?${params.toString()}`);
+            } else {
+              handleOpenCourse(course.id);
+            }
+          };
           
           return (
             <div
               key={course.id}
               id={`course-${course.id}`}
-              className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 $\{
+              draggable
+              onDragStart={() => handleDragStart(course.id)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, course.id)}
+              className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${
                 isSelected ? 'ring-4 ring-primary-500 scale-105' : ''
               } ${expired ? 'opacity-60' : ''}`}
             >
@@ -239,6 +399,12 @@ export default function MyCourses() {
                     <BookOpen className="w-4 h-4" />
                     <span>{course.modules ? Object.keys(course.modules).length : 0} {t('course.modules')}</span>
                   </div>
+                  {formattedDuration && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{formattedDuration}</span>
+                    </div>
+                  )}
                   {course.enrollment?.enrolledAt && (
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
@@ -269,26 +435,60 @@ export default function MyCourses() {
                   </div>
                 )}
 
-                {/* Action Button */}
-                <button 
-                  onClick={() => handleOpenCourse(course.id)}
+                {/* Smart Resume Button - glassmorphism style */}
+                <button
+                  onClick={handleSmartContinue}
                   disabled={expired}
-                  className={`w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                  className={`relative w-full overflow-hidden group rounded-2xl px-4 py-4 text-left transition-all duration-300 ${
                     expired
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:scale-105'
+                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed shadow-none'
+                      : 'bg-white/60 dark:bg-slate-900/60 text-gray-900 dark:text-white border border-white/40 dark:border-white/10 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(15,23,42,0.28)]'
                   }`}
+                  style={{ minHeight: '80px' }}
                 >
-                  {expired ? (
-                    <>
-                      <Clock className="w-5 h-5" />
-                      <span>{t('course.expiredStatus')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-5 h-5" />
-                      <span>{t('course.continueLearning')}</span>
-                    </>
+                  {!expired && (
+                    <div className="pointer-events-none absolute inset-0 opacity-60 group-hover:opacity-90 transition-opacity duration-300">
+                      <div className="absolute inset-[1px] rounded-2xl border border-white/40 dark:border-white/10" />
+                      <div className="absolute -bottom-10 right-[-40%] h-32 w-32 bg-gradient-to-tr from-indigo-400/30 via-sky-400/20 to-transparent blur-2xl" />
+                    </div>
+                  )}
+
+                  <div className="relative z-10 flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-700/80 dark:text-gray-300/80">
+                        {hasResumePoint ? t('myCourses.continueWatching') : t('course.continueLearning')}
+                      </p>
+                      <p className="mt-1 text-sm sm:text-[15px] font-semibold truncate max-w-[220px]">
+                        {lastLessonTitle || course.title}
+                      </p>
+                      <p
+                        className={`mt-0.5 text-xs transition-opacity duration-200 ${
+                          hasResumePoint ? 'opacity-75 text-gray-700 dark:text-gray-200' : 'opacity-0'
+                        }`}
+                      >
+                        {hasResumePoint ? formatTimeFromSeconds(lastTimestamp) : '00:00'}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <div
+                        className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
+                          expired
+                            ? 'bg-gray-300/60 text-gray-500'
+                            : 'bg-white/30 dark:bg-white/10 text-indigo-600 dark:text-indigo-300 shadow-lg shadow-indigo-500/40 group-hover:scale-110'
+                        }`}
+                      >
+                        <Play className="w-4 h-4 ml-0.5" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {!expired && (
+                    <div className="absolute left-4 right-4 bottom-2 h-[2px] rounded-full bg-white/20 dark:bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-sky-400 via-violet-400 to-amber-300 transition-all duration-700 ease-out"
+                        style={{ width: `${Math.min(100, smartProgress || 0)}%` }}
+                      />
+                    </div>
                   )}
                 </button>
               </div>
