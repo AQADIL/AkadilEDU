@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X, Clock, Download, Presentation, ExternalLink, Target } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Play, Lock, CheckCircle, FileText, Calculator, Youtube, Menu, X, Clock, Download, Presentation, ExternalLink, Target, Plus, Trash2, Palette } from 'lucide-react';
 import { ref, get } from 'firebase/database';
 import { database, getUserCourses, isUserAdmin } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
@@ -504,8 +504,18 @@ export default function CourseDetail() {
     const hasLegacy = !!(lesson?.homeworkUrl || lesson?.formulasUrl);
     const hasFormulaLinks = Array.isArray(lesson?.formulaLinks) && lesson.formulaLinks.some(u => (u || '').trim());
     const hasMaterials = Array.isArray(lesson?.materials) && lesson.materials.some((m) => (m?.url || '').trim());
-    return hasLegacy || hasFormulaLinks || hasMaterials;
+    const hasCustomModules = Array.isArray(lesson?.customModules) && lesson.customModules.some(m => (m?.url || '').trim());
+    return hasLegacy || hasFormulaLinks || hasMaterials || hasCustomModules;
   };
+
+  const MODULE_COLORS = [
+    { name: 'blue', label: 'Көк', bg: 'from-blue-50 to-blue-100', darkBg: 'from-blue-900/30 to-blue-800/30', border: 'border-blue-200 dark:border-blue-700', iconBg: 'bg-blue-600 dark:bg-blue-500', text: 'text-blue-900 dark:text-blue-100', subtext: 'text-blue-700 dark:text-blue-300' },
+    { name: 'green', label: 'Жасыл', bg: 'from-green-50 to-green-100', darkBg: 'from-green-900/30 to-green-800/30', border: 'border-green-200 dark:border-green-700', iconBg: 'bg-green-600 dark:bg-green-500', text: 'text-green-900 dark:text-green-100', subtext: 'text-green-700 dark:text-green-300' },
+    { name: 'purple', label: 'Күлгін', bg: 'from-purple-50 to-purple-100', darkBg: 'from-purple-900/30 to-purple-800/30', border: 'border-purple-200 dark:border-purple-700', iconBg: 'bg-purple-600 dark:bg-purple-500', text: 'text-purple-900 dark:text-purple-100', subtext: 'text-purple-700 dark:text-purple-300' },
+    { name: 'orange', label: 'Қызыл-сары', bg: 'from-orange-50 to-orange-100', darkBg: 'from-orange-900/30 to-orange-800/30', border: 'border-orange-200 dark:border-orange-700', iconBg: 'bg-orange-600 dark:bg-orange-500', text: 'text-orange-900 dark:text-orange-100', subtext: 'text-orange-700 dark:text-orange-300' },
+    { name: 'pink', label: 'Қызғылт', bg: 'from-pink-50 to-pink-100', darkBg: 'from-pink-900/30 to-pink-800/30', border: 'border-pink-200 dark:border-pink-700', iconBg: 'bg-pink-600 dark:bg-pink-500', text: 'text-pink-900 dark:text-pink-100', subtext: 'text-pink-700 dark:text-pink-300' },
+    { name: 'indigo', label: 'Көкшіл', bg: 'from-indigo-50 to-indigo-100', darkBg: 'from-indigo-900/30 to-indigo-800/30', border: 'border-indigo-200 dark:border-indigo-700', iconBg: 'bg-indigo-600 dark:bg-indigo-500', text: 'text-indigo-900 dark:text-indigo-100', subtext: 'text-indigo-700 dark:text-indigo-300' },
+  ];
 
   const findModuleIdForLesson = (lessonId) => {
     if (!course?.modules) return null;
@@ -633,6 +643,34 @@ export default function CourseDetail() {
                 </button>
               ));
             })()}
+
+            {/* Custom dynamic modules */}
+            {Array.isArray(lesson.customModules) && lesson.customModules
+              .filter((m) => (m?.url || '').trim())
+              .map((m) => {
+                const colorConfig = MODULE_COLORS.find(c => c.name === m.color) || MODULE_COLORS[0];
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => openMaterial({ title: m.name, type: 'pdf', url: m.url })}
+                    className={`w-full group p-4 bg-gradient-to-br ${colorConfig.bg} dark:${colorConfig.darkBg} hover:from-${colorConfig.name}-100 hover:to-${colorConfig.name}-200 dark:hover:from-${colorConfig.name}-900/40 dark:hover:to-${colorConfig.name}-800/40 border-2 ${colorConfig.border} rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 ${colorConfig.iconBg} rounded-lg group-hover:scale-110 transition-transform flex-shrink-0`}>
+                        <FileText className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="text-left flex-1 min-w-0">
+                        <h4 className={`font-bold ${colorConfig.text} text-sm sm:text-base`}>
+                          {m.name}
+                        </h4>
+                        <p className={`text-xs ${colorConfig.subtext} truncate`}>
+                          {t('courseDetail.moduleOpen')}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
 
             {Array.isArray(lesson.materials) && lesson.materials
               .filter((m) => (m?.url || '').trim())

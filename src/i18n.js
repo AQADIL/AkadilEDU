@@ -145,6 +145,15 @@ const resources = {
       'courseDetail.quizAiImport': 'ИИ импорт',
       'courseDetail.quizPreviewTitle': 'Парсинг нәтижесі',
       'courseDetail.quizConfirmSave': '{{count}} сұрақты сақтау',
+      'courseDetail.moduleAdd': 'Модуль қосу',
+      'courseDetail.moduleAddDesc': 'Жаңа модуль жасау',
+      'courseDetail.moduleName': 'Модуль атауы',
+      'courseDetail.moduleNamePlaceholder': 'Мысалы: Қосымша материалдар',
+      'courseDetail.moduleColor': 'Түсі',
+      'courseDetail.moduleUrl': 'URL сілтеме',
+      'courseDetail.moduleUrlPlaceholder': 'https://drive.google.com/...',
+      'courseDetail.moduleCancel': 'Бас тарту',
+      'courseDetail.moduleOpen': 'Ашу',
       
       // Course Editor
       'courseEditor.title': 'Курс редакторы',
@@ -725,6 +734,15 @@ const resources = {
       'courseDetail.quizAiImport': 'ИИ импорт',
       'courseDetail.quizPreviewTitle': 'Результат парсинга',
       'courseDetail.quizConfirmSave': 'Сохранить {{count}} вопросов',
+      'courseDetail.moduleAdd': 'Добавить модуль',
+      'courseDetail.moduleAddDesc': 'Создать новый модуль',
+      'courseDetail.moduleName': 'Название модуля',
+      'courseDetail.moduleNamePlaceholder': 'Например: Дополнительные материалы',
+      'courseDetail.moduleColor': 'Цвет',
+      'courseDetail.moduleUrl': 'URL ссылка',
+      'courseDetail.moduleUrlPlaceholder': 'https://drive.google.com/...',
+      'courseDetail.moduleCancel': 'Отмена',
+      'courseDetail.moduleOpen': 'Открыть',
       
       // Course Editor
       'courseEditor.title': 'Редактор курса',

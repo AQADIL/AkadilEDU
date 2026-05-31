@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Plus, Trash2, Youtube, GripVertical, FileText, Calculator } from 'lucide-react';
+import { X, Save, Plus, Trash2, Youtube, GripVertical, FileText, Calculator, Palette } from 'lucide-react';
 import { createCourse, updateCourse } from '../../firebase/realtimeDb';
 import { auth } from '../../firebase/config';
 import { useTranslation } from 'react-i18next';
+
+const MODULE_COLORS = [
+  { name: 'blue', label: 'Көк', bg: 'from-blue-50 to-blue-100', border: 'border-blue-200', iconBg: 'bg-blue-600' },
+  { name: 'green', label: 'Жасыл', bg: 'from-green-50 to-green-100', border: 'border-green-200', iconBg: 'bg-green-600' },
+  { name: 'purple', label: 'Күлгін', bg: 'from-purple-50 to-purple-100', border: 'border-purple-200', iconBg: 'bg-purple-600' },
+  { name: 'orange', label: 'Қызыл-сары', bg: 'from-orange-50 to-orange-100', border: 'border-orange-200', iconBg: 'bg-orange-600' },
+  { name: 'pink', label: 'Қызғылт', bg: 'from-pink-50 to-pink-100', border: 'border-pink-200', iconBg: 'bg-pink-600' },
+  { name: 'indigo', label: 'Көкшіл', bg: 'from-indigo-50 to-indigo-100', border: 'border-indigo-200', iconBg: 'bg-indigo-600' },
+];
 
 export default function CourseEditor({ course, isOpen, onClose }) {
   const { t } = useTranslation();
@@ -171,6 +180,36 @@ export default function CourseEditor({ course, isOpen, onClose }) {
         }
       }
     });
+  };
+
+  // Custom modules functions
+  const addCustomModule = (moduleId, lessonId) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.customModules) ? lesson.customModules : [];
+    const newModule = {
+      id: `custom_${Date.now()}`,
+      name: '',
+      color: 'blue',
+      url: ''
+    };
+    updateLesson(moduleId, lessonId, 'customModules', [...current, newModule]);
+  };
+
+  const updateCustomModule = (moduleId, lessonId, moduleIndex, field, value) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.customModules) ? [...lesson.customModules] : [];
+    current[moduleIndex] = { ...current[moduleIndex], [field]: value };
+    updateLesson(moduleId, lessonId, 'customModules', current);
+  };
+
+  const deleteCustomModule = (moduleId, lessonId, moduleIndex) => {
+    const lesson = formData.modules?.[moduleId]?.lessons?.[lessonId];
+    if (!lesson) return;
+    const current = Array.isArray(lesson.customModules) ? [...lesson.customModules] : [];
+    current.splice(moduleIndex, 1);
+    updateLesson(moduleId, lessonId, 'customModules', current);
   };
 
   const moveModule = (moduleId, direction) => {
@@ -491,6 +530,61 @@ export default function CourseEditor({ course, isOpen, onClose }) {
                                       >
                                         <Trash2 className="w-3.5 h-3.5 text-red-500" />
                                       </button>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Custom modules with custom names and colors */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <label className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                      <Palette className="w-3 h-3" />
+                                      <span>{t('courseDetail.moduleAdd')}</span>
+                                    </label>
+                                    <button
+                                      type="button"
+                                      onClick={() => addCustomModule(moduleId, lessonId)}
+                                      className="text-xs px-2 py-1 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 hover:bg-purple-200"
+                                    >
+                                      + {t('courseEditor.addModule').split(' ')[0]}
+                                    </button>
+                                  </div>
+                                  {(Array.isArray(lesson.customModules) ? lesson.customModules : []).map((module, idx) => (
+                                    <div key={module.id} className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 space-y-2">
+                                      <div className="flex gap-2">
+                                        <input
+                                          type="text"
+                                          value={module.name || ''}
+                                          onChange={(e) => updateCustomModule(moduleId, lessonId, idx, 'name', e.target.value)}
+                                          className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                          placeholder={t('courseDetail.moduleNamePlaceholder')}
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => deleteCustomModule(moduleId, lessonId, idx)}
+                                          className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                        </button>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <select
+                                          value={module.color || 'blue'}
+                                          onChange={(e) => updateCustomModule(moduleId, lessonId, idx, 'color', e.target.value)}
+                                          className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                        >
+                                          {MODULE_COLORS.map(color => (
+                                            <option key={color.name} value={color.name}>{color.label}</option>
+                                          ))}
+                                        </select>
+                                        <input
+                                          type="text"
+                                          value={module.url || ''}
+                                          onChange={(e) => updateCustomModule(moduleId, lessonId, idx, 'url', e.target.value)}
+                                          className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-500 rounded text-sm"
+                                          placeholder={t('courseDetail.moduleUrlPlaceholder')}
+                                        />
+                                      </div>
                                     </div>
                                   ))}
                                 </div>
