@@ -1,3 +1,4 @@
+import { normalizeExternalUrl } from '../utils/urls';
 import i18n from '../i18n';
 import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -51,14 +52,6 @@ const getGoogleDriveDownloadUrl = (url) => {
   const fileId = getGoogleDriveFileId(url);
   if (!fileId) return null;
   return `${new URL(url).origin}/uc?export=download&id=${fileId}`;
-};
-
-const normalizeExternalUrl = (url) => {
-  const raw = (url || '').trim();
-  if (!raw) return null;
-  if (/^https?:\/\//i.test(raw)) return raw;
-
-  return `https://${raw}`;
 };
 
 export default function CourseDetail() {
@@ -245,14 +238,17 @@ export default function CourseDetail() {
 
   const openMaterial = (material) => {
     if (!material) return;
-    const url = typeof material === 'string' ? material : material.url;
-    if (!url) return;
+    const url = normalizeExternalUrl(typeof material === 'string' ? material : material.url);
+    if (!url) {
+      alert(t('courseDetail.invalidMaterialUrl'));
+      return;
+    }
 
     if (typeof material === 'object' && material.type === 'wayground') {
       const normalized = normalizeExternalUrl(url);
       if (!normalized) return;
       setActiveMaterial({
-        title: material.title || 'Wayground',
+        title: material.title || i18n.t('ui.material'),
         type: 'wayground',
         url: normalized,
         embedUrl: normalized,
@@ -263,7 +259,7 @@ export default function CourseDetail() {
 
     const embedUrl = getGoogleDriveEmbedUrl(url);
     if (!embedUrl) {
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
 
@@ -1104,7 +1100,7 @@ export default function CourseDetail() {
                   {activeMaterial.title}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {String(activeMaterial.type || 'file').toUpperCase()}
+                  {i18n.t('ui.material')}
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">

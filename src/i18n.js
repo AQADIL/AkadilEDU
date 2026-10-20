@@ -1001,6 +1001,7 @@ const resources = {
       'app.description': 'Курстарды оқып, пәндік тесттерге дайындалыңыз.',
       'auth.errors.loginFailed': 'Кіру сәтсіз. Қайталап көріңіз.',
       'auth.errors.signupFailed': 'Тіркелу сәтсіз. Қайталап көріңіз.',
+      'courseDetail.invalidMaterialUrl': 'Материал сілтемесі жарамсыз. Әкімшіге хабарласыңыз.',
     },
   },
   ru: {
@@ -1999,6 +2000,8 @@ const resources = {
       'app.description': 'Изучайте курсы и готовьтесь по предметным тестам.',
       'auth.errors.loginFailed': 'Не удалось войти. Повторите попытку.',
       'auth.errors.signupFailed': 'Не удалось зарегистрироваться. Повторите попытку.',
+      'courseDetail.invalidMaterialUrl':
+        'Ссылка на материал некорректна. Обратитесь к администратору.',
     },
   },
   en: {
@@ -2993,6 +2996,8 @@ const resources = {
       'app.description': 'Study courses and prepare with subject practice tests.',
       'auth.errors.loginFailed': 'Sign-in failed. Please retry.',
       'auth.errors.signupFailed': 'Registration failed. Please retry.',
+      'courseDetail.invalidMaterialUrl':
+        'The material link is invalid. Contact your administrator.',
     },
   },
 };

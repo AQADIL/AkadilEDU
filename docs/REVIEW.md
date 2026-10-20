@@ -18,20 +18,20 @@ Reviewed application source, Firebase access paths, privileged functions, depend
 | Hardcoded interface text, emoji, debug logs and dead pages | Centralized interface strings in i18n.js, aligned all three locales and added regression checks. Removed console output, emoji and obsolete source files. |
 | Home and shop exposed unfinished or fictional content | Home now offers account access or assigned courses; the old shop route redirects to the course catalog. |
 | Enrollment updates, auth subscriptions and unavailable states were inconsistent | Fixed the expiry path, profile creation race and subscription cleanup. Added explicit course/profile load failures and retry actions. |
-| Unsafe trusted LaTeX output and unnecessary decorative scripts | Disabled trusted KaTeX commands, removed the unused inline jQuery script and replaced quiz smiley faces with status icons. |
+| Unsafe trusted LaTeX output and unnecessary decorative scripts | Rejects executable material URLs and disables trusted KaTeX commands; removed the unused inline jQuery script and replaced quiz smiley faces with status icons. |
 | Dependency advisories and oversized entry bundle | Updated affected packages, removed unused packages and split translations, motion and PDF editing into separate bundles. |
 
 ## Verified locally
 
 - Security candidate-file check, ESLint and production build pass.
-- 13 unit/integration checks pass in the standard suite. Two emulator suites intentionally skip outside an emulator.
+- 14 unit/integration checks pass in the standard suite. Two emulator suites intentionally skip outside an emulator.
 - Database and Storage emulator run passes all 7 checks, including nested database cases.
 - npm audit reports zero known vulnerabilities for the frontend, Functions and optional backend at review time.
 - Browser checks cover guest home, sign-in, 404 navigation, protected-route redirects, language switching and persistence, and mobile layout. Screenshots and local diagnostic logs are kept outside Git.
 
 ## GitHub
 
-Updated the repository description and topics and enabled vulnerability alerts. Added CI with pinned official actions, Dependabot configuration, a pull request template and security/deployment documentation. GitHub returned 404 for private vulnerability reporting; it was not enabled. Branch protection and secret-scanning availability remain separate repository/account settings.
+Updated the repository description and topics and enabled vulnerability alerts. Added CI with pinned official actions, Dependabot configuration, a pull request template and security/deployment documentation. GitHub returned 404 for private vulnerability reporting; it was not enabled. Main now requires the check status and resolved review conversations; force pushes and deletion are disabled. Administrator bypass remains available. Secret-scanning availability depends on repository/account settings.
 
 The publication branch starts at remote main and contains the sanitized final snapshot. The original local main and its three unpushed commits are retained locally.
 
