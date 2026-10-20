@@ -1,3 +1,4 @@
+import { formatDuration } from '../utils/duration';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -64,21 +65,6 @@ export default function Courses() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [userCourses, setUserCourses] = useState([]);
-
-  const formatDuration = (totalMinutes) => {
-    if (!totalMinutes || totalMinutes <= 0) return null;
-
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-
-    if (hours > 0 && minutes > 0) {
-      return t('duration.hoursAndMinutes', { hours, minutes });
-    }
-    if (hours > 0) {
-      return t('duration.hoursOnly', { hours });
-    }
-    return t('duration.minutesOnly', { minutes });
-  };
 
   useEffect(() => {
     checkAdminStatus();
@@ -218,7 +204,7 @@ export default function Courses() {
 
             const expired = isExpired(course.id);
             const totalDurationMinutes = getTotalDurationMinutes(course);
-            const formattedDuration = formatDuration(totalDurationMinutes);
+            const formattedDuration = formatDuration(totalDurationMinutes, t);
 
             return (
               <div
