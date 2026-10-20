@@ -1,21 +1,22 @@
+import i18n from '../../i18n';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import MatchingDrag from '../MatchingDrag';
 import katex from 'katex';
 
-export default function QuestionCard({ 
-  question, 
-  questionNumber, 
-  totalQuestions, 
-  selectedAnswers, 
-  onAnswerSelect 
+export default function QuestionCard({
+  question,
+  questionNumber,
+  totalQuestions,
+  selectedAnswers,
+  onAnswerSelect,
 }) {
   const { t } = useTranslation();
   const [imageErrors, setImageErrors] = useState(new Set());
   const [selectedOptions, setSelectedOptions] = useState(
-    Array.isArray(selectedAnswers) ? selectedAnswers : []
+    Array.isArray(selectedAnswers) ? selectedAnswers : [],
   );
 
   useEffect(() => {
@@ -23,14 +24,14 @@ export default function QuestionCard({
   }, [selectedAnswers]);
 
   const isMatching = question?.type === 'matching';
-  // Determine if question supports multiple answers and max selections
-  const isMulti = !isMatching && (question?.type === 'multi' || (question?.correct && question.correct.length > 1));
-  // Determine if question supports multiple answers and max selections
-  const maxSelect = question?.maxSelect && question.maxSelect > 0
-    ? question.maxSelect
-    : (isMulti ? 3 : 1);
 
-  // Sanitize HTML content
+  const isMulti =
+    !isMatching &&
+    (question?.type === 'multi' || (question?.correct && question.correct.length > 1));
+
+  const maxSelect =
+    question?.maxSelect && question.maxSelect > 0 ? question.maxSelect : isMulti ? 3 : 1;
+
   const sanitizeHTML = (html) => {
     return sanitizeHtml(html);
   };
@@ -44,7 +45,9 @@ export default function QuestionCard({
     let idx = 0;
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(<span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>);
+        parts.push(
+          <span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>,
+        );
         idx += 1;
       }
       parts.push(<em key={`${keyPrefix}-it-${idx}-e`}>{match[1]}</em>);
@@ -59,7 +62,7 @@ export default function QuestionCard({
 
   const renderMathInText = (text, keyPrefix) => {
     if (!text) return null;
-    // Support both inline $...$ and display $$...$$ math
+
     const segments = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/g);
     return segments.map((seg, idx) => {
       if (!seg) return null;
@@ -74,8 +77,7 @@ export default function QuestionCard({
             throwOnError: false,
             displayMode: isDisplay,
           });
-        } catch (_) {
-          // Fallback: show raw LaTeX text if KaTeX fails
+        } catch {
           return (
             <span
               key={`${keyPrefix}-math-fallback-${idx}`}
@@ -113,20 +115,26 @@ export default function QuestionCard({
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         const normal = text.slice(lastIndex, match.index);
-        parts.push(<span key={`${keyPrefix}-b-${idx}-n`}>{renderItalic(normal, `${keyPrefix}-b-${idx}-n`)}</span>);
+        parts.push(
+          <span key={`${keyPrefix}-b-${idx}-n`}>
+            {renderItalic(normal, `${keyPrefix}-b-${idx}-n`)}
+          </span>,
+        );
         idx += 1;
       }
       parts.push(
         <strong key={`${keyPrefix}-b-${idx}-s`}>
           {renderItalic(match[1], `${keyPrefix}-b-${idx}-s`)}
-        </strong>
+        </strong>,
       );
       idx += 1;
       lastIndex = regex.lastIndex;
     }
     if (lastIndex < text.length) {
       const rest = text.slice(lastIndex);
-      parts.push(<span key={`${keyPrefix}-b-rest`}>{renderItalic(rest, `${keyPrefix}-b-rest`)}</span>);
+      parts.push(
+        <span key={`${keyPrefix}-b-rest`}>{renderItalic(rest, `${keyPrefix}-b-rest`)}</span>,
+      );
     }
     return parts;
   };
@@ -135,51 +143,40 @@ export default function QuestionCard({
     if (!question) return;
     const current = Array.isArray(selectedOptions) ? selectedOptions : [];
     let newSelection;
-    
+
     if (isMulti) {
-      // Multiple choice with optional maxSelect limit
       if (current.includes(optionKey)) {
         newSelection = current.filter((key) => key !== optionKey);
       } else {
         if (current.length >= maxSelect) {
-          // Do not allow selecting more than maxSelect options
           return;
         }
         newSelection = [...current, optionKey];
       }
     } else {
-      // Single choice
       newSelection = [optionKey];
     }
-    
+
     setSelectedOptions(newSelection);
     onAnswerSelect(question.id, newSelection);
-
-    // jQuery effect for selection animation
-    if (typeof $ !== 'undefined') {
-      $(`[data-option="${optionKey}"]`).addClass('pulse-animation');
-      setTimeout(() => {
-        $(`[data-option="${optionKey}"]`).removeClass('pulse-animation');
-      }, 300);
-    }
   };
 
   const handleImageError = (src) => {
-    setImageErrors(prev => new Set([...prev, src]));
+    setImageErrors((prev) => new Set([...prev, src]));
   };
 
-  // Plain-text inline renderer for context questions (26–30) with shared context
   const renderInlineForContext = (content, inlineUrls, photoRef, keyPrefix) => {
     if (!content) return null;
 
-    const parts = content.split(/(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi);
+    const parts = content.split(
+      /(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi,
+    );
 
     return (
       <>
         {parts.map((part, index) => {
           if (!part) return null;
 
-          // Inline marker [[img: URL]]
           const markerMatch = part.match(/^\[\[img:\s*([^\]]+)\]\]$/i);
           if (markerMatch) {
             const url = (markerMatch[1] || '').trim();
@@ -195,19 +192,18 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // PHOTO placeholder mapped strictly to inlineUrls
           if (/^PHOTO$/i.test(part.trim())) {
             const urls = Array.isArray(inlineUrls) ? inlineUrls : [];
             const url = urls[photoRef.current] || null;
             photoRef.current += 1;
             if (!url) {
-              return <span key={`${keyPrefix}-photo-text-${index}`}>PHOTO</span>;
+              return <span key={`${keyPrefix}-photo-text-${index}`}>{i18n.t('common.photo')}</span>;
             }
             return (
               <img
@@ -220,13 +216,12 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // data:image inline URL
           if (part.match(/^data:image\/[^^\s]+$/i)) {
             const url = part.trim();
             return (
@@ -240,13 +235,12 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // Direct http(s) image URL with extension
           if (part.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
             const url = part.trim();
             return (
@@ -260,7 +254,7 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
@@ -279,7 +273,6 @@ export default function QuestionCard({
   const renderContent = (content) => {
     if (!content) return null;
 
-    // If it's HTML content
     if (content.includes('<') && content.includes('>')) {
       return (
         <div
@@ -289,8 +282,9 @@ export default function QuestionCard({
       );
     }
 
-    // Mixed text with inline image markers [[img: URL]], PHOTO placeholders, and/or direct image URLs (including data:image URIs)
-    const parts = content.split(/(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi);
+    const parts = content.split(
+      /(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi,
+    );
 
     let photoIndex = 0;
 
@@ -299,7 +293,6 @@ export default function QuestionCard({
         {parts.map((part, index) => {
           if (!part) return null;
 
-          // Inline marker [[img: URL]]
           const markerMatch = part.match(/^\[\[img:\s*([^\]]+)\]\]$/i);
           if (markerMatch) {
             const url = (markerMatch[1] || '').trim();
@@ -315,21 +308,18 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // PHOTO placeholder mapped only to question.inlineImageUrls by order
           if (/^PHOTO$/i.test(part.trim())) {
-            const urls = Array.isArray(question?.inlineImageUrls)
-              ? question.inlineImageUrls
-              : [];
+            const urls = Array.isArray(question?.inlineImageUrls) ? question.inlineImageUrls : [];
             const url = urls[photoIndex];
             photoIndex += 1;
             if (!url) {
-              return <span key={`photo-text-${index}`}>PHOTO</span>;
+              return <span key={`photo-text-${index}`}>{i18n.t('common.photo')}</span>;
             }
             return (
               <img
@@ -342,13 +332,12 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // data:image inline URL
           if (part.match(/^data:image\/[^^\s]+$/i)) {
             const url = part.trim();
             return (
@@ -362,13 +351,12 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
           }
 
-          // Direct http(s) image URL with extension
           if (part.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
             const url = part.trim();
             return (
@@ -382,7 +370,7 @@ export default function QuestionCard({
                 style={{
                   display: imageErrors.has(url) ? 'none' : 'inline-block',
                   maxHeight: window.innerWidth < 640 ? 140 : 180,
-                  objectFit: 'contain'
+                  objectFit: 'contain',
                 }}
               />
             );
@@ -397,7 +385,7 @@ export default function QuestionCard({
   const renderOption = (optionKey, option) => {
     const selectedArray = Array.isArray(selectedOptions) ? selectedOptions : [];
     const isSelected = selectedArray.includes(optionKey);
-    
+
     return (
       <button
         key={optionKey}
@@ -410,25 +398,25 @@ export default function QuestionCard({
         }`}
       >
         <div className="flex items-start space-x-2">
-          <div className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center ${
-            isSelected 
-              ? 'border-blue-500 bg-blue-500' 
-              : 'border-gray-300 dark:border-gray-600'
-          }`}>
-            <span className={`text-xs font-medium ${
-              isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'
-            }`}>
+          <div
+            className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center ${
+              isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+          >
+            <span
+              className={`text-xs font-medium ${
+                isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'
+              }`}
+            >
               {optionKey}
             </span>
           </div>
-          
+
           <div className="flex-1 min-w-0">
             {option.type === 'image' && option.image ? (
               <div className="space-y-2">
                 {option.value && (
-                  <div className="text-gray-900 dark:text-white">
-                    {renderContent(option.value)}
-                  </div>
+                  <div className="text-gray-900 dark:text-white">{renderContent(option.value)}</div>
                 )}
                 <img
                   src={option.image}
@@ -436,10 +424,10 @@ export default function QuestionCard({
                   className="max-w-full h-auto rounded-lg shadow-sm"
                   loading="lazy"
                   onError={() => handleImageError(option.image)}
-                  style={{ 
+                  style={{
                     display: imageErrors.has(option.image) ? 'none' : 'block',
                     maxHeight: '200px',
-                    objectFit: 'contain'
+                    objectFit: 'contain',
                   }}
                 />
                 {imageErrors.has(option.image) && (
@@ -470,25 +458,25 @@ export default function QuestionCard({
   }
 
   const isContextQuestion =
-    typeof question?.order === 'number' && question.order >= 26 && question.order <= 30 &&
-    typeof question.contentHtml === 'string' && question.contentHtml.includes('<hr');
+    typeof question?.order === 'number' &&
+    question.order >= 26 &&
+    question.order <= 30 &&
+    typeof question.contentHtml === 'string' &&
+    question.contentHtml.includes('<hr');
 
   return (
     <div className="relative">
-      {/* Watermark */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-5 bg-repeat-space"
         style={{
           backgroundImage: 'url(/icons/logo-прозрачный.png)',
           backgroundSize: '150px 150px',
           backgroundPosition: 'center',
-          zIndex: 1
+          zIndex: 1,
         }}
       />
-      
-      {/* Question Card */}
+
       <div className="relative z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2.5 sm:p-4 lg:p-6 text-white">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <h2 className="text-sm sm:text-base lg:text-lg font-semibold">
@@ -502,73 +490,79 @@ export default function QuestionCard({
               )}
             </div>
           </div>
-          
-          {/* Progress bar */}
+
           <div className="w-full bg-blue-500/30 rounded-full h-1.5 sm:h-2">
-            <div 
+            <div
               className="bg-white rounded-full h-1.5 sm:h-2 transition-all duration-300"
               style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
             />
           </div>
         </div>
 
-        {/* Question Content */}
         <div className="p-3 sm:p-4 lg:p-6">
-          {/* Main question content */}
           <div className="mb-4 sm:mb-6 lg:mb-8">
-            {isContextQuestion ? (() => {
-              const html = question.contentHtml || '';
-              const [rawContext = '', rawQuestion = ''] = html.split(/<hr\s*\/?>([\s\S]*)/i);
-              const contextText = rawContext.trim();
-              const questionText = rawQuestion.trim();
-              const inlineUrls = Array.isArray(question.inlineImageUrls) ? question.inlineImageUrls : [];
-              const photoRef = { current: 0 };
+            {isContextQuestion ? (
+              (() => {
+                const html = question.contentHtml || '';
+                const [rawContext = '', rawQuestion = ''] = html.split(/<hr\s*\/?>([\s\S]*)/i);
+                const contextText = rawContext.trim();
+                const questionText = rawQuestion.trim();
+                const inlineUrls = Array.isArray(question.inlineImageUrls)
+                  ? question.inlineImageUrls
+                  : [];
+                const photoRef = { current: 0 };
 
-              return (
-                <>
-                  {contextText && (
-                    <div className="text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white leading-relaxed mb-3 sm:mb-4">
-                      {renderInlineForContext(contextText, inlineUrls, photoRef, 'ctx')}
+                return (
+                  <>
+                    {contextText && (
+                      <div className="text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white leading-relaxed mb-3 sm:mb-4">
+                        {renderInlineForContext(contextText, inlineUrls, photoRef, 'ctx')}
+                      </div>
+                    )}
+
+                    {question.imageUrls && question.imageUrls.length > 0 && (
+                      <div className="mt-1 sm:mt-2 mb-3 sm:mb-4 space-y-2">
+                        {question.imageUrls.map((imageUrl, index) => (
+                          <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`Question attachment ${index + 1}`}
+                            className="max-w-full h-auto rounded-lg shadow-sm mx-auto block"
+                            loading="lazy"
+                            onError={() => handleImageError(imageUrl)}
+                            style={{
+                              display: imageErrors.has(imageUrl) ? 'none' : 'block',
+                              maxHeight: window.innerWidth < 640 ? 220 : 320,
+                              objectFit: 'contain',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="my-3 sm:my-4">
+                      <div className="border-t-2 border-gray-300 dark:border-gray-600 opacity-80" />
                     </div>
-                  )}
 
-                  {question.imageUrls && question.imageUrls.length > 0 && (
-                    <div className="mt-1 sm:mt-2 mb-3 sm:mb-4 space-y-2">
-                      {question.imageUrls.map((imageUrl, index) => (
-                        <img
-                          key={index}
-                          src={imageUrl}
-                          alt={`Question attachment ${index + 1}`}
-                          className="max-w-full h-auto rounded-lg shadow-sm mx-auto block"
-                          loading="lazy"
-                          onError={() => handleImageError(imageUrl)}
-                          style={{
-                            display: imageErrors.has(imageUrl) ? 'none' : 'block',
-                            maxHeight: window.innerWidth < 640 ? 220 : 320,
-                            objectFit: 'contain'
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="my-3 sm:my-4">
-                    <div className="border-t-2 border-gray-300 dark:border-gray-600 opacity-80" />
-                  </div>
-
-                  {questionText && (
-                    <div className="text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white leading-relaxed">
-                      {renderInlineForContext(questionText, inlineUrls, photoRef, 'q')}
-                    </div>
-                  )}
-                </>
-              );
-            })() : (
+                    {questionText && (
+                      <div className="text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white leading-relaxed">
+                        {renderInlineForContext(questionText, inlineUrls, photoRef, 'q')}
+                      </div>
+                    )}
+                  </>
+                );
+              })()
+            ) : (
               <>
                 <div className="text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white leading-relaxed">
                   {question.contentText && renderContent(question.contentText)}
-                  {!question.contentText && question.contentHtml && renderContent(question.contentHtml)}
-                  {!question.contentText && !question.contentHtml && question.content && renderContent(question.content)}
+                  {!question.contentText &&
+                    question.contentHtml &&
+                    renderContent(question.contentHtml)}
+                  {!question.contentText &&
+                    !question.contentHtml &&
+                    question.content &&
+                    renderContent(question.content)}
                 </div>
 
                 {question.imageUrls && question.imageUrls.length > 0 && (
@@ -581,10 +575,10 @@ export default function QuestionCard({
                         className="max-w-full h-auto rounded-lg shadow-sm mx-auto block"
                         loading="lazy"
                         onError={() => handleImageError(imageUrl)}
-                        style={{ 
+                        style={{
                           display: imageErrors.has(imageUrl) ? 'none' : 'block',
                           maxHeight: window.innerWidth < 640 ? '200px' : '300px',
-                          objectFit: 'contain'
+                          objectFit: 'contain',
                         }}
                       />
                     ))}
@@ -594,7 +588,6 @@ export default function QuestionCard({
             )}
           </div>
 
-          {/* Answer Options / Matching */}
           <div className="space-y-2">
             {isMatching ? (
               <>
@@ -619,18 +612,16 @@ export default function QuestionCard({
                     </span>
                   )}
                 </h3>
-                {question.options && Object.entries(question.options).map(([key, option]) => 
-                  renderOption(key, option)
-                )}
+                {question.options &&
+                  Object.entries(question.options).map(([key, option]) =>
+                    renderOption(key, option),
+                  )}
               </>
             )}
           </div>
-
-          {/* Selection info - removed per user request */}
         </div>
       </div>
 
-      {/* CSS for animations */}
       <style>{`
         .pulse-animation {
           animation: pulse 0.3s ease-in-out;

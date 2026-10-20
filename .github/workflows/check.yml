@@ -1,0 +1,79 @@
+name: Firebase
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm ci --prefix functions
+      - run: npm run check
+      - run: npm audit --audit-level=high
+      - run: npm audit --prefix functions --audit-level=high
+      - run: npx --yes firebase-tools@15.28.1 emulators:exec --only database,storage --project demo-akadiledu-audit "node --test tests/database.rules.test.cjs tests/storage.rules.test.cjs"
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: production
+      url: ${{ vars.FIREBASE_HOSTING_URL }}
+    concurrency:
+      group: firebase-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_HOSTING_URL: ${{ vars.FIREBASE_HOSTING_URL }}
+      GEMINI_API_URL: ${{ vars.GEMINI_API_URL }}
+      DATABASE_REGION: ${{ vars.DATABASE_REGION }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix functions
+      - name: Prepare deployment configuration
+        run: node scripts/firebase-release.mjs prepare
+        env:
+          FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          project_id: ${{ vars.FIREBASE_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.FIREBASE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}
+      - name: Deploy Firebase services
+        run: npx --yes firebase-tools@15.28.1 deploy --project "$FIREBASE_PROJECT_ID" --only functions,database,storage,hosting --non-interactive
+      - name: Verify published build
+        run: node scripts/firebase-release.mjs verify

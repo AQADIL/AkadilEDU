@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +21,6 @@ export default function ForgotPassword() {
       await resetPassword(email);
       setSuccess(true);
     } catch (error) {
-      console.error('Password reset error:', error);
-      
       switch (error.code) {
         case 'auth/user-not-found':
           setError(t('auth.errors.userNotFound'));
@@ -50,13 +49,8 @@ export default function ForgotPassword() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             {t('auth.resetSentMessage')} <strong>{email}</strong>
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
-            {t('auth.checkInbox')}
-          </p>
-          <Link
-            to="/login"
-            className="btn-primary inline-flex items-center gap-2"
-          >
+          <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">{t('auth.checkInbox')}</p>
+          <Link to="/login" className="btn-primary inline-flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             {t('auth.backToLogin')}
           </Link>
@@ -68,26 +62,22 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
               <img
                 src="/icons/logo-прозрачный.png"
-                alt="AkadilEDU logo"
+                alt={i18n.t('ui.akadileduLogo')}
                 className="w-10 h-10 object-contain"
               />
             </div>
             <span className="text-3xl font-bold text-gray-900 dark:text-white">
-              AkadilEDU
+              {i18n.t('header.logo')}
             </span>
           </div>
-          <p className="text-gray-600 dark:text-gray-400">
-            {t('auth.resetPassword')}
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">{t('auth.resetPassword')}</p>
         </div>
 
-        {/* Form */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-center">
             {t('auth.resetInstructions')}
@@ -101,18 +91,23 @@ export default function ForgotPassword() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
+              <label
+                htmlFor="forgotpassword-field-0"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                {i18n.t('auth.email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="forgotpassword-field-0"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
+                  placeholder={i18n.t('auth.emailPlaceholder')}
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required
                   disabled={loading}
@@ -120,7 +115,6 @@ export default function ForgotPassword() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -137,7 +131,6 @@ export default function ForgotPassword() {
             </button>
           </form>
 
-          {/* Back to Login */}
           <div className="mt-6 text-center">
             <Link
               to="/login"

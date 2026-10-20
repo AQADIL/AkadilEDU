@@ -13,11 +13,9 @@ build/
 *.local
 
 # Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
+!**/.env.example
 
 # Logs
 logs/
@@ -47,6 +45,16 @@ firebase-debug.log
 firestore-debug.log
 **/serviceAccountKey.json
 scripts/serviceAccountKey.json
+**/*service-account*.json
+**/*serviceAccount*.json
+**/*credentials*.json
+*.pem
+*.key
+.claude/
+.agents/
+.artifacts/
+playwright-report/
+test-results/
 
 # Temporary files
 *.tmp
@@ -56,3 +64,6 @@ scripts/serviceAccountKey.json
 # OS files
 Thumbs.db
 Desktop.ini
+
+.playwright-cli/
+gha-creds-*.json

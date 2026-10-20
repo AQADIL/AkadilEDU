@@ -1,6 +1,7 @@
+import i18n from '../../i18n';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Save, Plus, Eye, Edit, Trash2, Image as ImageIcon, Copy } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Edit, Trash2, Image as ImageIcon, Copy } from 'lucide-react';
 import { parseQuestionsWithAI } from '../../api/aiParser';
 import QuestionEditor from './QuestionEditor';
 import ContextBlockEditor from './ContextBlockEditor';
@@ -21,19 +22,19 @@ const SUBJECTS = [
   { id: 'basics_of_law', nameKey: 'test.subjects.basics_of_law' },
   { id: 'informatics', nameKey: 'test.subjects.informatics' },
   { id: 'profile1', nameKey: 'test.subjects.profile1' },
-  { id: 'profile2', nameKey: 'test.subjects.profile2' }
+  { id: 'profile2', nameKey: 'test.subjects.profile2' },
 ];
 
 export default function TestBuilder({ test, onSave, onCancel }) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
-    subjects: [], // always max 1 subjectId
+    subjects: [],
     variant: 1,
     timeLimit: 60,
     language: 'kk',
     creativeMode: false,
-    sections: {}
+    sections: {},
   });
   const [currentSection, setCurrentSection] = useState(null);
   const [showQuestionEditor, setShowQuestionEditor] = useState(false);
@@ -47,78 +48,21 @@ export default function TestBuilder({ test, onSave, onCancel }) {
   const [dragInfo, setDragInfo] = useState(null);
 
   const copyExternalAiGuide = async () => {
-    const guide = [
-      'You are a helper that prepares UBT test questions as PLAIN TEXT for a second AI parser.',
-      'The second AI will read your text and convert it into structured JSON questions used in a web test system.',
-      '',
-      'GENERAL RULES (structure and types):',
-      '- There must be exactly 40 questions, numbered "1)", "2)", ..., "40)" on separate lines.',
-      '- Questions 1-25: standard single-choice questions with exactly 4 options (A-D) and ONE correct answer.',
-      '- Questions 26-30: context-based questions. First write a shared reading passage (you may include inline images), then write questions that rely on this context. Each such question must still follow the numbered format below.',
-      '- Questions 31-35: matching tasks. In plain text, clearly describe the LEFT items and the RIGHT items, but keep them inside one numbered block (31), 32), ... 35)). The parser will convert them into matching pairs.',
-      '- Questions 36-40: single- or multi-answer questions with up to 6 options (A-F). Some of them may have several correct answers.',
-      '',
-      'QUESTION FORMAT (for each question N):',
-      'N) Question text here',
-      'A) option text',
-      'B) option text',
-      'C) option text',
-      'D) option text',
-      '[E) option text (only for questions 36-40 when needed)]',
-      '[F) option text (only for questions 36-40 when needed)]',
-      'Correct: A              # for single-answer',
-      'Correct: A, C           # for multi-answer',
-      'Points: 1               # optional, can be omitted (36-40 are usually 2 points)',
-      '',
-      'INLINE IMAGES INSIDE QUESTION TEXT:',
-      '- If there is a small image that must appear INSIDE the text (for example a symbol, fragment of formula or map mark), insert a marker [[img: URL]] exactly in that place in the sentence.',
-      '- Example: "Find the mark [[img: https://example.com/mark.png]] on the map."',
-      '- You may also sometimes have plain image URLs in text (https://...png or data:image/...). The parser treats both [[img: URL]] and bare image URLs as inline images.',
-      '',
-      'MATH FORMULAS AND SYMBOLS:',
-      '- You may use TeX/LaTeX-style math notation for formulas, for example: "$log_{3} 27 + log_{2} 8$", "$a^2 + b^2 = c^2$", "$E_k = \\frac{mv^2}{2}$", "$\\eta = 1 - \\frac{Q_2}{Q_1}$".',
-      '- When you write formulas, keep the symbols, powers (x^2), indices (a_1), fractions (\\frac{a}{b}), roots (\\sqrt{...}) exactly as they should appear in the final text. The parser will store them as plain text and the client will display them as-is.',
-      '- Do NOT replace math symbols with words (for example, keep "^2" instead of writing "squared"), and do not remove backslashes or dollar signs from inline formulas.',
-      '',
-      'ADDITIONAL (BLOCK) IMAGES FOR A QUESTION:',
-      '- If a question has separate illustration images under the text (not inline), add a block:',
-      '  Images:',
-      '  - https://example.com/image1.png',
-      '  - https://example.com/image2.png',
-      '- These images belong to the whole question, not to a specific option.',
-      '',
-      'IMAGES IN ANSWER OPTIONS:',
-      '- If an option shows an image, use the pattern:',
-      '  A) Image: https://example.com/figure.png (short description)',
-      '- The URL may be http, https or data:image. The description in brackets is optional.',
-      '',
-      'SHARED CONTEXT (26-30):',
-      '- If several questions share the same reading passage, repeat the relevant part of the passage before each of these questions or make it very clear in the text which questions use the same context.',
-      '',
-      'MATCHING TASKS (31-35):',
-      '- For matching tasks, clearly list the LEFT items and the RIGHT items inside the same numbered block so that another AI can infer pairs. For example:',
-      '  31) Match the terms and definitions.',
-      '  LEFT: 1) Term A; 2) Term B',
-      '  RIGHT: A) Definition 1; B) Definition 2',
-      '',
-      'IMPORTANT:',
-      '- Always keep clean numbering 1) .. 40).',
-      '- Always provide a Correct: line for every question that has options (1-25 and 36-40). This line must start with the word "Correct:" and stay on a SINGLE line (do not break it across lines).',
-      '- Never treat lines starting with "Correct:" or "Points:" as answer options. They are metadata for the current question only.',
-      '- Use A-D options for questions 1-25, and A-F options only for questions 36-40.',
-    ].join('\n');
+    const guide = t('admin.externalGuide');
 
     try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
         await navigator.clipboard.writeText(guide);
-        window.alert('External AI guide copied to clipboard');
+        window.alert(i18n.t('ui.aiInstructionsCopied'));
       } else {
-        console.log(guide);
-        window.alert('Clipboard API not available. Guide printed to console.');
+        window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
       }
-    } catch (e) {
-      console.error('Error copying AI guide:', e);
-      window.alert('Failed to copy AI guide');
+    } catch {
+      window.alert(i18n.t('ui.couldNotCopyAiInstructions'));
     }
   };
 
@@ -131,23 +75,22 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         timeLimit: test.timeLimit || 60,
         language: test.language || 'kk',
         creativeMode: Boolean(test.creativeMode),
-        sections: test.sections || {}
+        sections: test.sections || {},
       });
     }
   }, [test]);
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubjectToggle = (subjectId) => {
-    // Each test now belongs to exactly one subject
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      subjects: [subjectId]
+      subjects: [subjectId],
     }));
   };
 
@@ -160,8 +103,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       alert(t('admin.selectSubjectsRequired'));
       return;
     }
-    
-    // Sanitize sections/questions to remove undefined (RTDB disallows undefined)
+
     const sanitizedSections = {};
     Object.entries(formData.sections || {}).forEach(([sectionId, section]) => {
       const newQs = {};
@@ -186,15 +128,15 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       ...formData,
       sections: sanitizedSections,
       totalQuestions: getTotalQuestions(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
-    
+
     onSave(testData);
   };
 
   const getTotalQuestions = () => {
     let total = 0;
-    Object.values(formData.sections).forEach(section => {
+    Object.values(formData.sections).forEach((section) => {
       if (section.questions) {
         total += Object.keys(section.questions).length;
       }
@@ -204,17 +146,17 @@ export default function TestBuilder({ test, onSave, onCancel }) {
 
   const initializeSection = (subjectId) => {
     if (!formData.sections[subjectId]) {
-      const subjectMeta = SUBJECTS.find(s => s.id === subjectId);
+      const subjectMeta = SUBJECTS.find((s) => s.id === subjectId);
       const titleKey = subjectMeta?.nameKey || `test.subjects.${subjectId}`;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         sections: {
           ...prev.sections,
           [subjectId]: {
             title: t(titleKey),
-            questions: {}
-          }
-        }
+            questions: {},
+          },
+        },
       }));
     }
     setCurrentSection(subjectId);
@@ -225,41 +167,34 @@ export default function TestBuilder({ test, onSave, onCancel }) {
 
     const nextOrder = getNextQuestionOrder(sectionId);
 
-    // Enforce max 40 questions per subject (1-40)
     if (nextOrder > 40) {
       try {
-        window.alert('Максимум 40 вопросов (1–40) на один предмет.');
-      } catch (_) {}
+        window.alert(i18n.t('ui.upTo_40QuestionsPerSubject'));
+      } catch {}
       return;
     }
 
-    // If we are at 26-30, open context block editor instead of single question
     if (nextOrder >= 26 && nextOrder <= 30) {
       setShowContextEditor(true);
       setShowQuestionEditor(false);
       return;
     }
 
-    // Prepare base question skeleton; specific blocks (1-25, 31-35, 36-40)
-    // are distinguished по номеру order. UI в редакторе покажет метки.
-
-    // For complex block 36-40 we want up to 6 options (A-F) by default.
-    // For earlier blocks (1-25 and 31-35) we start with 4 options (A-D).
     const isComplexBlock = nextOrder >= 36 && nextOrder <= 40;
     const baseOptions = isComplexBlock
       ? {
-          'A': { type: 'text', value: '' },
-          'B': { type: 'text', value: '' },
-          'C': { type: 'text', value: '' },
-          'D': { type: 'text', value: '' },
-          'E': { type: 'text', value: '' },
-          'F': { type: 'text', value: '' }
+          A: { type: 'text', value: '' },
+          B: { type: 'text', value: '' },
+          C: { type: 'text', value: '' },
+          D: { type: 'text', value: '' },
+          E: { type: 'text', value: '' },
+          F: { type: 'text', value: '' },
         }
       : {
-          'A': { type: 'text', value: '' },
-          'B': { type: 'text', value: '' },
-          'C': { type: 'text', value: '' },
-          'D': { type: 'text', value: '' }
+          A: { type: 'text', value: '' },
+          B: { type: 'text', value: '' },
+          C: { type: 'text', value: '' },
+          D: { type: 'text', value: '' },
         };
     setEditingQuestion({
       sectionId,
@@ -270,22 +205,17 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       inlineImageUrls: [],
       options: baseOptions,
       correct: ['A'],
-      points: isComplexBlock ? 2 : 1
+      points: isComplexBlock ? 2 : 1,
     });
     setShowQuestionEditor(true);
   };
 
   const handleSaveContextBlock = (sectionId, payload) => {
-    const {
-      contextText,
-      items,
-      contextImages,
-      contextInlineImageUrls,
-      questionInlineImageUrls
-    } = payload || {};
+    const { contextText, items, contextImages, contextInlineImageUrls, questionInlineImageUrls } =
+      payload || {};
     if (!sectionId || !Array.isArray(items)) return;
 
-    setFormData(prev => {
+    setFormData((prev) => {
       const next = { ...prev, sections: { ...prev.sections } };
       const section = next.sections[sectionId] || { title: '', questions: {} };
       if (!section.questions) section.questions = {};
@@ -294,14 +224,15 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         const order = item.order;
         if (typeof order !== 'number' || order < 26 || order > 30) return;
 
-        const qid = Object.keys(section.questions).find((id) => section.questions[id]?.order === order)
-          || `q_${Date.now()}_${order}_${Math.random().toString(36).slice(2, 6)}`;
+        const qid =
+          Object.keys(section.questions).find((id) => section.questions[id]?.order === order) ||
+          `q_${Date.now()}_${order}_${Math.random().toString(36).slice(2, 6)}`;
 
         const options = {
           A: { type: 'text', value: item.options.A || '' },
           B: { type: 'text', value: item.options.B || '' },
           C: { type: 'text', value: item.options.C || '' },
-          D: { type: 'text', value: item.options.D || '' }
+          D: { type: 'text', value: item.options.D || '' },
         };
 
         const correctKey = item.correct || 'A';
@@ -319,15 +250,17 @@ export default function TestBuilder({ test, onSave, onCancel }) {
           sectionId,
           order,
           type: 'single',
-          // contentText хранит только текст вопроса без контекста
+
           contentText: item.text || '',
-          // contentHtml = контекст + <hr /> + текст вопроса (для клиента)
+
           contentHtml: `${contextText}\n<hr />\n${item.text || ''}`,
           options,
-          // inlineImageUrls: сначала PHOTOS из контекста, потом из конкретного вопроса
+
           inlineImageUrls: inlineUrlsForQuestion,
-          // imageUrls: дополнительные изображения общего контекста (одни и те же для 26–30)
-          imageUrls: Array.isArray(contextImages) ? contextImages : (section.questions[qid]?.imageUrls || []),
+
+          imageUrls: Array.isArray(contextImages)
+            ? contextImages
+            : section.questions[qid]?.imageUrls || [],
           correct: [correctKey],
           points: Number.isFinite(section.questions[qid]?.points)
             ? section.questions[qid].points
@@ -346,42 +279,53 @@ export default function TestBuilder({ test, onSave, onCancel }) {
   const getNextQuestionOrder = (sectionId) => {
     const section = formData.sections[sectionId];
     if (!section || !section.questions) return 1;
-    const orders = Object.values(section.questions).map(q => q.order || 0);
+    const orders = Object.values(section.questions).map((q) => q.order || 0);
     return Math.max(0, ...orders) + 1;
   };
 
   const insertAIQuestions = (sectionId, questions) => {
     if (!sectionId || !Array.isArray(questions) || questions.length === 0) return;
-    setFormData(prev => {
+    setFormData((prev) => {
       const next = { ...prev };
       if (!next.sections[sectionId]) {
-        const subjectMeta = SUBJECTS.find(s => s.id === sectionId);
+        const subjectMeta = SUBJECTS.find((s) => s.id === sectionId);
         const titleKey = subjectMeta?.nameKey || `test.subjects.${sectionId}`;
         next.sections[sectionId] = { title: t(titleKey), questions: {} };
       }
       const buildSignature = (q) => {
-        const type = q?.type || (Array.isArray(q?.correct) && q.correct.length > 1 ? 'multi' : 'single');
+        const type =
+          q?.type || (Array.isArray(q?.correct) && q.correct.length > 1 ? 'multi' : 'single');
         const options = q?.options && typeof q.options === 'object' ? q.options : {};
         const optionsStr = Object.keys(options)
           .sort()
           .map((k) => `${k}:${(options[k]?.value ?? '').trim()}`)
           .join('|');
         const correctStr = Array.isArray(q?.correct) ? [...q.correct].sort().join(',') : '';
-        const pairsStr = Array.isArray(q?.matchPairs) ? q.matchPairs.map((p) => `${p.left}=>${p.right}`).join('|') : '';
-        const cm = q?.correctMatches && typeof q.correctMatches === 'object' ? q.correctMatches : {};
-        const cmStr = Object.keys(cm).sort().map((k) => `${k}:${cm[k]}`).join('|');
-        return [type, (q?.contentText || '').trim(), optionsStr, correctStr, pairsStr, cmStr].join('||');
+        const pairsStr = Array.isArray(q?.matchPairs)
+          ? q.matchPairs.map((p) => `${p.left}=>${p.right}`).join('|')
+          : '';
+        const cm =
+          q?.correctMatches && typeof q.correctMatches === 'object' ? q.correctMatches : {};
+        const cmStr = Object.keys(cm)
+          .sort()
+          .map((k) => `${k}:${cm[k]}`)
+          .join('|');
+        return [type, (q?.contentText || '').trim(), optionsStr, correctStr, pairsStr, cmStr].join(
+          '||',
+        );
       };
 
       const target = next.sections[sectionId];
       const questionsMap = target.questions || (target.questions = {});
-      const existingSignatures = new Set(Object.values(questionsMap).map((ex) => buildSignature(ex)));
+      const existingSignatures = new Set(
+        Object.values(questionsMap).map((ex) => buildSignature(ex)),
+      );
 
       let order = getNextQuestionOrder(sectionId);
       questions.forEach((q) => {
         const sig = buildSignature(q);
-        if (existingSignatures.has(sig)) return; // skip duplicates
-        const id = `q_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        if (existingSignatures.has(sig)) return;
+        const id = `q_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
         questionsMap[id] = {
           id,
           sectionId,
@@ -392,10 +336,12 @@ export default function TestBuilder({ test, onSave, onCancel }) {
           imageUrls: Array.isArray(q.imageUrls) ? q.imageUrls : [],
           inlineImageUrls: Array.isArray(q.inlineImageUrls) ? q.inlineImageUrls : [],
           options: q.options || {},
-          correct: Array.isArray(q.correct) ? q.correct : (q.correct ? [q.correct] : ['A']),
-          points: Number.isFinite(q.points) && q.points > 0 ? q.points : (aiDefaultPoints || 1),
+          correct: Array.isArray(q.correct) ? q.correct : q.correct ? [q.correct] : ['A'],
+          points: Number.isFinite(q.points) && q.points > 0 ? q.points : aiDefaultPoints || 1,
           ...(Array.isArray(q.matchPairs) ? { matchPairs: q.matchPairs } : {}),
-          ...(q.correctMatches && typeof q.correctMatches === 'object' ? { correctMatches: q.correctMatches } : {})
+          ...(q.correctMatches && typeof q.correctMatches === 'object'
+            ? { correctMatches: q.correctMatches }
+            : {}),
         };
         existingSignatures.add(sig);
         order += 1;
@@ -419,58 +365,14 @@ export default function TestBuilder({ test, onSave, onCancel }) {
     setAiLoading(true);
     try {
       const res = await parseQuestionsWithAI(aiInput, { defaultPoints: aiDefaultPoints });
-      if (res && res.meta) {
-        console.log('AI parser meta:', res.meta);
-      }
+
       insertAIQuestions(aiTargetSection, res.questions || []);
       setShowAiModal(false);
       setAiInput('');
-    } catch (e) {
-      // no-op
+    } catch {
     } finally {
       setAiLoading(false);
     }
-  };
-
-  const dedupeAllSections = () => {
-    setFormData(prev => {
-      const next = { ...prev, sections: { ...prev.sections } };
-      let removed = 0;
-      const buildSignature = (q) => {
-        const type = q?.type || (Array.isArray(q?.correct) && q.correct.length > 1 ? 'multi' : 'single');
-        const options = q?.options && typeof q.options === 'object' ? q.options : {};
-        const optionsStr = Object.keys(options)
-          .sort()
-          .map((k) => `${k}:${(options[k]?.value ?? '').trim()}`)
-          .join('|');
-        const correctStr = Array.isArray(q?.correct) ? [...q.correct].sort().join(',') : '';
-        const pairsStr = Array.isArray(q?.matchPairs) ? q.matchPairs.map((p) => `${p.left}=>${p.right}`).join('|') : '';
-        const cm = q?.correctMatches && typeof q.correctMatches === 'object' ? q.correctMatches : {};
-        const cmStr = Object.keys(cm).sort().map((k) => `${k}:${cm[k]}`).join('|');
-        return [type, (q?.contentText || '').trim(), optionsStr, correctStr, pairsStr, cmStr].join('||');
-      };
-      Object.keys(next.sections || {}).forEach((sectionId) => {
-        const section = next.sections[sectionId];
-        if (!section?.questions) return;
-        const entries = Object.entries(section.questions)
-          .sort(([,a],[,b]) => (a.order || 0) - (b.order || 0));
-        const seen = new Set();
-        const newQuestions = {};
-        let order = 1;
-        for (const [qid, q] of entries) {
-          const sig = buildSignature(q);
-          if (seen.has(sig)) { removed += 1; continue; }
-          seen.add(sig);
-          newQuestions[qid] = { ...q, order };
-          order += 1;
-        }
-        section.questions = newQuestions;
-      });
-      if (removed > 0) {
-        try { window.alert(`Removed duplicates: ${removed}`); } catch (_) {}
-      }
-      return next;
-    });
   };
 
   const buildExportBlockForQuestion = (q) => {
@@ -478,17 +380,21 @@ export default function TestBuilder({ test, onSave, onCancel }) {
 
     const qNumber = q.order || 1;
 
-    let baseText = (q.contentText && q.contentText.trim())
-      || (q.contentHtml && q.contentHtml
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim())
-      || '';
+    let baseText =
+      (q.contentText && q.contentText.trim()) ||
+      (q.contentHtml &&
+        q.contentHtml
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()) ||
+      '';
 
-    // Replace PHOTO placeholders with explicit inline markers for external AI
-    const photoSources = (Array.isArray(q.inlineImageUrls) && q.inlineImageUrls.length > 0)
-      ? q.inlineImageUrls
-      : (Array.isArray(q.imageUrls) ? q.imageUrls : []);
+    const photoSources =
+      Array.isArray(q.inlineImageUrls) && q.inlineImageUrls.length > 0
+        ? q.inlineImageUrls
+        : Array.isArray(q.imageUrls)
+          ? q.imageUrls
+          : [];
     let photoIdx = 0;
     if (baseText && baseText.includes('PHOTO') && photoSources.length > 0) {
       baseText = baseText.replace(/\bPHOTO\b/g, () => {
@@ -534,7 +440,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       });
     }
 
-    const correct = Array.isArray(q.correct) ? q.correct : (q.correct ? [q.correct] : []);
+    const correct = Array.isArray(q.correct) ? q.correct : q.correct ? [q.correct] : [];
     if (correct.length > 0) {
       lines.push(`Correct: ${correct.join(', ')}`);
     }
@@ -549,32 +455,36 @@ export default function TestBuilder({ test, onSave, onCancel }) {
   const buildExportText = () => {
     const lines = [];
     const sections = formData.sections || {};
-    const subjectOrder = (formData.subjects && formData.subjects.length > 0)
-      ? formData.subjects
-      : Object.keys(sections);
+    const subjectOrder =
+      formData.subjects && formData.subjects.length > 0 ? formData.subjects : Object.keys(sections);
 
     subjectOrder.forEach((subjectId) => {
       const section = sections[subjectId];
       if (!section || !section.questions) return;
 
-      const entries = Object.entries(section.questions)
-        .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0));
+      const entries = Object.entries(section.questions).sort(
+        ([, a], [, b]) => (a.order || 0) - (b.order || 0),
+      );
 
       entries.forEach(([, q], idx) => {
-        const qNumber = q.order || (idx + 1);
-        let baseText = (q.contentText && q.contentText.trim())
-          || (q.contentHtml && q.contentHtml
-                .replace(/<[^>]+>/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim())
-          || '';
+        const qNumber = q.order || idx + 1;
+        let baseText =
+          (q.contentText && q.contentText.trim()) ||
+          (q.contentHtml &&
+            q.contentHtml
+              .replace(/<[^>]+>/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()) ||
+          '';
 
-        // Replace PHOTO placeholders in export with explicit inline markers for external AI
-        const photoSources = (Array.isArray(q.inlineImageUrls) && q.inlineImageUrls.length > 0)
-          ? q.inlineImageUrls
-          : (Array.isArray(q.imageUrls) ? q.imageUrls : []);
+        const photoSources =
+          Array.isArray(q.inlineImageUrls) && q.inlineImageUrls.length > 0
+            ? q.inlineImageUrls
+            : Array.isArray(q.imageUrls)
+              ? q.imageUrls
+              : [];
+        let photoIdx = 0;
         if (baseText && baseText.includes('PHOTO') && photoSources.length > 0) {
-          let photoIdx = 0;
           baseText = baseText.replace(/\bPHOTO\b/g, () => {
             const url = photoSources[photoIdx] || 'PHOTO';
             photoIdx += 1;
@@ -606,7 +516,6 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               text = opt.value || '';
             }
 
-            // Also convert PHOTO markers inside option texts back to [[img: URL]]
             if (text && text.includes('PHOTO') && photoSources.length > 0) {
               text = text.replace(/\bPHOTO\b/g, () => {
                 const url = photoIdx < photoSources.length ? photoSources[photoIdx] : 'PHOTO';
@@ -619,7 +528,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
           });
         }
 
-        const correct = Array.isArray(q.correct) ? q.correct : (q.correct ? [q.correct] : []);
+        const correct = Array.isArray(q.correct) ? q.correct : q.correct ? [q.correct] : [];
         if (correct.length > 0) {
           lines.push(`Correct: ${correct.join(', ')}`);
         }
@@ -639,20 +548,22 @@ export default function TestBuilder({ test, onSave, onCancel }) {
     try {
       const text = buildExportText();
       if (!text.trim()) {
-        window.alert('No questions to export');
+        window.alert(i18n.t('ui.noQuestionsToExport'));
         return;
       }
 
-      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
         await navigator.clipboard.writeText(text);
-        window.alert('Questions copied to clipboard');
+        window.alert(i18n.t('ui.questionsCopied'));
       } else {
-        console.log(text);
-        window.alert('Clipboard API not available. Text printed to console.');
+        window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
       }
-    } catch (e) {
-      console.error('Error exporting questions:', e);
-      window.alert('Failed to export questions');
+    } catch {
+      window.alert(i18n.t('ui.couldNotExportQuestions'));
     }
   };
 
@@ -660,37 +571,38 @@ export default function TestBuilder({ test, onSave, onCancel }) {
     const block = buildExportBlockForQuestion(question);
     if (!block.trim()) {
       try {
-        window.alert('Nothing to export for this question');
-      } catch (_) {}
+        window.alert(i18n.t('ui.thisQuestionHasNoContentToExport'));
+      } catch {}
       return;
     }
 
     try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
         await navigator.clipboard.writeText(block);
         try {
-          window.alert('Question export copied to clipboard');
-        } catch (_) {}
+          window.alert(i18n.t('ui.questionCopied'));
+        } catch {}
       } else {
-        // Fallback: log to console so it can be copied manually
-        console.log(block);
         try {
-          window.alert('Clipboard API not available. Question text printed to console.');
-        } catch (_) {}
+          window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
+        } catch {}
       }
-    } catch (e) {
-      console.error('Error copying question export:', e);
+    } catch {
       try {
-        window.alert('Failed to copy question export');
-      } catch (_) {}
+        window.alert(i18n.t('ui.couldNotCopyQuestion'));
+      } catch {}
     }
   };
 
   const handleSaveQuestion = (questionData) => {
     const questionId = questionData.id || `q_${Date.now()}`;
     const sectionId = questionData.sectionId;
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       sections: {
         ...prev.sections,
@@ -700,13 +612,13 @@ export default function TestBuilder({ test, onSave, onCancel }) {
             ...prev.sections[sectionId]?.questions,
             [questionId]: {
               ...questionData,
-              id: questionId
-            }
-          }
-        }
-      }
+              id: questionId,
+            },
+          },
+        },
+      },
     }));
-    
+
     setShowQuestionEditor(false);
     setEditingQuestion(null);
   };
@@ -714,7 +626,6 @@ export default function TestBuilder({ test, onSave, onCancel }) {
   const handleEditQuestion = (sectionId, questionId, question) => {
     const order = question?.order;
 
-    // For context questions (26–30) open the shared ContextBlockEditor
     if (typeof order === 'number' && order >= 26 && order <= 30) {
       setCurrentSection(sectionId);
       setShowContextEditor(true);
@@ -723,25 +634,25 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       return;
     }
 
-    // For all other questions use the regular QuestionEditor
     setEditingQuestion({
       ...question,
       sectionId,
-      id: questionId
+      id: questionId,
     });
     setShowQuestionEditor(true);
   };
 
   const handleDeleteQuestion = (sectionId, questionId) => {
     if (window.confirm(t('admin.confirmDeleteQuestion'))) {
-      setFormData(prev => {
+      setFormData((prev) => {
         const newSections = { ...prev.sections };
         delete newSections[sectionId].questions[questionId];
-        // Renumber remaining questions in this section: 1..N without gaps
+
         const section = newSections[sectionId];
         if (section?.questions) {
-          const entries = Object.entries(section.questions)
-            .sort(([,a],[,b]) => (a.order || 0) - (b.order || 0));
+          const entries = Object.entries(section.questions).sort(
+            ([, a], [, b]) => (a.order || 0) - (b.order || 0),
+          );
           const newQuestions = {};
           let order = 1;
           for (const [qid, q] of entries) {
@@ -752,7 +663,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         }
         return {
           ...prev,
-          sections: newSections
+          sections: newSections,
         };
       });
     }
@@ -771,13 +682,14 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       setDragInfo(null);
       return;
     }
-    setFormData(prev => {
+    setFormData((prev) => {
       const sections = { ...prev.sections };
       const section = sections[sectionId];
       if (!section?.questions) return prev;
 
-      const entries = Object.entries(section.questions)
-        .sort(([,a],[,b]) => (a.order || 0) - (b.order || 0));
+      const entries = Object.entries(section.questions).sort(
+        ([, a], [, b]) => (a.order || 0) - (b.order || 0),
+      );
       const fromIndex = entries.findIndex(([qid]) => qid === dragInfo.questionId);
       const toIndex = entries.findIndex(([qid]) => qid === targetQuestionId);
       if (fromIndex === -1 || toIndex === -1) return prev;
@@ -795,7 +707,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
 
       return {
         ...prev,
-        sections
+        sections,
       };
     });
     setDragInfo(null);
@@ -828,7 +740,6 @@ export default function TestBuilder({ test, onSave, onCancel }) {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-3 sm:px-0">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex items-center space-x-3 sm:space-x-4">
           <button
@@ -842,76 +753,88 @@ export default function TestBuilder({ test, onSave, onCancel }) {
           </h2>
         </div>
 
-    {showAiModal && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">AI Parser (Gemini)</h3>
-          <div className="grid gap-3 mb-4">
-            <div>
-              <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Target section</label>
-              <select
-                value={aiTargetSection || ''}
-                onChange={(e) => setAiTargetSection(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              >
-                <option value="" disabled>Select section</option>
-                {formData.subjects.map((s) => (
-                  <option key={s} value={s}>{t(`test.subjects.${s}`)}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Default points</label>
-              <input
-                type="number"
-                min="1"
-                value={aiDefaultPoints}
-                onChange={(e) => setAiDefaultPoints(parseInt(e.target.value) || 1)}
-                className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Input</label>
-              <textarea
-                value={aiInput}
-                onChange={(e) => setAiInput(e.target.value)}
-                rows={8}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                placeholder={
-                  'Paste text with questions and options\n1) Question text\nA) ...\nB) ...\nCorrect: A\n\nUse [[img: URL]] inside text for inline images and simple context + questions blocks.'
-                }
-              />
-              <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                <span>Need instructions for another AI?</span>
+        {showAiModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                {i18n.t('ui.importWithAi')}
+              </h3>
+              <div className="grid gap-3 mb-4">
+                <div>
+                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    {i18n.t('ui.targetSection')}
+                  </label>
+                  <select
+                    value={aiTargetSection || ''}
+                    onChange={(e) => setAiTargetSection(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="" disabled>
+                      {i18n.t('ui.selectSection')}
+                    </option>
+                    {formData.subjects.map((s) => (
+                      <option key={s} value={s}>
+                        {t(`test.subjects.${s}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    {i18n.t('ui.defaultPoints')}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={aiDefaultPoints}
+                    onChange={(e) => setAiDefaultPoints(parseInt(e.target.value) || 1)}
+                    className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    {i18n.t('ui.sourceText')}
+                  </label>
+                  <textarea
+                    value={aiInput}
+                    onChange={(e) => setAiInput(e.target.value)}
+                    rows={8}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    placeholder={
+                      'Paste text with questions and options\n1) Question text\nA) ...\nB) ...\nCorrect: A\n\nUse [[img: URL]] inside text for inline images and simple context + questions blocks.'
+                    }
+                  />
+                  <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                    <span>{i18n.t('ui.needInstructionsForAnotherAiTool')}</span>
+                    <button
+                      type="button"
+                      onClick={copyExternalAiGuide}
+                      className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-[11px]"
+                    >
+                      {i18n.t('ui.copyAiInstructions')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3">
                 <button
-                  type="button"
-                  onClick={copyExternalAiGuide}
-                  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-[11px]"
+                  onClick={() => setShowAiModal(false)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300"
                 >
-                  Copy external AI guide
+                  {i18n.t('course.cancel')}
+                </button>
+                <button
+                  onClick={handleAiParse}
+                  disabled={aiLoading || !aiTargetSection || !aiInput.trim()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
+                >
+                  {i18n.t(aiLoading ? 'test.parsing' : 'test.parse')}
                 </button>
               </div>
             </div>
           </div>
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={() => setShowAiModal(false)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleAiParse}
-              disabled={aiLoading || !aiTargetSection || !aiInput.trim()}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
-            >
-              {aiLoading ? 'Parsing…' : 'Parse'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-        
+        )}
+
         <button
           onClick={handleSave}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
@@ -921,12 +844,11 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         </button>
       </div>
 
-      {/* Test Configuration */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('admin.testConfiguration')}
         </h3>
-        
+
         <div className="grid md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -940,7 +862,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               placeholder={t('admin.enterTestTitle')}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.testVariant')}
@@ -952,11 +874,10 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               value={formData.variant}
               onChange={(e) => handleInputChange('variant', parseInt(e.target.value) || 1)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="1"
+              placeholder={i18n.t('test.variantPlaceholder')}
             />
           </div>
-          
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.timeLimit')} ({t('test.minutes')})
@@ -974,7 +895,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               max="300"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('admin.language')}
@@ -984,25 +905,24 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               onChange={(e) => handleInputChange('language', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
-              <option value="kk">Қазақша</option>
-              <option value="ru">Русский</option>
-              <option value="en">English</option>
+              <option value="kk">{i18n.t('language.kazakh')}</option>
+              <option value="ru">{i18n.t('language.russian')}</option>
+              <option value="en">{i18n.t('ui.english')}</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Subject Selection */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('admin.selectSubjects')}
         </h3>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {SUBJECTS.map((subject) => {
             const isSelected = formData.subjects.includes(subject.id);
             const isDisabled = false;
-            
+
             return (
               <button
                 key={subject.id}
@@ -1012,8 +932,8 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                   isSelected
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : isDisabled
-                    ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 opacity-50 cursor-not-allowed'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                      ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 opacity-50 cursor-not-allowed'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
                 }`}
               >
                 <div className="font-medium text-gray-900 dark:text-white">
@@ -1032,7 +952,6 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* Questions Management */}
       {formData.subjects.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
@@ -1047,21 +966,21 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                 onClick={() => openAiModal()}
                 className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm"
               >
-                AI
+                {i18n.t('ui.ai')}
               </button>
               <button
                 onClick={handleExportQuestions}
                 className="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm"
               >
-                Export
+                {i18n.t('ui.export')}
               </button>
             </div>
           </div>
-          
+
           {formData.subjects.map((subjectId) => {
             const section = formData.sections[subjectId];
             const questionCount = section?.questions ? Object.keys(section.questions).length : 0;
-            
+
             return (
               <div key={subjectId} className="mb-6 last:mb-0">
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -1073,7 +992,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                       {questionCount} {t('admin.questions')}
                     </p>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       initializeSection(subjectId);
@@ -1085,17 +1004,20 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                     <span>{t('admin.addQuestion')}</span>
                   </button>
                 </div>
-                
-                {/* Questions List */}
+
                 {section?.questions && Object.entries(section.questions).length > 0 && (
                   <div className="mt-4 space-y-2">
                     {Object.entries(section.questions)
-                      .sort(([,a], [,b]) => (a.order || 0) - (b.order || 0))
+                      .sort(([, a], [, b]) => (a.order || 0) - (b.order || 0))
                       .map(([questionId, question]) => {
                         const order = question.order || 1;
-                        const previewText = (question.contentText || '').trim() || 'Сұрақ мәтіні...';
-                        const optionsCount = question.options ? Object.keys(question.options).length : 0;
-                        const hasImages = Array.isArray(question.imageUrls) && question.imageUrls.length > 0;
+                        const previewText =
+                          (question.contentText || '').trim() || i18n.t('ui.questionText');
+                        const optionsCount = question.options
+                          ? Object.keys(question.options).length
+                          : 0;
+                        const hasImages =
+                          Array.isArray(question.imageUrls) && question.imageUrls.length > 0;
                         const points = Number.isFinite(question.points) ? question.points : null;
                         return (
                           <div
@@ -1126,7 +1048,8 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                                   )}
                                   {optionsCount > 0 && (
                                     <span className="px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                                      {optionsCount} options
+                                      {optionsCount}
+                                      {i18n.t('ui.options')}
                                     </span>
                                   )}
                                   {hasImages && (

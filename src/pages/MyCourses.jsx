@@ -1,24 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, Play, Clock, CheckCircle, Calendar, Zap } from 'lucide-react';
 import AppLoader from '../components/AppLoader';
-import { getUserCourses, updateUserCoursesOrder, getUserCoursesProgress } from '../firebase/realtimeDb';
+import {
+  getUserCourses,
+  updateUserCoursesOrder,
+  getUserCoursesProgress,
+} from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 
-// Функция генерации красивой обложки на основе названия курса
 const generateCoverGradient = (title) => {
   const gradients = [
     'from-blue-500 to-purple-600',
     'from-green-500 to-teal-600',
     'from-orange-500 to-red-600',
     'from-pink-500 to-rose-600',
-    'from-indigo-500 to-blue-600',
+    'from-sky-600 to-blue-700',
     'from-yellow-500 to-orange-600',
-    'from-purple-500 to-pink-600',
+    'from-slate-500 to-slate-700',
     'from-teal-500 to-green-600',
   ];
-  
+
   const hash = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return gradients[hash % gradients.length];
 };
@@ -53,71 +56,14 @@ const formatTimeFromSeconds = (seconds) => {
 };
 
 export default function MyCourses() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCourseId, setSelectedCourseId] = useState(location.state?.selectedCourseId || null);
+  const [loadError, setLoadError] = useState(false);
+  const [selectedCourseId] = useState(location.state?.selectedCourseId || null);
   const [draggedCourseId, setDraggedCourseId] = useState(null);
-
-  useEffect(() => {
-    loadCourses();
-  }, []);
-
-  useEffect(() => {
-    if (selectedCourseId && courses.length > 0) {
-      // Scroll to selected course
-      const element = document.getElementById(`course-${selectedCourseId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [selectedCourseId, courses]);
-
-  const loadCourses = async () => {
-    if (!auth.currentUser) {
-      navigate('/login');
-      return;
-    }
-    
-    try {
-      const userCoursesData = await getUserCourses(auth.currentUser.uid);
-      const progressMap = await getUserCoursesProgress(auth.currentUser.uid);
-
-      if (progressMap) {
-        userCoursesData.forEach((course) => {
-          if (progressMap[course.id]) {
-            course.progressData = progressMap[course.id];
-          }
-        });
-      }
-      // Sort by explicit user-defined order if present, otherwise by enrollment date
-      userCoursesData.sort((a, b) => {
-        const orderA = a.enrollment?.order;
-        const orderB = b.enrollment?.order;
-
-        const hasOrderA = typeof orderA === 'number';
-        const hasOrderB = typeof orderB === 'number';
-
-        if (hasOrderA && hasOrderB) {
-          return orderA - orderB;
-        }
-        if (hasOrderA) return -1;
-        if (hasOrderB) return 1;
-
-        const enrolledA = a.enrollment?.enrolledAt || 0;
-        const enrolledB = b.enrollment?.enrolledAt || 0;
-        return enrolledA - enrolledB;
-      });
-
-      setCourses(userCoursesData);
-    } catch (error) {
-      console.error('Error loading user courses:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const isExpired = (course) => {
     return course.enrollment?.expiryDate && course.enrollment.expiryDate < Date.now();
@@ -133,7 +79,6 @@ export default function MyCourses() {
     navigate(`/courses/${courseId}`);
   };
 
-  // Calculate total duration of a course (sum of lesson durations in minutes)
   const getTotalDurationMinutes = (course) => {
     if (!course.modules) return 0;
 
@@ -150,7 +95,6 @@ export default function MyCourses() {
     return total;
   };
 
-  // Format duration in minutes using i18n
   const formatDuration = (totalMinutes) => {
     if (!totalMinutes || totalMinutes <= 0) return null;
 
@@ -183,7 +127,6 @@ export default function MyCourses() {
   };
 
   const handleDragOver = (event) => {
-    // Allow drop
     event.preventDefault();
   };
 
@@ -197,16 +140,90 @@ export default function MyCourses() {
 
     if (auth.currentUser) {
       try {
-        await updateUserCoursesOrder(auth.currentUser.uid, newOrder.map((c) => c.id));
-      } catch (error) {
-        console.error('Error updating user courses order:', error);
-      }
+        await updateUserCoursesOrder(
+          auth.currentUser.uid,
+          newOrder.map((c) => c.id),
+        );
+      } catch {}
     }
   };
+
+  const loadCourses = useCallback(async () => {
+    if (!auth.currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const userCoursesData = await getUserCourses(auth.currentUser.uid);
+      const progressMap = await getUserCoursesProgress(auth.currentUser.uid);
+
+      if (progressMap) {
+        userCoursesData.forEach((course) => {
+          if (progressMap[course.id]) {
+            course.progressData = progressMap[course.id];
+          }
+        });
+      }
+
+      userCoursesData.sort((a, b) => {
+        const orderA = a.enrollment?.order;
+        const orderB = b.enrollment?.order;
+
+        const hasOrderA = typeof orderA === 'number';
+        const hasOrderB = typeof orderB === 'number';
+
+        if (hasOrderA && hasOrderB) {
+          return orderA - orderB;
+        }
+        if (hasOrderA) return -1;
+        if (hasOrderB) return 1;
+
+        const enrolledA = a.enrollment?.enrolledAt || 0;
+        const enrolledB = b.enrollment?.enrolledAt || 0;
+        return enrolledA - enrolledB;
+      });
+
+      setCourses(userCoursesData);
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    loadCourses();
+  }, [loadCourses]);
+
+  useEffect(() => {
+    if (selectedCourseId && courses.length > 0) {
+      const element = document.getElementById(`course-${selectedCourseId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [courses, selectedCourseId]);
 
   if (loading) {
     return <AppLoader text={t('common.loading')} />;
   }
+
+  if (loadError)
+    return (
+      <div role="alert" className="py-16 text-center space-y-4">
+        <p>{t('common.loadError')}</p>
+        <button
+          type="button"
+          onClick={loadCourses}
+          className="px-5 py-3 rounded-xl bg-primary-600 text-white"
+        >
+          {t('common.retry')}
+        </button>
+      </div>
+    );
 
   if (courses.length === 0) {
     return (
@@ -214,9 +231,9 @@ export default function MyCourses() {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
           {t('sidebar.myCourses')}
         </h1>
-        
+
         <div className="text-center py-16 sm:py-24 bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-dashed border-primary-300 dark:border-primary-700">
-          <BookOpen className="w-20 h-20 text-primary-400 mx-auto mb-6 animate-pulse" />
+          <BookOpen className="w-20 h-20 text-primary-400 mx-auto mb-6 " />
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
             {t('courses.noCourses')}
           </h3>
@@ -237,7 +254,6 @@ export default function MyCourses() {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
@@ -249,7 +265,6 @@ export default function MyCourses() {
         </div>
       </div>
 
-      {/* Courses Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {courses.map((course) => {
           const gradient = generateCoverGradient(course.title);
@@ -266,9 +281,7 @@ export default function MyCourses() {
           const lastTimestamp = progressData?.lastActiveTimestamp || 0;
           const lastLessonTitle = getLessonTitle(course, lastLessonId);
           const lastLessonProgress =
-            lastLessonId && progressData?.lessons
-              ? progressData.lessons[lastLessonId]
-              : null;
+            lastLessonId && progressData?.lessons ? progressData.lessons[lastLessonId] : null;
           const resumePercent = lastLessonProgress?.percent || 0;
           const smartProgress = resumePercent > 0 ? resumePercent : progress;
           const hasResumePoint = !!lastLessonId && lastTimestamp > 0;
@@ -288,7 +301,7 @@ export default function MyCourses() {
               handleOpenCourse(course.id);
             }
           };
-          
+
           return (
             <div
               key={course.id}
@@ -301,7 +314,6 @@ export default function MyCourses() {
                 isSelected ? 'ring-4 ring-primary-500 scale-105' : ''
               } ${expired ? 'opacity-60' : ''}`}
             >
-              {/* Cover Image */}
               <div className="relative h-40 sm:h-48 overflow-hidden">
                 {coverUrl ? (
                   <img
@@ -314,21 +326,17 @@ export default function MyCourses() {
                     }}
                   />
                 ) : null}
-                
-                {/* Gradient Fallback */}
+
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${gradient} ${coverUrl ? 'hidden' : 'flex'} items-center justify-center`}
                   style={{ display: coverUrl ? 'none' : 'flex' }}
                 >
                   <div className="text-center text-white p-6">
                     <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-90" />
-                    <h3 className="text-lg font-bold opacity-90 line-clamp-2">
-                      {course.title}
-                    </h3>
+                    <h3 className="text-lg font-bold opacity-90 line-clamp-2">{course.title}</h3>
                   </div>
                 </div>
 
-                {/* Status Badges */}
                 <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
                   <div className="flex flex-col gap-2">
                     {expired ? (
@@ -337,7 +345,7 @@ export default function MyCourses() {
                         {t('course.expiredStatus')}
                       </span>
                     ) : daysLeft !== null && daysLeft <= 7 ? (
-                      <span className="px-3 py-1.5 bg-orange-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg animate-pulse">
+                      <span className="px-3 py-1.5 bg-orange-500 backdrop-blur-sm text-white text-xs font-bold rounded-full flex items-center gap-1.5 shadow-lg ">
                         <Zap className="w-3.5 h-3.5" />
                         {daysLeft} {t('course.daysLeft')}
                       </span>
@@ -348,8 +356,7 @@ export default function MyCourses() {
                       </span>
                     )}
                   </div>
-                  
-                  {/* Progress Circle */}
+
                   {progress > 0 && (
                     <div className="relative w-14 h-14">
                       <svg className="w-14 h-14 transform -rotate-90">
@@ -383,21 +390,24 @@ export default function MyCourses() {
                 </div>
               </div>
 
-              {/* Course Info */}
               <div className="p-5">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
                   {course.title}
                 </h3>
-                
+
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed">
                   {course.description || t('course.noDescription')}
                 </p>
 
-                {/* Stats */}
                 <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
-                    <span>{course.modules ? Object.keys(course.modules).length : 0} {t('course.modules')}</span>
+                    <span>
+                      {course.modules
+                        ? Object.keys(course.modules).length
+                        : course.moduleCount || 0}{' '}
+                      {t('course.modules')}
+                    </span>
                   </div>
                   {formattedDuration && (
                     <div className="flex items-center gap-1">
@@ -408,18 +418,27 @@ export default function MyCourses() {
                   {course.enrollment?.enrolledAt && (
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{t('course.receivedOn')}: {new Date(course.enrollment.enrolledAt).toLocaleDateString('kk-KZ')}</span>
+                      <span>
+                        {t('course.receivedOn')}:{' '}
+                        {new Date(course.enrollment.enrolledAt).toLocaleDateString(
+                          i18n.resolvedLanguage,
+                        )}
+                      </span>
                     </div>
                   )}
                   {course.enrollment?.expiryDate && !expired && (
                     <div className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      <span>{t('course.validUntil')}: {new Date(course.enrollment.expiryDate).toLocaleDateString('kk-KZ')}</span>
+                      <span>
+                        {t('course.validUntil')}:{' '}
+                        {new Date(course.enrollment.expiryDate).toLocaleDateString(
+                          i18n.resolvedLanguage,
+                        )}
+                      </span>
                     </div>
                   )}
                 </div>
 
-                {/* Progress Bar */}
                 {progress > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -435,7 +454,6 @@ export default function MyCourses() {
                   </div>
                 )}
 
-                {/* Smart Resume Button - glassmorphism style */}
                 <button
                   onClick={handleSmartContinue}
                   disabled={expired}
@@ -456,14 +474,18 @@ export default function MyCourses() {
                   <div className="relative z-10 flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0 text-left">
                       <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-700/80 dark:text-gray-300/80">
-                        {hasResumePoint ? t('myCourses.continueWatching') : t('course.continueLearning')}
+                        {hasResumePoint
+                          ? t('myCourses.continueWatching')
+                          : t('course.continueLearning')}
                       </p>
                       <p className="mt-1 text-sm sm:text-[15px] font-semibold truncate max-w-[220px]">
                         {lastLessonTitle || course.title}
                       </p>
                       <p
                         className={`mt-0.5 text-xs transition-opacity duration-200 ${
-                          hasResumePoint ? 'opacity-75 text-gray-700 dark:text-gray-200' : 'opacity-0'
+                          hasResumePoint
+                            ? 'opacity-75 text-gray-700 dark:text-gray-200'
+                            : 'opacity-0'
                         }`}
                       >
                         {hasResumePoint ? formatTimeFromSeconds(lastTimestamp) : '00:00'}

@@ -1,4 +1,5 @@
-export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
+import i18n from '../i18n';
+export default function AppLoader({ text = i18n.t('common.loading'), fullScreen = true }) {
   const containerClass = fullScreen
     ? 'min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4'
     : 'flex items-center justify-center w-full';
@@ -7,12 +8,10 @@ export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
     <div className={containerClass}>
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <span className="app-loader-eye" aria-label="Loading" />
+          <span className="app-loader-eye" aria-label={i18n.t('ui.loading')} />
         </div>
         {text && (
-          <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            {text}
-          </p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">{text}</p>
         )}
         <style>{`
           :root {
@@ -28,8 +27,6 @@ export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
             --loader-eye-lid: #020617;
             --loader-eye-pupil: rgb(2,60,115);
           }
-
-          /* Eye loader */
           .app-loader-eye {
             position: relative;
             width: 78px;

@@ -1,12 +1,7 @@
-/**
- * Storage utility for managing localStorage with consent
- */
-
 const STORAGE_KEYS = {
   CONSENT: 'ak_consent',
   THEME: 'ak_theme',
   LANG: 'ak_lang',
-  PROFILE: 'users.profile'
 };
 
 class Storage {
@@ -23,44 +18,25 @@ class Storage {
     this.consentGiven = true;
   }
 
-  revokeConsent() {
-    this.clearAll();
-    this.consentGiven = false;
-  }
-
   getItem(key) {
     try {
       return localStorage.getItem(key);
-    } catch (error) {
-      console.error('Storage access error:', error);
+    } catch {
       return null;
     }
   }
 
   setItem(key, value) {
-    // Only allow essential keys or if consent is given
     const essentialKeys = [STORAGE_KEYS.CONSENT, STORAGE_KEYS.THEME, STORAGE_KEYS.LANG];
-    
+
     if (!this.consentGiven && !essentialKeys.includes(key)) {
-      console.warn('Cannot store non-essential data without consent');
       return false;
     }
 
     try {
       localStorage.setItem(key, value);
       return true;
-    } catch (error) {
-      console.error('Storage write error:', error);
-      return false;
-    }
-  }
-
-  removeItem(key) {
-    try {
-      localStorage.removeItem(key);
-      return true;
-    } catch (error) {
-      console.error('Storage remove error:', error);
+    } catch {
       return false;
     }
   }
@@ -69,13 +45,11 @@ class Storage {
     try {
       localStorage.clear();
       return true;
-    } catch (error) {
-      console.error('Storage clear error:', error);
+    } catch {
       return false;
     }
   }
 
-  // Specific getters/setters for common data
   getTheme() {
     return this.getItem(STORAGE_KEYS.THEME) || 'light';
   }
@@ -83,16 +57,6 @@ class Storage {
   setTheme(theme) {
     return this.setItem(STORAGE_KEYS.THEME, theme);
   }
-
-  getProfile() {
-    const data = this.getItem(STORAGE_KEYS.PROFILE);
-    return data ? JSON.parse(data) : null;
-  }
-
-  setProfile(profile) {
-    return this.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-  }
 }
 
 export const storage = new Storage();
-export { STORAGE_KEYS };

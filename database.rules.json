@@ -1,0 +1,126 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      ".indexOn": ["email", "role", "status"],
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid || (auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true))",
+        ".write": "(auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)) || (auth != null && auth.uid === $uid && !data.exists() && newData.child('role').val() === 'student' && newData.child('status').val() === 'active' && newData.child('isDeleted').val() === false && !newData.child('courses').exists() && !newData.child('purchasedCourses').exists())",
+        ".validate": "!newData.child('password').exists() && !newData.child('newPassword').exists()",
+        "name": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 160"
+        },
+        "firstName": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "lastName": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "phone": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "avatarUrl": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "fcmToken": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "lastLogin": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "currentSession": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "sessions": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "progress": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "securityAlerts": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "ipHistory": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "courses": {
+          "$courseId": {
+            "order": {
+              ".write": "auth != null && auth.uid === $uid && root.child('users').child($uid).child('courses').child($courseId).exists()",
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            }
+          }
+        }
+      }
+    },
+    "courseCatalog": {
+      ".read": "auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true",
+      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+    },
+    "courses": {
+      ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      "$courseId": {
+        ".read": "(auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true) && root.child('users').child(auth.uid).child('courses').child($courseId).exists() && (!root.child('users').child(auth.uid).child('courses').child($courseId).child('expiryDate').exists() || root.child('users').child(auth.uid).child('courses').child($courseId).child('expiryDate').val() > now)"
+      }
+    },
+    "tests": {
+      ".read": "auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true",
+      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      ".indexOn": ["subject", "createdAt"]
+    },
+    "adminLogs": {
+      ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+    },
+    "adminSecurityAlerts": {
+      ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      "$alert": {
+        ".write": "(auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)) || (auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('resolved').val() === false)"
+      }
+    },
+    "userResults": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid || (auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true))",
+        ".write": "auth != null && auth.uid === $uid && (auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+      }
+    },
+    "quizResults": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid || (auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true))",
+        ".write": "auth != null && auth.uid === $uid && (auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+      }
+    },
+    "testProgress": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && (auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+      }
+    },
+    "results": {
+      ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      "$testId": {
+        ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+        }
+      }
+    },
+    "auth_logs": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid || (auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true))",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "privateRateLimits": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

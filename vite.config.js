@@ -1,35 +1,28 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-  base: './',
-  server: {
-    port: 3000,
-    strictPort: false,
-    host: true,
-    hmr: {
-      overlay: true
-    }
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-    minify: 'esbuild', 
-    esbuild: {
-      drop: ['console', 'debugger'],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  return {
+    plugins: [react()],
+    server: {
+      host: env.VITE_DEV_HOST,
+      port: env.VITE_DEV_PORT ? Number(env.VITE_DEV_PORT) : undefined,
+      strictPort: true,
     },
-    rollupOptions: {
-      output: {
-
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]',
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore']
-        }
-      }
-    }
-  }
-})
+    esbuild: { drop: ['debugger'] },
+    build: {
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            localization: ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+            motion: ['framer-motion'],
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/database'],
+          },
+        },
+      },
+    },
+  };
+});

@@ -1,296 +1,287 @@
+const functions = require('firebase-functions/v1');
+const { initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getDatabase } = require('firebase-admin/database');
+const { getMessaging } = require('firebase-admin/messaging');
+const { getStorage } = require('firebase-admin/storage');
+const { validId, expiryTimestamp, validNotification } = require('./validation');
 
-
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-
-admin.initializeApp();
-
+initializeApp();
 
 async function verifyAdmin(uid) {
-  const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
-  
-  if (!userSnapshot.exists()) {
-    throw new functions.https.HttpsError('not-found', 'User not found');
+  const user = await getAuth().getUser(uid);
+  if (user.disabled || user.customClaims?.admin !== true) {
+    throw new functions.https.HttpsError('permission-denied', 'Admin access required');
   }
-  
-  const userData = userSnapshot.val();
-  if (userData.role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can perform this action');
+  const profile = (
+    await getDatabase()
+      .ref('users/' + uid)
+      .get()
+  ).val();
+  if (profile?.status !== 'active' || profile?.isDeleted) {
+    throw new functions.https.HttpsError('permission-denied', 'Account unavailable');
   }
-  
   return true;
 }
 
-/**
- * Delete User Permanently
- * 
- * Deletes user from Authentication, Realtime Database, and Storage
- * 
- * @param {string} uid - Target user ID to delete
- * @returns {object} Success message
- */
+async function throttlePush(uid) {
+  const now = Date.now();
+  const result = await getDatabase()
+    .ref('privateRateLimits/push/' + uid)
+    .transaction((previous) => {
+      if (typeof previous === 'number' && now - previous < 60000) return;
+      return now;
+    });
+  if (!result.committed)
+    throw new functions.https.HttpsError('resource-exhausted', 'Notification limit reached');
+}
+
+function parseExpiry(value) {
+  try {
+    return expiryTimestamp(value);
+  } catch {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid expiry');
+  }
+}
+
 exports.deleteUser = functions.https.onCall(async (data, context) => {
-  // Check authentication
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
-  
+
   const requesterUid = context.auth.uid;
-  const targetUid = data.uid;
-  
-  if (!targetUid) {
+  const targetUid = data?.uid;
+
+  if (!validId(targetUid) || targetUid === requesterUid) {
     throw new functions.https.HttpsError('invalid-argument', 'User ID is required');
   }
-  
-  // Verify requester is admin
-  await verifyAdmin(requesterUid);
-  
-  try {
-    await admin.auth().deleteUser(targetUid);
-    console.log(`✅ Deleted user from Auth: ${targetUid}`);
-    
 
-    await admin.database().ref(`/users/${targetUid}`).remove();
-    await admin.database().ref(`/auth_logs/${targetUid}`).remove();
-    console.log(`✅ Deleted user data from Database: ${targetUid}`);
-    
+  await verifyAdmin(requesterUid);
+
+  try {
+    await getAuth().deleteUser(targetUid);
+
+    await getDatabase().ref(`/users/${targetUid}`).remove();
+    await getDatabase().ref(`/auth_logs/${targetUid}`).remove();
+
     try {
-      const bucket = admin.storage().bucket();
-      await bucket.deleteFiles({
-        prefix: `user_uploads/${targetUid}/`
-      });
-      console.log(`✅ Deleted user files from Storage: ${targetUid}`);
-    } catch (storageError) {
-      console.warn('Storage deletion error (may not exist):', storageError.message);
-    }
-    
-    // Log admin action
-    await admin.database().ref('/adminLogs').push({
+      const bucket = getStorage().bucket();
+      await Promise.all(
+        ['user_uploads', 'user_avatars'].map((directory) =>
+          bucket.deleteFiles({ prefix: `${directory}/${targetUid}/` }),
+        ),
+      );
+    } catch (storageError) {}
+
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'deleteUser',
       targetUid,
-      ts: new Date().toISOString()
+      ts: new Date().toISOString(),
     });
-    
+
     return {
       success: true,
-      message: `User ${targetUid} deleted successfully`
+      message: `User ${targetUid} deleted successfully`,
     };
-    
   } catch (error) {
-    console.error('Delete user error:', error);
-    throw new functions.https.HttpsError('internal', `Failed to delete user: ${error.message}`);
+    throw new functions.https.HttpsError('internal', 'User deletion failed');
   }
 });
 
-/**
- * Assign Course to User
- * 
- * Assigns a course to a user with expiration date
- * Server-side function to ensure data integrity
- * 
- * @param {string} uid - User ID
- * @param {string} courseId - Course ID
- * @param {string} expiresAt - ISO date string for expiration
- * @returns {object} Success message
- */
 exports.assignCourseServer = functions.https.onCall(async (data, context) => {
-  // Check authentication
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
-  
+
   const requesterUid = context.auth.uid;
-  const {uid, courseId, expiresAt} = data;
-  
-  if (!uid || !courseId) {
+  const { uid, courseId, expiresAt } = data || {};
+
+  if (!validId(uid) || !validId(courseId)) {
     throw new functions.https.HttpsError('invalid-argument', 'User ID and Course ID are required');
   }
-  
-  // Verify requester is admin
+
   await verifyAdmin(requesterUid);
-  
+
   try {
-    // Verify course exists
-    const courseSnapshot = await admin.database().ref(`/courses/${courseId}`).once('value');
+    const courseSnapshot = await getDatabase().ref(`/courses/${courseId}`).once('value');
     if (!courseSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'Course not found');
     }
-    
-    // Verify target user exists
-    const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
+
+    const userSnapshot = await getDatabase().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'User not found');
     }
-    
-    // Assign course
-    await admin.database().ref(`/users/${uid}/purchasedCourses/${courseId}`).set({
-      expiresAt: expiresAt || null,
-      progress: 0,
-      assignedBy: requesterUid,
-      assignedAt: new Date().toISOString()
-    });
-    
-    // Log admin action
-    await admin.database().ref('/adminLogs').push({
+
+    await getDatabase()
+      .ref(`/users/${uid}/courses/${courseId}`)
+      .set({
+        expiryDate: parseExpiry(expiresAt),
+        progress: 0,
+        assignedBy: requesterUid,
+        assignedAt: new Date().toISOString(),
+      });
+
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'assignCourse',
       targetUid: uid,
-      payload: {courseId, expiresAt},
-      ts: new Date().toISOString()
+      payload: { courseId, expiresAt },
+      ts: new Date().toISOString(),
     });
-    
+
     return {
       success: true,
-      message: `Course ${courseId} assigned to user ${uid}`
+      message: `Course ${courseId} assigned to user ${uid}`,
     };
-    
   } catch (error) {
-    console.error('Assign course error:', error);
-    throw new functions.https.HttpsError('internal', `Failed to assign course: ${error.message}`);
+    throw new functions.https.HttpsError('internal', 'Course assignment failed');
   }
 });
 
-/**
- * Send Push Notification to User (Optional)
- * 
- * Sends FCM push notification to specific user
- * Requires FCM token stored in user profile
- * 
- * @param {string} uid - User ID
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @returns {object} Success message
- */
 exports.sendPushToUser = functions.https.onCall(async (data, context) => {
-  // Check authentication
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
-  
+
   const requesterUid = context.auth.uid;
-  const {uid, title, body} = data;
-  
-  if (!uid || !title || !body) {
-    throw new functions.https.HttpsError('invalid-argument', 'User ID, title, and body are required');
+  const { uid, title, body } = data || {};
+
+  if (!validId(uid) || !validNotification(title, body)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'User ID, title, and body are required',
+    );
   }
-  
-  // Verify requester is admin
+
   await verifyAdmin(requesterUid);
-  
+
   try {
-    // Get user's FCM token
-    const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
+    const userSnapshot = await getDatabase().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'User not found');
     }
-    
+
     const userData = userSnapshot.val();
+    if (
+      userData.status !== 'active' ||
+      userData.isDeleted ||
+      userData.pushNotificationsEnabled === false
+    ) {
+      throw new functions.https.HttpsError('failed-precondition', 'Recipient unavailable');
+    }
+    await throttlePush(requesterUid);
     const fcmToken = userData.fcmToken;
-    
+
     if (!fcmToken) {
       throw new functions.https.HttpsError('failed-precondition', 'User does not have FCM token');
     }
-    
-    // Send notification
+
     const message = {
       notification: {
         title,
-        body
+        body,
       },
-      token: fcmToken
+      token: fcmToken,
     };
-    
-    await admin.messaging().send(message);
-    
-    // Log admin action
-    await admin.database().ref('/adminLogs').push({
+
+    await getMessaging().send(message);
+
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'sendPush',
       targetUid: uid,
-      payload: {title, body},
-      ts: new Date().toISOString()
+      payload: { title, body },
+      ts: new Date().toISOString(),
     });
-    
+
     return {
       success: true,
-      message: `Push notification sent to user ${uid}`
+      message: `Push notification sent to user ${uid}`,
     };
-    
   } catch (error) {
-    console.error('Send push error:', error);
-    throw new functions.https.HttpsError('internal', `Failed to send push: ${error.message}`);
+    throw new functions.https.HttpsError('internal', 'Notification delivery failed');
   }
 });
 
-/**
- * Bulk Assign Course to Multiple Users
- * 
- * @param {array} uids - Array of user IDs
- * @param {string} courseId - Course ID
- * @param {string} expiresAt - ISO date string
- * @returns {object} Results
- */
 exports.bulkAssignCourse = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
-  
+
   const requesterUid = context.auth.uid;
-  const {uids, courseId, expiresAt} = data;
-  
-  if (!uids || !Array.isArray(uids) || !courseId) {
-    throw new functions.https.HttpsError('invalid-argument', 'UIDs array and Course ID are required');
+  const { uids, courseId, expiresAt } = data || {};
+
+  if (
+    !Array.isArray(uids) ||
+    uids.length < 1 ||
+    uids.length > 100 ||
+    !uids.every(validId) ||
+    !validId(courseId)
+  ) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'UIDs array and Course ID are required',
+    );
   }
-  
+
   await verifyAdmin(requesterUid);
-  
+
+  parseExpiry(expiresAt);
+  if (
+    !(
+      await getDatabase()
+        .ref('courses/' + courseId)
+        .get()
+    ).exists()
+  ) {
+    throw new functions.https.HttpsError('not-found', 'Course not found');
+  }
   const results = {
     success: [],
-    failed: []
+    failed: [],
   };
-  
-  for (const uid of uids) {
+
+  for (const uid of new Set(uids)) {
     try {
-      await admin.database().ref(`/users/${uid}/purchasedCourses/${courseId}`).set({
-        expiresAt: expiresAt || null,
-        progress: 0,
-        assignedBy: requesterUid,
-        assignedAt: new Date().toISOString()
-      });
+      if (
+        !(
+          await getDatabase()
+            .ref('users/' + uid)
+            .get()
+        ).exists()
+      )
+        throw new Error('missing-user');
+      await getDatabase()
+        .ref(`/users/${uid}/courses/${courseId}`)
+        .set({
+          expiryDate: parseExpiry(expiresAt),
+          progress: 0,
+          assignedBy: requesterUid,
+          assignedAt: new Date().toISOString(),
+        });
       results.success.push(uid);
     } catch (error) {
-      results.failed.push({uid, error: error.message});
+      results.failed.push({ uid, error: 'assignment-failed' });
     }
   }
-  
-  // Log admin action
-  await admin.database().ref('/adminLogs').push({
-    adminUid: requesterUid,
-    action: 'bulkAssignCourse',
-    payload: {courseId, count: results.success.length},
-    ts: new Date().toISOString()
-  });
-  
+
+  await getDatabase()
+    .ref('/adminLogs')
+    .push({
+      adminUid: requesterUid,
+      action: 'bulkAssignCourse',
+      payload: { courseId, count: results.success.length },
+      ts: new Date().toISOString(),
+    });
+
   return results;
 });
 
-/**
- * Send Push Notification to All Users
- * 
- * Ported from legacy Express backend/server.js to Cloud Function.
- * Sends FCM push notification to all users who have FCM tokens.
- * Uses sendEachForMulticast with deduplicated tokens for better performance.
- * 
- * @param {string} title - Notification title
- * @param {string} message - Notification body
- * @param {string} [imageUrl] - Optional image URL for webpush notification
- * @returns {object} Results with success/failure counts
- */
 exports.sendPushToAll = functions
   .runWith({ memory: '512MB' })
   .https.onCall(async (data, context) => {
-    // Check authentication
     if (!context.auth) {
       throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
     }
@@ -298,18 +289,15 @@ exports.sendPushToAll = functions
     const requesterUid = context.auth.uid;
     const { title, message, imageUrl } = data || {};
 
-    if (!title || !message) {
+    if (!validNotification(title, message, imageUrl)) {
       throw new functions.https.HttpsError('invalid-argument', 'Title and message are required');
     }
 
-    // Verify requester is admin
     await verifyAdmin(requesterUid);
+    await throttlePush(requesterUid);
 
     try {
-      console.log(`📱 Sending push: "${title}"${imageUrl ? ' with image' : ''}`);
-
-      // Get all users with FCM tokens
-      const usersSnapshot = await admin.database().ref('/users').once('value');
+      const usersSnapshot = await getDatabase().ref('/users').once('value');
 
       if (!usersSnapshot.exists()) {
         return {
@@ -317,20 +305,22 @@ exports.sendPushToAll = functions
           message: 'No users found',
           successCount: 0,
           failureCount: 0,
-          totalUsers: 0
+          totalUsers: 0,
         };
       }
 
       const rawTokens = [];
-      const userEmails = [];
 
       usersSnapshot.forEach((userSnap) => {
         const userData = userSnap.val();
-        if (userData && userData.fcmToken) {
+        if (
+          userData &&
+          userData.fcmToken &&
+          userData.status === 'active' &&
+          !userData.isDeleted &&
+          userData.pushNotificationsEnabled !== false
+        ) {
           rawTokens.push(userData.fcmToken);
-          if (userData.email) {
-            userEmails.push(userData.email);
-          }
         }
       });
 
@@ -341,18 +331,11 @@ exports.sendPushToAll = functions
             'Нет пользователей с FCM токенами. Войдите в приложение и разрешите уведомления.',
           successCount: 0,
           failureCount: 0,
-          totalUsers: 0
+          totalUsers: 0,
         };
       }
 
-      // Remove duplicate tokens
       const tokens = Array.from(new Set(rawTokens));
-
-      if (tokens.length !== rawTokens.length) {
-        console.log(`♻️ Deduplicated tokens: ${rawTokens.length} -> ${tokens.length}`);
-      }
-
-      console.log(`📤 Sending to ${tokens.length} users:`, userEmails);
 
       let successCount = 0;
       let failureCount = 0;
@@ -366,7 +349,7 @@ exports.sendPushToAll = functions
           tokens: batchTokens,
           notification: {
             title: title,
-            body: message
+            body: message,
           },
           android: {
             priority: 'high',
@@ -374,47 +357,45 @@ exports.sendPushToAll = functions
               channelId: 'high_importance_channel',
               defaultSound: true,
               defaultVibrateTimings: true,
-              visibility: 'public'
-            }
+              visibility: 'public',
+            },
           },
           apns: {
             headers: {
               'apns-priority': '10',
-              'apns-push-type': 'alert'
+              'apns-push-type': 'alert',
             },
             payload: {
               aps: {
                 alert: {
                   title: title,
-                  body: message
+                  body: message,
                 },
                 sound: 'default',
                 'mutable-content': 1,
-                'content-available': 1
-              }
+                'content-available': 1,
+              },
             },
             ...(imageUrl
               ? {
                   fcmOptions: {
-                    image: imageUrl
-                  }
+                    image: imageUrl,
+                  },
                 }
-              : {})
+              : {}),
           },
           webpush: {
             headers: {
-              Urgency: 'high'
+              Urgency: 'high',
             },
-            fcmOptions: {
-              link: '/'
-            },
+
             notification: {
               icon: '/icons/icon-192.png',
               badge: '/icons/icon-192.png',
               tag: 'akadiledu-push',
-              renotify: false
-            }
-          }
+              renotify: false,
+            },
+          },
         };
 
         if (imageUrl) {
@@ -422,7 +403,7 @@ exports.sendPushToAll = functions
         }
 
         try {
-          const batchResponse = await admin.messaging().sendEachForMulticast(multicastMessage);
+          const batchResponse = await getMessaging().sendEachForMulticast(multicastMessage);
 
           successCount += batchResponse.successCount || 0;
           failureCount += batchResponse.failureCount || 0;
@@ -440,84 +421,59 @@ exports.sendPushToAll = functions
               }
             });
           }
-
-          console.log(
-            `✅ Batch sent: ${batchResponse.successCount} success, ${batchResponse.failureCount} failed (tokens ${i + 1}-${
-              i + batchTokens.length
-            })`
-          );
         } catch (batchError) {
-          console.error('❌ FCM batch send error:', batchError);
-          // Continue with next batch, but surface error at the end
           throw new functions.https.HttpsError(
             'internal',
-            `FCM отправка не удалась: ${batchError.message}`
+            `FCM отправка не удалась: ${batchError.message}`,
           );
         }
       }
 
-      if (invalidTokens.length > 0) {
-        console.log(`🗑️ Found ${invalidTokens.length} invalid tokens`);
-      }
-
-      console.log(`✅ Total Success: ${successCount}, Failed: ${failureCount}`);
-
       const totalUsers = tokens.length;
 
-      // Log to database
-      await admin.database().ref('/adminLogs').push({
-        adminUid: requesterUid,
-        action: 'sendPushToAll',
-        payload: { title, message, recipientCount: totalUsers },
-        results: {
-          success: successCount,
-          failure: failureCount
-        },
-        ts: new Date().toISOString()
-      });
+      await getDatabase()
+        .ref('/adminLogs')
+        .push({
+          adminUid: requesterUid,
+          action: 'sendPushToAll',
+          payload: { title, message, recipientCount: totalUsers },
+          results: {
+            success: successCount,
+            failure: failureCount,
+          },
+          ts: new Date().toISOString(),
+        });
 
       return {
-        success: true,
-        message: `Отправлено ${successCount} из ${totalUsers} пользователей`,
+        success: successCount > 0,
         successCount,
         failureCount,
-        totalUsers
+        totalUsers,
       };
     } catch (error) {
-      console.error('❌ Send push to all error:', error);
       if (error instanceof functions.https.HttpsError) {
         throw error;
       }
-      throw new functions.https.HttpsError('internal', `Failed to send push: ${error.message}`);
+      throw new functions.https.HttpsError('internal', 'Notification delivery failed');
     }
   });
 
-/**
- * AUTO-CREATE USER PROFILE ON SIGNUP
- * 
- * Автоматически создаёт профиль в Realtime DB при регистрации
- * Триггер срабатывает когда пользователь регистрируется через Firebase Auth
- */
 exports.createUserProfileOnSignup = functions.auth.user().onCreate(async (user) => {
-  
-  const db = admin.database();
+  const db = getDatabase();
   const userRef = db.ref(`users/${user.uid}`);
-  
+
   try {
-    // Проверяем, не существует ли уже профиль
     const snapshot = await userRef.once('value');
     if (snapshot.exists()) {
-      console.log('⏭️  Profile already exists:', user.uid);
       return;
     }
-    
-    // Создаём новый профиль
+
     const userData = {
       uid: user.uid,
-      email: user.email,
-      name: user.displayName || user.email.split('@')[0],
+      email: user.email || '',
+      name: user.displayName || user.email?.split('@')[0] || '',
       phone: user.phoneNumber || '',
-      role: 'student', // По умолчанию все студенты
+      role: 'student',
       status: 'active',
       registeredAt: user.metadata.creationTime,
       lastLogin: user.metadata.lastSignInTime || user.metadata.creationTime,
@@ -525,15 +481,44 @@ exports.createUserProfileOnSignup = functions.auth.user().onCreate(async (user) 
       ipHistory: {},
       sessions: {},
       purchasedCourses: {},
-      isDeleted: false
+      isDeleted: false,
     };
-    
-    await userRef.set(userData);
-    
-    console.log('✅ Auto-created profile for new user:', user.email);
-    
-  } catch (error) {
-    console.error('❌ Error auto-creating profile:', error);
-    // Не бросаем ошибку, чтобы не блокировать регистрацию
+
+    await userRef.transaction((current) => current || userData);
+  } catch (error) {}
+});
+
+exports.processLearningAI = require('./learningAI').processLearningAI;
+exports.syncCourseCatalog = functions
+  .region(process.env.DATABASE_REGION)
+  .database.ref('/courses/{courseId}')
+  .onWrite(async (change, context) => {
+    const { courseSummary } = require('./catalog');
+    return getDatabase()
+      .ref('courseCatalog/' + context.params.courseId)
+      .set(courseSummary(change.after.val()));
+  });
+exports.setUserRole = functions.https.onCall(async (data, context) => {
+  if (!context.auth)
+    throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+  await verifyAdmin(context.auth.uid);
+  if (!validId(data?.uid) || !['student', 'teacher', 'admin'].includes(data.role)) {
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid role');
   }
+  if (data.uid === context.auth.uid && data.role !== 'admin') {
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      'Use another administrator to change your role',
+    );
+  }
+  const user = await getAuth().getUser(data.uid);
+  await getAuth().setCustomUserClaims(data.uid, {
+    ...user.customClaims,
+    admin: data.role === 'admin',
+  });
+  await getDatabase()
+    .ref('users/' + data.uid + '/role')
+    .set(data.role);
+  await getAuth().revokeRefreshTokens(data.uid);
+  return { success: true };
 });

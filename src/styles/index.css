@@ -1,20 +1,7 @@
-@import "katex/dist/katex.min.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config "../../tailwind.config.cjs";
 
 @layer base {
-  :root {
-    --color-primary: 91 140 201;
-    --color-primary-dark: 58 90 122;
-  }
-
-  .dark {
-    --color-primary: 91 140 201;
-    --color-primary-dark: 74 118 168;
-  }
-
   body {
     @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200;
   }
@@ -26,7 +13,7 @@
 
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 bg-primary-700 hover:bg-primary-800 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
@@ -36,10 +23,6 @@
   .input-field {
     @apply w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-primary-500 dark:focus:border-primary-400 transition-colors duration-200;
   }
-
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 dark:border-gray-700;
-  }
 }
 
 @layer utilities {
@@ -47,7 +30,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -56,53 +39,8 @@
     animation: fadeIn 0.3s ease-in-out;
   }
 
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-bounce-slow {
-    animation: bounce 2s infinite;
-  }
-
   .animate-slide-in-right {
     animation: slideInRight 0.3s ease-out;
-  }
-  
-  .subject-border-snake {
-    background:
-      repeating-linear-gradient(
-        90deg,
-        rgba(59,130,246,0.15) 0px,
-        rgba(59,130,246,0.15) 10px,
-        rgba(59,130,246,0.6) 10px,
-        rgba(59,130,246,0.6) 20px
-      );
-    background-size: 200% 200%;
-    animation: subject-border-snake-move 12s linear infinite;
-  }
-
-  @keyframes subject-border-snake-move {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  @keyframes scale-in {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
-  .animate-scale-in {
-    animation: scale-in 0.3s ease-out;
   }
 
   @keyframes fadeIn {
@@ -114,15 +52,6 @@
     }
   }
 
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.85;
-    }
-  }
-
   @keyframes slideInRight {
     from {
       transform: translateX(100%);
@@ -130,5 +59,16 @@
     to {
       transform: translateX(0);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

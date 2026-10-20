@@ -1,11 +1,20 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import i18n from '../i18n';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Plyr from 'plyr';
+import playerIcons from '../../node_modules/plyr/dist/plyr.svg?url';
 import 'plyr/dist/plyr.css';
 import { auth } from '../firebase/config';
 import { updateLessonProgress } from '../firebase/realtimeDb';
 
-const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpdate, resumeTime }) => {
+const VideoPlayer = ({
+  videoUrl,
+  courseId,
+  lessonId,
+  durationSeconds,
+  onTimeUpdate,
+  resumeTime,
+}) => {
   const videoContainerRef = useRef(null);
   const playerRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -14,11 +23,6 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
 
   const location = useLocation();
 
-  // Timer for double-tap detection
-  const lastTapRef = useRef(0);
-  const tapTimeoutRef = useRef(null);
-
-  // Smart resume tracking
   const watchedSecondsRef = useRef(0);
   const lastTimeRef = useRef(null);
   const sessionStartedRef = useRef(false);
@@ -38,46 +42,6 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
   };
 
   const videoId = getYouTubeId(videoUrl);
-
-  // --- SMART GESTURE LOGIC (Inline/Desktop) ---
-  const handleSmartClick = useCallback((e) => {
-    const player = playerRef.current;
-    if (!player) return;
-
-    // On iOS native fullscreen, these clicks won't fire, which is fine.
-
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
-    const timeSinceLastTap = now - lastTapRef.current;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const width = rect.width;
-    const percent = (x / width) * 100;
-
-    if (timeSinceLastTap < DOUBLE_TAP_DELAY) {
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-
-      if (percent < 35) {
-        player.rewind(10);
-      } else if (percent > 65) {
-        player.forward(10);
-      } else if (player.fullscreen && typeof player.fullscreen.toggle === 'function') {
-        player.fullscreen.toggle();
-      } else if (typeof player.toggleFullscreen === 'function') {
-        player.toggleFullscreen();
-      }
-
-      lastTapRef.current = 0;
-    } else {
-      lastTapRef.current = now;
-      tapTimeoutRef.current = setTimeout(() => {
-        player.togglePlay();
-      }, DOUBLE_TAP_DELAY);
-    }
-  }, []);
 
   useEffect(() => {
     if (playerRef.current) {
@@ -101,31 +65,29 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       'volume',
       'captions',
       'settings',
-      // Show PiP on desktop/Android only
+
       ...(isIOS ? [] : ['pip']),
       'airplay',
-      'fullscreen'
+      'fullscreen',
     ];
 
-    const pip = isIOS
-      ? { enabled: false, fallback: false }
-      : { enabled: true, fallback: true };
+    const pip = isIOS ? { enabled: false, fallback: false } : { enabled: true, fallback: true };
 
     const player = new Plyr(videoContainerRef.current, {
       loadSprite: true,
-      iconUrl: 'https://cdn.plyr.io/3.7.8/plyr.svg',
+      iconUrl: playerIcons,
       controls,
-      // YouTube no longer respects JS quality switching; keep UI clean
+
       settings: ['speed', 'loop'],
       speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-      // Let Plyr own click-to-play on the video surface (works in fullscreen too)
+
       clickToPlay: true,
-      // Enable global keyboard shortcuts so F/Space work reliably in fullscreen
+
       keyboard: {
         focused: true,
-        global: true
+        global: true,
       },
-      // Force PiP support where the browser and provider allow it (desktop / Android)
+
       pip,
       youtube: {
         noCookie: true,
@@ -134,15 +96,15 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
         iv_load_policy: 3,
         modestbranding: 1,
         disablekb: 0,
-        // Allow native iOS player to take over when appropriate
+
         playsinline: 0,
-        vq: 'hd1080'
+        vq: 'hd1080',
       },
       fullscreen: {
         enabled: true,
         fallback: true,
-        iosNative: true
-      }
+        iosNative: true,
+      },
     });
 
     playerRef.current = player;
@@ -152,19 +114,15 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
     const forceHD = () => {
       try {
         if (player.embed && typeof player.embed.setPlaybackQuality === 'function') {
-          // Try to push YouTube into HD/highres when possible
           player.embed.setPlaybackQuality('hd1080');
           player.embed.setPlaybackQuality('highres');
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
     };
 
     player.on('ready', forceHD);
     player.on('playing', forceHD);
 
-    // URL-based seeking (?t=seconds)
     const params = new URLSearchParams(location.search);
     const timeParam = params.get('t');
     const seekSeconds = timeParam ? parseFloat(timeParam) : null;
@@ -173,9 +131,7 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       const onReadySeek = () => {
         try {
           player.currentTime = seekSeconds;
-        } catch (e) {
-          // ignore seek errors
-        }
+        } catch {}
         player.off('ready', onReadySeek);
       };
       player.on('ready', onReadySeek);
@@ -188,19 +144,14 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       if (!uid) return;
 
       const currentTime = player.currentTime || 0;
-      const effectiveDuration =
-        (typeof durationSeconds === 'number' && durationSeconds > 0
-          ? durationSeconds
-          : player.duration || 0) || currentTime || 0;
 
-      // Track approximate real watch time for this session (avoid counting big seeks)
       if (!sessionStartedRef.current) {
         sessionStartedRef.current = true;
         lastTimeRef.current = currentTime;
       } else {
         const last = lastTimeRef.current ?? currentTime;
         let delta = currentTime - last;
-        // Ignore negative jumps and very large jumps (likely seeking)
+
         if (delta > 0 && delta < 15) {
           watchedSecondsRef.current += delta;
         }
@@ -210,9 +161,7 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       if (onTimeUpdateRef.current) {
         try {
           onTimeUpdateRef.current(currentTime);
-        } catch {
-          // ignore callback errors
-        }
+        } catch {}
       }
     };
 
@@ -227,11 +176,8 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
 
       const currentTime = playerInstance.currentTime || 0;
       const effectiveDuration =
-        (typeof durationSeconds === 'number' && durationSeconds > 0
-          ? durationSeconds
-          : playerInstance.duration || 0) || currentTime || 0;
+        (durationSeconds > 0 ? durationSeconds : playerInstance.duration) || 0;
 
-      // Apply 30s session threshold for background saves
       if (watchedSecondsRef.current < 30 && currentTime < 30) {
         return;
       }
@@ -239,30 +185,27 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       const timeLeft = Math.max(0, effectiveDuration - currentTime);
       const rawPercent = effectiveDuration > 0 ? (currentTime / effectiveDuration) * 100 : 0;
       const percent = Math.max(0, Math.min(100, Math.round(rawPercent)));
-      const completed = percent >= 95 || timeLeft <= 300; // <5 мин до конца или >95%
+      const completed = percent >= 95 || timeLeft <= 300;
 
       updateLessonProgress(uid, courseId, lessonId, {
         timestamp: Math.floor(currentTime),
         percent,
-        completed
+        completed,
       });
     };
 
     const handleEnded = () => {
+      const effectiveDuration =
+        (durationSeconds > 0 ? durationSeconds : player.duration) || player.currentTime || 0;
       if (!auth.currentUser || !courseId || !lessonId) return;
 
       const uid = auth.currentUser.uid;
       if (!uid) return;
 
-      const effectiveDuration =
-        (typeof durationSeconds === 'number' && durationSeconds > 0
-          ? durationSeconds
-          : player.duration || 0) || player.currentTime || 0;
-
       updateLessonProgress(uid, courseId, lessonId, {
         timestamp: Math.floor(effectiveDuration),
         percent: 100,
-        completed: true
+        completed: true,
       });
     };
 
@@ -284,7 +227,7 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
 
     const intervalId = window.setInterval(() => {
       saveProgress();
-    }, 300000); // 5 минут
+    }, 300000);
 
     return () => {
       player.off('timeupdate', handleTimeUpdate);
@@ -295,9 +238,6 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
       if (playerRef.current) {
         playerRef.current.destroy();
         playerRef.current = null;
-      }
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
       }
     };
   }, [videoId, location.search, courseId, lessonId, durationSeconds]);
@@ -312,9 +252,7 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
 
     try {
       player.currentTime = target;
-    } catch {
-      // ignore seek errors
-    }
+    } catch {}
   }, [resumeTime]);
 
   if (!videoId) {
@@ -345,7 +283,6 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
         }
       `}</style>
 
-      {/* SMART GLASS SHIELD (Inline/Desktop) – only over video area, not controls */}
       <div
         className="absolute left-0 right-0 top-0 z-20 w-full bg-transparent pointer-events-none"
         style={{ bottom: '56px' }}
@@ -353,10 +290,10 @@ const VideoPlayer = ({ videoUrl, courseId, lessonId, durationSeconds, onTimeUpda
 
       <div ref={videoContainerRef} className="plyr__video-embed" id="player">
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&iv_load_policy=3&modestbranding=1&playsinline=0&showinfo=0&rel=0&enablejsapi=1&vq=hd1080`}
+          src={`${import.meta.env.VITE_VIDEO_EMBED_ORIGIN}/embed/${videoId}?origin=${encodeURIComponent(window.location.origin)}&iv_load_policy=3&modestbranding=1&playsinline=0&showinfo=0&rel=0&enablejsapi=1&vq=hd1080`}
           allowFullScreen
           allow="autoplay; encrypted-media; picture-in-picture; web-share"
-          title="Lesson Video"
+          title={i18n.t('ui.lessonVideo')}
         />
       </div>
     </div>

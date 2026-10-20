@@ -7,39 +7,49 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "migrate": "node scripts/migrateAuthUsers.js"
+    "lint": "eslint src public scripts functions/*.js vite.config.js --ext js,jsx,cjs,mjs --report-unused-disable-directives --max-warnings 0",
+    "migrate": "node scripts/admin.mjs migrate-profiles",
+    "test": "node --test tests/*.test.cjs",
+    "check:security": "node scripts/check-security.mjs",
+    "check": "npm run check:security && npm run lint && npm test && npm run build",
+    "format": "prettier --write src scripts tests functions/*.js *.json *.js *.cjs",
+    "format:check": "prettier --check src scripts tests functions/*.js *.json *.js *.cjs"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@headlessui/react": "^1.7.17",
     "dompurify": "^3.3.0",
-    "firebase": "^10.14.1",
+    "firebase": "^12.19.0",
     "framer-motion": "^11.18.2",
     "i18next": "^23.7.0",
     "i18next-browser-languagedetector": "^7.2.0",
-    "katex": "^0.16.27",
+    "katex": "^0.19.0",
     "lucide-react": "^0.294.0",
-    "pdfjs-dist": "^5.6.205",
+    "pdfjs-dist": "^6.4.299",
     "plyr": "^3.8.4",
-    "plyr-react": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^13.5.0",
-    "react-router-dom": "^6.20.0",
-    "three": "^0.169.0"
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.16",
+    "@babel/parser": "^8.0.7",
+    "@babel/traverse": "^8.0.7",
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.32",
-    "tailwindcss": "^3.3.6",
-    "vite": "^5.0.8"
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
+    "vite": "^7.3.7"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.6"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

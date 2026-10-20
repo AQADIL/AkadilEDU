@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { useState } from 'react';
 import { X, Mail, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -24,8 +25,6 @@ export default function EmailVerificationBanner({ user, onClose }) {
       setResendSuccess(true);
       setTimeout(() => setResendSuccess(false), 5000);
     } catch (error) {
-      console.error('Resend verification error:', error);
-      
       if (error.code === 'auth/too-many-requests') {
         setResendError(t('auth.errors.tooManyRequests'));
       } else {
@@ -51,13 +50,11 @@ export default function EmailVerificationBanner({ user, onClose }) {
               </p>
               {resendSuccess && (
                 <p className="text-xs text-green-700 dark:text-green-400 font-medium">
-                  ✅ {t('emailVerification.resendSuccess')}
+                  {t('emailVerification.resendSuccess')}
                 </p>
               )}
               {resendError && (
-                <p className="text-xs text-red-700 dark:text-red-400 font-medium">
-                  ❌ {resendError}
-                </p>
+                <p className="text-xs text-red-700 dark:text-red-400 font-medium">{resendError}</p>
               )}
             </div>
           </div>
@@ -79,7 +76,7 @@ export default function EmailVerificationBanner({ user, onClose }) {
             <button
               onClick={onClose}
               className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors"
-              aria-label="Close"
+              aria-label={i18n.t('common.close')}
             >
               <X className="w-5 h-5" />
             </button>

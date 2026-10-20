@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '@headlessui/react';
@@ -10,10 +11,8 @@ export default function CookieConsent() {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    // Check if user has already given consent
     const hasConsent = storage.hasConsent();
     if (!hasConsent) {
-      // Show banner after a short delay
       setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);
@@ -25,7 +24,6 @@ export default function CookieConsent() {
 
   const handleDecline = () => {
     setShowBanner(false);
-    // User can browse but profile data won't be saved
   };
 
   const handleClearData = () => {
@@ -36,7 +34,6 @@ export default function CookieConsent() {
   };
 
   if (!showBanner) {
-    // Settings button (always visible in bottom-right corner)
     return (
       <>
         <button
@@ -58,33 +55,24 @@ export default function CookieConsent() {
 
   return (
     <>
-      {/* Cookie Banner */}
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
               <Cookie className="w-8 h-8 text-primary-500" />
             </div>
-            
+
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {t('cookie.title')}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                {t('cookie.message')}
-              </p>
-              
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('cookie.message')}</p>
+
               <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={handleAccept}
-                  className="btn-primary"
-                >
+                <button onClick={handleAccept} className="btn-primary">
                   {t('cookie.accept')}
                 </button>
-                <button
-                  onClick={handleDecline}
-                  className="btn-secondary"
-                >
+                <button onClick={handleDecline} className="btn-secondary">
                   {t('cookie.decline')}
                 </button>
                 <button
@@ -133,37 +121,50 @@ function SettingsDialog({ isOpen, onClose, onClearData }) {
           <div className="p-6 space-y-4">
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
               <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                Essential Cookies
+                {i18n.t('ui.essentialStorage')}
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                Required for the website to function properly.
+                {i18n.t('ui.usedForAuthenticationAndSavedPreferences')}
               </p>
               <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                <li><code className="text-xs">ak_theme</code> - Stores your theme preference (light/dark)</li>
-                <li><code className="text-xs">ak_lang</code> - Stores your language preference</li>
-                <li><code className="text-xs">ak_consent</code> - Stores your consent status</li>
+                <li>
+                  <code className="text-xs">{i18n.t('ui.aktheme')}</code>
+                  {i18n.t('ui.themePreference')}
+                </li>
+                <li>
+                  <code className="text-xs">{i18n.t('ui.aklang')}</code>
+                  {i18n.t('ui.languagePreference')}
+                </li>
+                <li>
+                  <code className="text-xs">{i18n.t('ui.akconsent')}</code>
+                  {i18n.t('ui.consentPreference')}
+                </li>
               </ul>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
               <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                Profile Data
+                {i18n.t('ui.profileData')}
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                Stored only if you accept cookies.
+                {i18n.t('ui.yourAccountProfileIsStoredInFirebase')}
               </p>
               <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                <li><code className="text-xs">users.profile</code> - Your profile information</li>
+                <li>
+                  <code className="text-xs">{i18n.t('ui.usersprofile')}</code>
+                  {i18n.t('ui.yourProfileInformation')}
+                </li>
               </ul>
             </div>
 
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Status: <span className="font-medium text-gray-900 dark:text-white">
-                  {hasConsent ? 'Accepted' : 'Not accepted'}
+                {i18n.t('ui.status')}
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {i18n.t(hasConsent ? 'cookie.accepted' : 'cookie.notAccepted')}
                 </span>
               </p>
-              
+
               <button
                 onClick={onClearData}
                 className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
