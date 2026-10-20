@@ -19,6 +19,14 @@ import katex from 'katex';
 
 import SANAFloatingChat from './SANAFloatingChat';
 
+const QUIZ_COVER_GIFS = Object.values(
+  import.meta.glob('../assets/quiz-covers/*.gif', { eager: true, import: 'default' }),
+);
+
+function getRandomQuizCover() {
+  return QUIZ_COVER_GIFS[Math.floor(Math.random() * QUIZ_COVER_GIFS.length)];
+}
+
 function RenderMath({ text, className = '' }) {
   if (!text) return null;
   const segments = String(text).split(/(\$\$[^$]+\$\$|\$[^$]+\$)/g);
@@ -122,8 +130,27 @@ function FireBadge({ streak }) {
   );
 }
 
-function HeroBanner({ title }) {
-  return <h3 className="text-xl font-semibold py-6 text-gray-900 dark:text-white">{title}</h3>;
+function HeroBanner({ title, src }) {
+  return (
+    <div className="mx-2 sm:mx-3 h-48 rounded-2xl overflow-hidden relative">
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+        <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1.5">
+          {i18n.t('ui.quiz2')}
+        </p>
+        <h3 className="text-white font-black text-base sm:text-lg leading-snug max-w-[260px] drop-shadow-lg">
+          {title}
+        </h3>
+      </div>
+    </div>
+  );
 }
 
 function CorrectSvg() {
@@ -164,6 +191,11 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
   const { t } = useTranslation();
   const REVIEW_PAGE_SIZE = 10;
   const [expanded, setExpanded] = useState(false);
+  const [coverGif, setCoverGif] = useState(getRandomQuizCover);
+
+  useEffect(() => {
+    setCoverGif(getRandomQuizCover());
+  }, [courseId, lessonId]);
   const [stage, setStage] = useState('idle');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -521,7 +553,7 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
 
             {stage === 'idle' && (
               <div className="qz-enter">
-                <HeroBanner title={quiz.title || t('courseDetail.quizTitle')} />
+                <HeroBanner title={quiz.title || t('courseDetail.quizTitle')} src={coverGif} />
 
                 <div className="px-5 pb-8 pt-5 sm:px-6">
                   {!hasTakenBefore && (
