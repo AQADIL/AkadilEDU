@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowUp, HelpCircle } from 'lucide-react';
 
@@ -70,7 +71,7 @@ export default function CourseQuotes() {
         samples: [{ y: touch.clientY, time: event.timeStamp }],
         velocity: 0,
         distance: 0,
-        height: rect.height,
+        height: window.innerHeight,
         nextIndex:
           (quoteIndex + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length,
         locked: false,
@@ -234,29 +235,35 @@ export default function CourseQuotes() {
         className="min-h-[60vh] flex items-center justify-center bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 sm:p-12 relative overflow-hidden"
       >
         {renderQuote(quote)}
-        {swipe && (
+      </div>
+      {swipe &&
+        createPortal(
           <div
             aria-hidden="true"
-            data-quote-preview
-            className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 p-6 sm:p-12 pointer-events-none motion-reduce:transition-none"
-            style={{
-              transform: `translateY(${swipe.height - swipe.distance}px)`,
-              clipPath: `polygon(${inset}% 0, ${100 - inset}% 0, 100% 100%, 0 100%)`,
-              transition: swipe.settling
-                ? `transform ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1), clip-path ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1)`
-                : 'none',
-            }}
+            className="fixed inset-0 z-[100] overflow-hidden pointer-events-none lg:hidden"
           >
-            {renderQuote(quotes[swipe.nextIndex], true)}
-          </div>
+            <div
+              data-quote-preview
+              className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 p-6 sm:p-12"
+              style={{
+                transform: `translateY(${swipe.height - swipe.distance}px)`,
+                clipPath: `polygon(${inset}% 0, ${100 - inset}% 0, 100% 100%, 0 100%)`,
+                transition: swipe.settling
+                  ? `transform ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1), clip-path ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1)`
+                  : 'none',
+              }}
+            >
+              {renderQuote(quotes[swipe.nextIndex], true)}
+            </div>
+          </div>,
+          document.body,
         )}
-      </div>
       <div className="flex flex-col items-center gap-3 pt-6">
         <button
           type="button"
           onClick={nextQuote}
           disabled={Boolean(swipe)}
-          className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          className="btn-primary hidden lg:inline-flex items-center gap-2 px-6 py-3 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
         >
           {t('courseDetail.quoteNext')}
           <ArrowRight className="w-5 h-5" aria-hidden="true" />
