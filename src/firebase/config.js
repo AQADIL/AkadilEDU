@@ -1,56 +1,20 @@
-/**
- * Firebase Configuration
- * 
- * SECURITY NOTE: These credentials are for client-side use and are safe to expose.
- * Actual security is enforced through Firebase Security Rules.
- */
-
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBqKkucrcXnCWsC07w3DwvPkBbhI9XJKIE",
-  authDomain: "akadiledu.firebaseapp.com",
-  databaseURL: "https://akadiledu-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "akadiledu",
-  storageBucket: "akadiledu.appspot.com",
-  messagingSenderId: "78627994035",
-  appId: "1:78627994035:web:eb93f14c26e6c9d96273c6",
-  measurementId: "G-8HFHFE0V38"
+export const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
-
-// Initialize Firebase
-let app;
-let auth;
-let db;
-let rtdb;
-let storage;
-let isInitialized = false;
-
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  
-  // Firestore DISABLED - not needed, causes 400 errors
-  db = null;
-  console.log('ℹ️ Firestore disabled (using Realtime Database only)');
-  
-  // Initialize Realtime Database
-  rtdb = getDatabase(app);
-  console.log('✅ Realtime Database initialized successfully');
-  
-  storage = getStorage(app);
-  isInitialized = true;
-  console.log('✅ Firebase initialized successfully');
-} catch (error) {
-  console.error('❌ Firebase initialization error:', error);
-}
-
-// Graceful degradation check
-export const isFirebaseConfigured = () => isInitialized;
-
-export { app, auth, db, rtdb, storage };
+const configured = Object.values(firebaseConfig).every(Boolean);
+export const app = configured ? initializeApp(firebaseConfig) : null;
+export const auth = app ? getAuth(app) : null;
+export const rtdb = app ? getDatabase(app) : null;
+export const storage = app ? getStorage(app) : null;
+export const isFirebaseConfigured = () => configured;

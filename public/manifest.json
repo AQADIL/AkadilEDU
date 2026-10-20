@@ -1,14 +1,16 @@
 {
-  "name": "AkadilEDU - Educational Platform",
+  "name": "AkadilEDU",
   "short_name": "AkadilEDU",
-  "description": "Modern educational platform for online learning",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#5b8cc9",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["education", "learning"],
+  "categories": [
+    "education",
+    "learning"
+  ],
   "icons": [
     {
       "src": "/icons/icon-512.png",
@@ -29,6 +31,5 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
   "prefer_related_applications": false
 }

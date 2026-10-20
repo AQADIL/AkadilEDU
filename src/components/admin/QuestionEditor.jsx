@@ -1,15 +1,16 @@
+import i18n from '../../i18n';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  ArrowLeft, 
-  Save, 
-  Eye, 
-  Image as ImageIcon, 
-  Plus, 
-  Trash2, 
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  Image as ImageIcon,
+  Plus,
+  Trash2,
   AlertCircle,
   Type,
-  Link
+  Link,
 } from 'lucide-react';
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import MatchingDrag from '../MatchingDrag';
@@ -24,25 +25,26 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     imageUrls: [],
     inlineImageUrls: [],
     options: {
-      'A': { type: 'text', value: '', image: null },
-      'B': { type: 'text', value: '', image: null },
-      'C': { type: 'text', value: '', image: null },
-      'D': { type: 'text', value: '', image: null }
+      A: { type: 'text', value: '', image: null },
+      B: { type: 'text', value: '', image: null },
+      C: { type: 'text', value: '', image: null },
+      D: { type: 'text', value: '', image: null },
     },
     correct: ['A'],
     points: 1,
     order: 1,
     matchLeft: ['', ''],
     matchRight: ['', '', '', ''],
-    matchCorrect: ['', '']
+    matchCorrect: ['', ''],
   });
   const [previewMode, setPreviewMode] = useState(false);
-  const [contentMode, setContentMode] = useState('text'); // text or html
+  const [contentMode] = useState('text');
   const [showMathPalette, setShowMathPalette] = useState(false);
 
   useEffect(() => {
     if (question) {
-      const isMatching = typeof question.order === 'number' && question.order >= 31 && question.order <= 35;
+      const isMatching =
+        typeof question.order === 'number' && question.order >= 31 && question.order <= 35;
 
       let matchLeft = ['', ''];
       let matchRight = ['', '', '', ''];
@@ -57,13 +59,13 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
           if (item?.left?.id && !leftMap.has(item.left.id)) {
             leftMap.set(item.left.id, {
               id: item.left.id,
-              label: item.left.label || ''
+              label: item.left.label || '',
             });
           }
           if (item?.right?.id && !rightMap.has(item.right.id)) {
             rightMap.set(item.right.id, {
               id: item.right.id,
-              label: item.right.label || ''
+              label: item.right.label || '',
             });
           }
         });
@@ -78,9 +80,10 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
           matchRight[idx] = item.label || '';
         });
 
-        const correctMatches = question.correctMatches && typeof question.correctMatches === 'object'
-          ? question.correctMatches
-          : {};
+        const correctMatches =
+          question.correctMatches && typeof question.correctMatches === 'object'
+            ? question.correctMatches
+            : {};
         const rightIdList = rightItems.map((item) => item.id);
         leftItems.slice(0, 2).forEach((leftItem, idx) => {
           const rid = correctMatches[leftItem.id];
@@ -102,30 +105,31 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         imageUrls: question.imageUrls || [],
         inlineImageUrls: question.inlineImageUrls || [],
         options: question.options || {
-          'A': { type: 'text', value: '', image: null },
-          'B': { type: 'text', value: '', image: null },
-          'C': { type: 'text', value: '', image: null },
-          'D': { type: 'text', value: '', image: null }
+          A: { type: 'text', value: '', image: null },
+          B: { type: 'text', value: '', image: null },
+          C: { type: 'text', value: '', image: null },
+          D: { type: 'text', value: '', image: null },
         },
         correct: question.correct || ['A'],
         points: isComplexBlock && (!Number.isFinite(basePoints) || basePoints < 2) ? 2 : basePoints,
         order: baseOrder,
         matchLeft,
         matchRight,
-        matchCorrect
+        matchCorrect,
       });
     }
   }, [question]);
 
   const handleContentChange = (value) => {
     if (contentMode === 'html') {
-      setFormData(prev => ({ ...prev, contentHtml: value }));
+      setFormData((prev) => ({ ...prev, contentHtml: value }));
     } else {
-      setFormData(prev => ({ ...prev, contentText: value }));
+      setFormData((prev) => ({ ...prev, contentText: value }));
     }
   };
 
-  const isMatching = typeof formData.order === 'number' && formData.order >= 31 && formData.order <= 35;
+  const isMatching =
+    typeof formData.order === 'number' && formData.order >= 31 && formData.order <= 35;
 
   const insertTextAtCursor = (text) => {
     if (!text) return;
@@ -135,7 +139,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
     if (!textarea) {
       const newValue = `${value}${text}`;
-      setFormData(prev => ({ ...prev, [key]: newValue }));
+      setFormData((prev) => ({ ...prev, [key]: newValue }));
       return;
     }
 
@@ -146,7 +150,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     const newValue = `${beforeText}${text}${afterText}`;
     const caret = start + text.length;
 
-    setFormData(prev => ({ ...prev, [key]: newValue }));
+    setFormData((prev) => ({ ...prev, [key]: newValue }));
 
     setTimeout(() => {
       const node = textareaRef.current;
@@ -168,12 +172,11 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     const afterText = value.slice(end);
     const newValue = `${beforeText}${before}${selected || ''}${after}${afterText}`;
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [key]: newValue
+      [key]: newValue,
     }));
 
-    // Restore selection inside formatted text
     const newStart = start + before.length;
     const newEnd = newStart + (selected || '').length;
     setTimeout(() => {
@@ -190,16 +193,16 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     const textarea = textareaRef.current;
     const key = contentMode === 'html' ? 'contentHtml' : 'contentText';
     const value = formData[key] || '';
-    const start = textarea ? textarea.selectionStart ?? 0 : value.length;
-    const end = textarea ? textarea.selectionEnd ?? 0 : value.length;
+    const start = textarea ? (textarea.selectionStart ?? 0) : value.length;
+    const end = textarea ? (textarea.selectionEnd ?? 0) : value.length;
     const beforeText = value.slice(0, start);
     const afterText = value.slice(end);
     const newValue = `${beforeText}PHOTO${afterText}`;
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [key]: newValue,
-      inlineImageUrls: [...(prev.inlineImageUrls || []), url.trim()]
+      inlineImageUrls: [...(prev.inlineImageUrls || []), url.trim()],
     }));
 
     setTimeout(() => {
@@ -212,43 +215,40 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
   };
 
   const handleOptionChange = (optionKey, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       options: {
         ...prev.options,
         [optionKey]: {
           ...prev.options[optionKey],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const handleCorrectAnswerToggle = (optionKey) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const isComplexBlock = typeof prev.order === 'number' && prev.order >= 36 && prev.order <= 40;
 
       let newCorrect;
       if (prev.correct.includes(optionKey)) {
-        // Turning off this option
-        newCorrect = prev.correct.filter(key => key !== optionKey);
+        newCorrect = prev.correct.filter((key) => key !== optionKey);
       } else {
-        // Turning on this option
         if (isComplexBlock && prev.correct.length >= 3) {
-          alert('Для вопросов 36–40 можно выбрать максимум 3 правильных ответа');
+          alert(i18n.t('ui.selectUpTo_3CorrectAnswersFor'));
           return prev;
         }
         newCorrect = [...prev.correct, optionKey];
       }
 
-      // Ensure at least one correct answer
       if (newCorrect.length === 0) {
         newCorrect = [optionKey];
       }
 
       return {
         ...prev,
-        correct: newCorrect
+        correct: newCorrect,
       };
     });
   };
@@ -256,22 +256,22 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
   const handleAddImageUrl = () => {
     const url = prompt(t('admin.enterImageUrl'));
     if (url && url.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        imageUrls: [...prev.imageUrls, url.trim()]
+        imageUrls: [...prev.imageUrls, url.trim()],
       }));
     }
   };
 
   const handleRemoveImageUrl = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index)
+      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
     }));
   };
 
   const handleMatchLeftChange = (index, value) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const next = Array.isArray(prev.matchLeft) ? [...prev.matchLeft] : ['', ''];
       next[index] = value;
       return { ...prev, matchLeft: next };
@@ -279,7 +279,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
   };
 
   const handleMatchRightChange = (index, value) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const next = Array.isArray(prev.matchRight) ? [...prev.matchRight] : ['', '', '', ''];
       next[index] = value;
       return { ...prev, matchRight: next };
@@ -287,7 +287,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
   };
 
   const handleMatchCorrectChange = (index, value) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const next = Array.isArray(prev.matchCorrect) ? [...prev.matchCorrect] : ['', ''];
       next[index] = value;
       return { ...prev, matchCorrect: next };
@@ -299,18 +299,17 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     const isStandard = formData.order <= 35;
 
     if (isStandard && existingKeys.length >= 4) {
-      alert('Для первых 35 вопросов всегда 4 варианта ответа');
+      alert(i18n.t('ui.theFirst_35QuestionsHave_4Options'));
       return;
     }
 
     if (!isStandard && existingKeys.length >= 6) {
-      alert('Максимум 6 вариантов ответа (A–F)');
+      alert(i18n.t('ui.upTo_6OptionsAf'));
       return;
     }
 
     const alphabet = 'ABCDEF';
-    
-    // Find next available letter
+
     let nextKey = null;
     for (let i = 0; i < alphabet.length; i++) {
       if (!existingKeys.includes(alphabet[i])) {
@@ -318,44 +317,44 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         break;
       }
     }
-    
+
     if (nextKey) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         options: {
           ...prev.options,
-          [nextKey]: { type: 'text', value: '', image: null }
-        }
+          [nextKey]: { type: 'text', value: '', image: null },
+        },
       }));
     } else {
-      alert('Достигнуто максимальное количество вариантов ответов');
+      alert(i18n.t('ui.maximumNumberOfOptionsReached'));
     }
   };
 
   const removeOption = (optionKey) => {
-    const remainingOptions = Object.keys(formData.options).filter(key => key !== optionKey);
+    const remainingOptions = Object.keys(formData.options).filter((key) => key !== optionKey);
     const isStandard = formData.order <= 35;
 
     if (isStandard && remainingOptions.length < 4) {
-      alert('Для первых 35 вопросов должно быть ровно 4 варианта ответа');
+      alert(i18n.t('ui.theFirst_35QuestionsRequireExactly_4'));
       return;
     }
 
     if (!isStandard && remainingOptions.length < 2) {
-      alert('Должно быть минимум 2 варианта ответа');
+      alert(i18n.t('ui.atLeast_2OptionsAreRequired'));
       return;
     }
 
-    setFormData(prev => {
+    setFormData((prev) => {
       const newOptions = { ...prev.options };
       delete newOptions[optionKey];
-      
-      const newCorrect = prev.correct.filter(key => key !== optionKey);
-      
+
+      const newCorrect = prev.correct.filter((key) => key !== optionKey);
+
       return {
         ...prev,
         options: newOptions,
-        correct: newCorrect.length > 0 ? newCorrect : [remainingOptions[0]]
+        correct: newCorrect.length > 0 ? newCorrect : [remainingOptions[0]],
       };
     });
   };
@@ -366,7 +365,8 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
       alert(t('admin.questionContentRequired'));
       return;
     }
-    const isMatching = typeof formData.order === 'number' && formData.order >= 31 && formData.order <= 35;
+    const isMatching =
+      typeof formData.order === 'number' && formData.order >= 31 && formData.order <= 35;
 
     if (isMatching) {
       const left = Array.isArray(formData.matchLeft) ? formData.matchLeft : [];
@@ -395,7 +395,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
       }
 
       const hasEmptyOptions = Object.values(formData.options).some(
-        option => !option.value?.trim() && !option.image?.trim()
+        (option) => !option.value?.trim() && !option.image?.trim(),
       );
       if (hasEmptyOptions) {
         alert(t('admin.allOptionsRequired'));
@@ -405,15 +405,18 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
     const { matchLeft, matchRight, matchCorrect, ...restForm } = formData;
 
-    // For complex block 36-40, explicitly mark question type and maxSelect
-    const isComplexBlock = !isMatching && typeof formData.order === 'number' && formData.order >= 36 && formData.order <= 40;
+    const isComplexBlock =
+      !isMatching &&
+      typeof formData.order === 'number' &&
+      formData.order >= 36 &&
+      formData.order <= 40;
     let extraProps = {};
     if (isComplexBlock) {
       const correctCount = Array.isArray(formData.correct) ? formData.correct.length : 0;
       const maxSelect = correctCount > 0 ? Math.min(correctCount, 3) : 1;
       extraProps = {
         type: correctCount > 1 ? 'multi' : 'single',
-        maxSelect
+        maxSelect,
       };
     }
 
@@ -422,7 +425,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
       ...restForm,
       ...extraProps,
       id: question?.id,
-      sectionId: question?.sectionId
+      sectionId: question?.sectionId,
     };
 
     if (isMatching) {
@@ -431,12 +434,12 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
       const leftItems = [
         { id: 'L1', label: (leftLabels[0] || '').trim() },
-        { id: 'L2', label: (leftLabels[1] || '').trim() }
+        { id: 'L2', label: (leftLabels[1] || '').trim() },
       ];
 
       const rightItems = ['R1', 'R2', 'R3', 'R4'].map((id, idx) => ({
         id,
-        label: (rightLabels[idx] || '').trim()
+        label: (rightLabels[idx] || '').trim(),
       }));
 
       const matchPairs = [];
@@ -462,7 +465,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         matchPairs,
         correctMatches,
         options: {},
-        correct: []
+        correct: [],
       };
     }
 
@@ -482,7 +485,9 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     let idx = 0;
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(<span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>);
+        parts.push(
+          <span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>,
+        );
         idx += 1;
       }
       parts.push(<em key={`${keyPrefix}-it-${idx}-e`}>{match[1]}</em>);
@@ -549,20 +554,26 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         const normal = text.slice(lastIndex, match.index);
-        parts.push(<span key={`${keyPrefix}-b-${idx}-n`}>{renderItalic(normal, `${keyPrefix}-b-${idx}-n`)}</span>);
+        parts.push(
+          <span key={`${keyPrefix}-b-${idx}-n`}>
+            {renderItalic(normal, `${keyPrefix}-b-${idx}-n`)}
+          </span>,
+        );
         idx += 1;
       }
       parts.push(
         <strong key={`${keyPrefix}-b-${idx}-s`}>
           {renderItalic(match[1], `${keyPrefix}-b-${idx}-s`)}
-        </strong>
+        </strong>,
       );
       idx += 1;
       lastIndex = regex.lastIndex;
     }
     if (lastIndex < text.length) {
       const rest = text.slice(lastIndex);
-      parts.push(<span key={`${keyPrefix}-b-rest`}>{renderItalic(rest, `${keyPrefix}-b-rest`)}</span>);
+      parts.push(
+        <span key={`${keyPrefix}-b-rest`}>{renderItalic(rest, `${keyPrefix}-b-rest`)}</span>,
+      );
     }
     return parts;
   };
@@ -570,14 +581,15 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
   const renderInlineContent = (content) => {
     if (!content) return null;
 
-    const parts = content.split(/(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi);
+    const parts = content.split(
+      /(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi,
+    );
 
     let photoIndex = 0;
 
     return parts.map((part, index) => {
       if (!part) return null;
 
-      // Inline marker [[img: URL]]
       const markerMatch = part.match(/^\[\[img:\s*([^\]]+)\]\]$/i);
       if (markerMatch) {
         const url = (markerMatch[1] || '').trim();
@@ -594,15 +606,17 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         );
       }
 
-      // PHOTO placeholder mapped to inlineImageUrls by order (fallback to imageUrls for legacy data)
       if (/^PHOTO$/i.test(part.trim())) {
-        const sources = (Array.isArray(formData.inlineImageUrls) && formData.inlineImageUrls.length > 0)
-          ? formData.inlineImageUrls
-          : (Array.isArray(formData.imageUrls) ? formData.imageUrls : []);
+        const sources =
+          Array.isArray(formData.inlineImageUrls) && formData.inlineImageUrls.length > 0
+            ? formData.inlineImageUrls
+            : Array.isArray(formData.imageUrls)
+              ? formData.imageUrls
+              : [];
         const url = sources[photoIndex] || null;
         photoIndex += 1;
         if (!url) {
-          return <span key={`photo-text-${index}`}>PHOTO</span>;
+          return <span key={`photo-text-${index}`}>{i18n.t('common.photo')}</span>;
         }
         return (
           <img
@@ -616,7 +630,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         );
       }
 
-      // data:image inline URL inside text
       if (part.match(/^data:image\/[^^\s]+$/i)) {
         const url = part.trim();
         return (
@@ -631,7 +644,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         );
       }
 
-      // Direct http(s) image URL inside text
       if (part.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
         const url = part.trim();
         return (
@@ -646,11 +658,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         );
       }
 
-      return (
-        <span key={`text-${index}`}>
-          {renderMathInText(part, `txt-${index}`)}
-        </span>
-      );
+      return <span key={`text-${index}`}>{renderMathInText(part, `txt-${index}`)}</span>;
     });
   };
 
@@ -666,12 +674,12 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
       const leftItems = [
         { id: 'L1', label: (leftLabels[0] || '').trim() },
-        { id: 'L2', label: (leftLabels[1] || '').trim() }
+        { id: 'L2', label: (leftLabels[1] || '').trim() },
       ];
 
       const rightItems = ['R1', 'R2', 'R3', 'R4'].map((id, idx) => ({
         id,
-        label: (rightLabels[idx] || '').trim()
+        label: (rightLabels[idx] || '').trim(),
       }));
 
       const pairs = [];
@@ -699,12 +707,11 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        {/* Question Content */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {t('admin.questionPreview')}
           </h3>
-          
+
           <div className="prose dark:prose-invert max-w-none">
             {contentMode === 'html' ? (
               <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(content) }} />
@@ -715,7 +722,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
             )}
           </div>
 
-          {/* Additional Images */}
           {formData.imageUrls.length > 0 && (
             <div className="mt-4 space-y-2">
               {formData.imageUrls.map((url, index) => (
@@ -731,11 +737,8 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
           )}
         </div>
 
-        {/* Options / Matching Preview */}
         <div className="space-y-3">
-          <h4 className="font-medium text-gray-900 dark:text-white">
-            {t('admin.answerOptions')}
-          </h4>
+          <h4 className="font-medium text-gray-900 dark:text-white">{t('admin.answerOptions')}</h4>
           {isMatching ? (
             <MatchingDrag
               pairs={previewPairs}
@@ -786,7 +789,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-3 sm:px-0">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex items-center space-x-3 sm:space-x-4">
           <button
@@ -799,7 +801,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
             {question?.id ? t('admin.editQuestion') : t('admin.createQuestion')}
           </h2>
         </div>
-        
+
         <div className="flex flex-wrap justify-end gap-2">
           <button
             onClick={() => setPreviewMode(!previewMode)}
@@ -808,7 +810,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
             <Eye className="h-4 w-4" />
             <span>{previewMode ? t('admin.editMode') : t('admin.previewMode')}</span>
           </button>
-          
+
           <button
             onClick={handleSave}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
@@ -819,9 +821,10 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
         </div>
       </div>
 
-      {previewMode ? renderPreview() : (
+      {previewMode ? (
+        renderPreview()
+      ) : (
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Question Content */}
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
@@ -840,41 +843,41 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                     type="button"
                     onClick={() => applyFormatting('**', '**')}
                     className="px-2 py-1 text-xs sm:text-sm rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    title="Bold"
+                    title={i18n.t('ui.bold')}
                   >
-                    <span className="font-bold">B</span>
+                    <span className="font-bold">{i18n.t('ui.b')}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => applyFormatting('_', '_')}
                     className="px-2 py-1 text-xs sm:text-sm rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 italic"
-                    title="Italic"
+                    title={i18n.t('ui.italic')}
                   >
-                    I
+                    {i18n.t('ui.i')}
                   </button>
                   <button
                     type="button"
                     onClick={handleInsertPhoto}
                     className="px-2 py-1 text-xs sm:text-sm rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-1"
-                    title="PHOTO"
+                    title={i18n.t('common.photo')}
                   >
                     <ImageIcon className="h-3 w-3" />
-                    <span>PHOTO</span>
+                    <span>{i18n.t('common.photo')}</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowMathPalette(v => !v)}
+                    onClick={() => setShowMathPalette((v) => !v)}
                     className="px-2 py-1 text-xs sm:text-sm rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    title="Math symbols"
+                    title={i18n.t('ui.mathSymbols')}
                   >
-                    <span>∑x²</span>
+                    <span>{i18n.t('ui.x')}</span>
                   </button>
                 </div>
               </div>
 
               {showMathPalette && (
                 <div className="mb-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-2 text-[11px] sm:text-xs space-y-2">
-                  {[ 
+                  {[
                     {
                       label: 'Basic',
                       items: ['+', '−', '·', '÷', '=', '≠', '≈', '≡'],
@@ -897,11 +900,13 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                     },
                     {
                       label: 'Other',
-                      items: ['∞', '°', '′', '→', '↔', '∑', '∏', '∫'],
+                      items: ['∞', '°', '′', '→', '', '∑', '∏', '∫'],
                     },
-                  ].map(group => (
+                  ].map((group) => (
                     <div key={group.label} className="flex flex-wrap items-center gap-1">
-                      <span className="font-semibold text-gray-600 dark:text-gray-300 mr-1">{group.label}:</span>
+                      <span className="font-semibold text-gray-600 dark:text-gray-300 mr-1">
+                        {group.label}:
+                      </span>
                       {group.items.map((item) => (
                         <button
                           key={`${group.label}-${item}`}
@@ -922,9 +927,10 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                 value={contentMode === 'html' ? formData.contentHtml : formData.contentText}
                 onChange={(e) => handleContentChange(e.target.value)}
                 className="w-full h-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                placeholder={contentMode === 'html' 
-                  ? t('admin.enterHTMLContent') 
-                  : t('admin.enterQuestionText')
+                placeholder={
+                  contentMode === 'html'
+                    ? t('admin.enterHTMLContent')
+                    : t('admin.enterQuestionText')
                 }
               />
 
@@ -941,13 +947,18 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                     <span>{t('admin.addImage')}</span>
                   </button>
                 </div>
-                
+
                 {formData.imageUrls.length > 0 && (
                   <div className="space-y-2">
                     {formData.imageUrls.map((url, index) => (
-                      <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-700 rounded"
+                      >
                         <Link className="h-4 w-4 text-gray-500" />
-                        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">{url}</span>
+                        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
+                          {url}
+                        </span>
                         <button
                           onClick={() => handleRemoveImageUrl(index)}
                           className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded"
@@ -968,7 +979,9 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                   <input
                     type="number"
                     value={formData.order}
-                    onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, order: parseInt(e.target.value) || 1 }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     min="1"
                   />
@@ -980,7 +993,9 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                   <input
                     type="number"
                     value={formData.points}
-                    onChange={(e) => setFormData(prev => ({ ...prev, points: parseInt(e.target.value) || 1 }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, points: parseInt(e.target.value) || 1 }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     min="1"
                   />
@@ -989,7 +1004,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
             </div>
           </div>
 
-          {/* Answer Options / Matching */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
             {isMatching ? (
               <>
@@ -1008,7 +1022,9 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                         </label>
                         <input
                           type="text"
-                          value={Array.isArray(formData.matchLeft) ? formData.matchLeft[idx] || '' : ''}
+                          value={
+                            Array.isArray(formData.matchLeft) ? formData.matchLeft[idx] || '' : ''
+                          }
                           onChange={(e) => handleMatchLeftChange(idx, e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
                           placeholder={t('admin.enterQuestionText')}
@@ -1025,7 +1041,9 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                         </label>
                         <input
                           type="text"
-                          value={Array.isArray(formData.matchRight) ? formData.matchRight[idx] || '' : ''}
+                          value={
+                            Array.isArray(formData.matchRight) ? formData.matchRight[idx] || '' : ''
+                          }
                           onChange={(e) => handleMatchRightChange(idx, e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
                           placeholder={t('admin.optionText')}
@@ -1038,17 +1056,21 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                 <div className="mt-4 grid sm:grid-cols-2 gap-3">
                   {[0, 1].map((idx) => (
                     <div key={idx} className="flex items-center justify-between">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
-                        {idx + 1})
-                      </span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{idx + 1})</span>
                       <select
-                        value={Array.isArray(formData.matchCorrect) ? formData.matchCorrect[idx] || '' : ''}
+                        value={
+                          Array.isArray(formData.matchCorrect)
+                            ? formData.matchCorrect[idx] || ''
+                            : ''
+                        }
                         onChange={(e) => handleMatchCorrectChange(idx, e.target.value)}
                         className="ml-2 flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-xs"
                       >
                         <option value="">{t('admin.correct')}</option>
                         {['A', 'B', 'C', 'D'].map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -1066,18 +1088,21 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                     className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Добавить вариант</span>
+                    <span>{i18n.t('ui.addOption')}</span>
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   {Object.entries(formData.options).map(([key, option]) => (
-                    <div key={key} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div
+                      key={key}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                    >
                       <div className="flex items-center justify-between mb-3">
                         <span className="font-medium text-gray-900 dark:text-white">
                           {t('admin.option')} {key}
                         </span>
-                        
+
                         <div className="flex items-center space-x-2">
                           <label className="flex items-center space-x-2 cursor-pointer">
                             <input
@@ -1090,12 +1115,12 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                               {t('admin.correct')}
                             </span>
                           </label>
-                          
+
                           {Object.keys(formData.options).length > 2 && (
                             <button
                               onClick={() => removeOption(key)}
                               className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                              title="Удалить вариант"
+                              title={i18n.t('ui.removeOption')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -1121,7 +1146,11 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                             value={option.value || ''}
                             onChange={(e) => handleOptionChange(key, 'value', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
-                            placeholder={option.type === 'image' ? t('admin.optionDescription') : t('admin.optionText')}
+                            placeholder={
+                              option.type === 'image'
+                                ? t('admin.optionDescription')
+                                : t('admin.optionText')
+                            }
                           />
                         </div>
 
@@ -1152,7 +1181,6 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
                   ))}
                 </div>
 
-                {/* Correct Answers Summary */}
                 <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="h-4 w-4 text-green-600" />

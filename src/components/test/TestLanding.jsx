@@ -1,23 +1,21 @@
+import i18n from '../../i18n';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Play, 
-  BookOpen, 
-  Calculator, 
-  FileText, 
-  Users, 
-  ArrowRight, 
-  X, 
-  Clock, 
+import {
+  BookOpen,
+  Calculator,
+  FileText,
+  Users,
+  ArrowRight,
+  X,
+  Clock,
   Target,
   List,
-  ChevronRight,
   History,
   Trophy,
-  BarChart3,
   Award,
   Globe,
-  FlaskConical
+  FlaskConical,
 } from 'lucide-react';
 import CertificateGenerator from '../CertificateGenerator';
 import { fetchAvailableTests, fetchUserResults } from '../../firebase/rtdbApi';
@@ -31,7 +29,7 @@ const SUBJECTS = [
     icon: BookOpen,
     color: 'from-amber-500 to-orange-600',
     activeBorder: 'border-amber-500',
-    description: 'test.subjects.kazakhHistoryDesc'
+    description: 'test.subjects.kazakhHistoryDesc',
   },
   {
     id: 'math_literacy',
@@ -39,7 +37,7 @@ const SUBJECTS = [
     icon: Target,
     color: 'from-green-500 to-emerald-600',
     activeBorder: 'border-emerald-500',
-    description: 'test.subjects.mathLiteracyDesc'
+    description: 'test.subjects.mathLiteracyDesc',
   },
   {
     id: 'reading_literacy',
@@ -47,7 +45,7 @@ const SUBJECTS = [
     icon: BookOpen,
     color: 'from-purple-500 to-violet-600',
     activeBorder: 'border-purple-500',
-    description: 'test.subjects.readingLiteracyDesc'
+    description: 'test.subjects.readingLiteracyDesc',
   },
   {
     id: 'profile1',
@@ -55,7 +53,7 @@ const SUBJECTS = [
     icon: Users,
     color: 'from-orange-500 to-red-600',
     activeBorder: 'border-orange-500',
-    description: 'test.subjects.profile1Desc'
+    description: 'test.subjects.profile1Desc',
   },
   {
     id: 'profile2',
@@ -63,23 +61,62 @@ const SUBJECTS = [
     icon: Users,
     color: 'from-pink-500 to-rose-600',
     activeBorder: 'border-pink-500',
-    description: 'test.subjects.profile2Desc'
-  }
+    description: 'test.subjects.profile2Desc',
+  },
 ];
 
-// Valid profile subject pairs for full UBT mode
 const PROFILE_PAIRS = [
-  { id: 'math_physics', label: 'Математика + Физика', subjects: ['math', 'physics'] },
-  { id: 'math_geography', label: 'Математика + География', subjects: ['math', 'geography'] },
-  { id: 'world_history_geography', label: 'Дүниежүзі тарихы + География', subjects: ['world_history', 'geography'] },
-  { id: 'biology_chemistry', label: 'Биология + Химия', subjects: ['biology', 'chemistry'] },
-  { id: 'biology_geography', label: 'Биология + География', subjects: ['biology', 'geography'] },
-  { id: 'foreign_world_history', label: 'Ағылшын тілі + Дүниежүзі тарихы', subjects: ['foreign_language', 'world_history'] },
-  { id: 'language_literature', label: 'Оқыту тілі + Әдебиет', subjects: ['language_of_instruction', 'literature'] },
-  { id: 'geography_foreign', label: 'География + Ағылшын тілі', subjects: ['geography', 'foreign_language'] },
-  { id: 'chemistry_physics', label: 'Химия + Физика', subjects: ['chemistry', 'physics'] },
-  { id: 'world_history_law', label: 'Дүниежүзі тарихы + Құқық негіздері', subjects: ['world_history', 'basics_of_law'] },
-  { id: 'math_informatics', label: 'Математика + Информатика', subjects: ['math', 'informatics'] }
+  { id: 'math_physics', label: 'ui.mathematicsPhysics', subjects: ['math', 'physics'] },
+  {
+    id: 'math_geography',
+    label: 'ui.mathematicsGeography',
+    subjects: ['math', 'geography'],
+  },
+  {
+    id: 'world_history_geography',
+    label: 'ui.worldHistoryGeography',
+    subjects: ['world_history', 'geography'],
+  },
+  {
+    id: 'biology_chemistry',
+    label: 'ui.biologyChemistry',
+    subjects: ['biology', 'chemistry'],
+  },
+  {
+    id: 'biology_geography',
+    label: 'ui.biologyGeography',
+    subjects: ['biology', 'geography'],
+  },
+  {
+    id: 'foreign_world_history',
+    label: 'ui.englishWorldHistory',
+    subjects: ['foreign_language', 'world_history'],
+  },
+  {
+    id: 'language_literature',
+    label: 'ui.languageLiterature',
+    subjects: ['language_of_instruction', 'literature'],
+  },
+  {
+    id: 'geography_foreign',
+    label: 'ui.geographyEnglish',
+    subjects: ['geography', 'foreign_language'],
+  },
+  {
+    id: 'chemistry_physics',
+    label: 'ui.chemistryPhysics',
+    subjects: ['chemistry', 'physics'],
+  },
+  {
+    id: 'world_history_law',
+    label: 'ui.worldHistoryLaw',
+    subjects: ['world_history', 'basics_of_law'],
+  },
+  {
+    id: 'math_informatics',
+    label: 'ui.mathematicsComputerScience',
+    subjects: ['math', 'informatics'],
+  },
 ];
 
 const PROFILE_SUBJECTS = [
@@ -90,10 +127,14 @@ const PROFILE_SUBJECTS = [
   { id: 'geography', nameKey: 'test.subjects.geography', icon: Globe },
   { id: 'world_history', nameKey: 'test.subjects.world_history', icon: BookOpen },
   { id: 'foreign_language', nameKey: 'test.subjects.foreign_language', icon: Globe },
-  { id: 'language_of_instruction', nameKey: 'test.subjects.language_of_instruction', icon: FileText },
+  {
+    id: 'language_of_instruction',
+    nameKey: 'test.subjects.language_of_instruction',
+    icon: FileText,
+  },
   { id: 'literature', nameKey: 'test.subjects.literature', icon: BookOpen },
   { id: 'basics_of_law', nameKey: 'test.subjects.basics_of_law', icon: FileText },
-  { id: 'informatics', nameKey: 'test.subjects.informatics', icon: Target }
+  { id: 'informatics', nameKey: 'test.subjects.informatics', icon: Target },
 ];
 
 export default function TestLanding({ onStartTest }) {
@@ -101,8 +142,8 @@ export default function TestLanding({ onStartTest }) {
   const [selectedMode, setSelectedMode] = useState(null);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [availableTests, setAvailableTests] = useState([]);
-  const [selectedTest, setSelectedTest] = useState(null);
-  const [showSubjectModal, setShowSubjectModal] = useState(false);
+  const [, setSelectedTest] = useState(null);
+
   const [showTestModal, setShowTestModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
@@ -114,12 +155,12 @@ export default function TestLanding({ onStartTest }) {
   const [selectedProfilePairId, setSelectedProfilePairId] = useState(null);
   const [selectedProfileSubjects, setSelectedProfileSubjects] = useState([]);
   const [showProfileSubjectModal, setShowProfileSubjectModal] = useState(false);
-  const [activeProfileSlot, setActiveProfileSlot] = useState(null);
+  const [, setActiveProfileSlot] = useState(null);
   const [selectedProfileSingleSubject, setSelectedProfileSingleSubject] = useState(null);
 
   const pickRandomTestForSubject = (subjectId) => {
-    const candidates = (availableTests || []).filter((test) =>
-      Array.isArray(test.subjects) && test.subjects.includes(subjectId)
+    const candidates = (availableTests || []).filter(
+      (test) => Array.isArray(test.subjects) && test.subjects.includes(subjectId),
     );
     if (candidates.length === 0) return null;
     const index = Math.floor(Math.random() * candidates.length);
@@ -137,7 +178,6 @@ export default function TestLanding({ onStartTest }) {
       const tests = await fetchAvailableTests();
       setAvailableTests(tests || []);
     } catch (error) {
-      console.error('Error loading tests:', error);
     } finally {
       setLoading(false);
     }
@@ -158,30 +198,31 @@ export default function TestLanding({ onStartTest }) {
         }
       });
       setResultsByTestId(map);
-    } catch (error) {
-      // тихо игнорируем, если история не загрузилась
-    }
+    } catch (error) {}
   };
 
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
     if (mode === 'full') {
-      setSelectedSubjects(['kazakh_history', 'math_literacy', 'reading_literacy', 'profile1', 'profile2']);
+      setSelectedSubjects([
+        'kazakh_history',
+        'math_literacy',
+        'reading_literacy',
+        'profile1',
+        'profile2',
+      ]);
       setSelectedProfilePairId(null);
       setSelectedProfileSubjects([]);
     } else if (mode === 'creative') {
-      // In creative mode, subjects are fixed: Kazakhstan History + Reading Literacy
       setSelectedSubjects(['kazakh_history', 'reading_literacy']);
       setSelectedProfilePairId(null);
       setSelectedProfileSubjects([]);
     } else {
-      // Single mode: let user pick exactly one subject
       setSelectedSubjects([]);
     }
   };
 
   const handleSubjectToggle = (subjectId) => {
-    // In creative mode subjects are fixed and cannot be changed
     if (selectedMode === 'creative') {
       return;
     }
@@ -191,10 +232,8 @@ export default function TestLanding({ onStartTest }) {
       setSelectedSubjects([subjectId]);
       setSelectedProfileSingleSubject(null);
     } else {
-      setSelectedSubjects(prev => 
-        prev.includes(subjectId) 
-          ? prev.filter(id => id !== subjectId)
-          : [...prev, subjectId]
+      setSelectedSubjects((prev) =>
+        prev.includes(subjectId) ? prev.filter((id) => id !== subjectId) : [...prev, subjectId],
       );
     }
   };
@@ -213,14 +252,12 @@ export default function TestLanding({ onStartTest }) {
       return;
     }
 
-    // If mode not explicitly chosen, infer it from selection
     let mode = selectedMode;
     if (!mode) {
       mode = selectedSubjects.length === 1 ? 'single' : 'full';
     }
 
     if (mode === 'creative') {
-      // Creative exam: composed from two single-subject tests (Kazakh History + Reading Literacy)
       const allSubjects = ['kazakh_history', 'reading_literacy'];
 
       const composedTests = [];
@@ -234,7 +271,7 @@ export default function TestLanding({ onStartTest }) {
           testId: test.id,
           subject: subj,
           title: test.title || '',
-          timeLimit: test.timeLimit || null
+          timeLimit: test.timeLimit || null,
         });
       }
 
@@ -246,7 +283,7 @@ export default function TestLanding({ onStartTest }) {
         title: t('test.creativeModeTitle'),
         timeLimit: 70,
         creativeMode: true,
-        startedAt: new Date().toISOString()
+        startedAt: new Date().toISOString(),
       };
 
       onStartTest(testConfig);
@@ -264,18 +301,18 @@ export default function TestLanding({ onStartTest }) {
       const testConfig = {
         testId: chosenTest.id,
         mode: 'single',
-        subjects: Array.isArray(chosenTest.subjects) && chosenTest.subjects.length > 0
-          ? chosenTest.subjects
-          : [subjectId],
+        subjects:
+          Array.isArray(chosenTest.subjects) && chosenTest.subjects.length > 0
+            ? chosenTest.subjects
+            : [subjectId],
         title: chosenTest.title,
         timeLimit: chosenTest.timeLimit || 60,
-        startedAt: new Date().toISOString()
+        startedAt: new Date().toISOString(),
       };
       onStartTest(testConfig);
       return;
     }
 
-    // Full UBT: compose from existing single-subject tests
     if (mode === 'full') {
       if (!selectedProfilePairId || selectedProfileSubjects.length !== 2) {
         alert(t('test.chooseProfileSubjects'));
@@ -296,7 +333,7 @@ export default function TestLanding({ onStartTest }) {
           testId: test.id,
           subject: subj,
           title: test.title || '',
-          timeLimit: test.timeLimit || null
+          timeLimit: test.timeLimit || null,
         });
       }
 
@@ -309,7 +346,7 @@ export default function TestLanding({ onStartTest }) {
         composedTests,
         title: t('test.fullMockTest'),
         timeLimit: 240,
-        startedAt: new Date().toISOString()
+        startedAt: new Date().toISOString(),
       };
 
       onStartTest(testConfig);
@@ -349,11 +386,11 @@ export default function TestLanding({ onStartTest }) {
   };
 
   const getResultModeLabel = (result) => {
-    if (!result) return 'ҰБТ тесті';
+    if (!result) return i18n.t('ui.untPracticeTest');
     if (result.mode === 'creative') return t('test.creativeModeTitle');
     if (result.mode === 'full') return t('test.fullMockTest');
     if (result.mode === 'single') return t('test.singleSubject');
-    return 'ҰБТ тесті';
+    return i18n.t('ui.untPracticeTest');
   };
 
   const getResultSubjectsLine = (result) => {
@@ -382,7 +419,7 @@ export default function TestLanding({ onStartTest }) {
           (test) =>
             test.mode === 'single' &&
             Array.isArray(test.subjects) &&
-            test.subjects.includes(singleModeSubjectId)
+            test.subjects.includes(singleModeSubjectId),
         )
         .sort((a, b) => {
           const av = typeof a.variant === 'number' ? a.variant : Number.POSITIVE_INFINITY;
@@ -392,15 +429,15 @@ export default function TestLanding({ onStartTest }) {
         })
     : [];
 
-  const visibleSubjects = selectedMode === 'creative'
-    ? SUBJECTS.filter((s) => s.id === 'kazakh_history' || s.id === 'reading_literacy')
-    : selectedMode === 'single'
-      ? SUBJECTS.filter((s) => s.id !== 'profile2') // В режиме "Жеке пән" показываем только одну кнопку Таңдау пән
-      : SUBJECTS;
+  const visibleSubjects =
+    selectedMode === 'creative'
+      ? SUBJECTS.filter((s) => s.id === 'kazakh_history' || s.id === 'reading_literacy')
+      : selectedMode === 'single'
+        ? SUBJECTS.filter((s) => s.id !== 'profile2')
+        : SUBJECTS;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           {t('test.ubtPracticeTests')}
@@ -410,7 +447,6 @@ export default function TestLanding({ onStartTest }) {
         </p>
       </div>
 
-      {/* History Button */}
       {userResults.length > 0 && (
         <div className="mb-8 flex justify-center">
           <button
@@ -477,89 +513,85 @@ export default function TestLanding({ onStartTest }) {
         </div>
       )}
 
-      {/* Test Mode Selection */}
       <div className="grid md:grid-cols-3 gap-6 mb-12">
-        <div 
+        <div
           onClick={() => handleModeChange('single')}
           className={`cursor-pointer p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${
-            selectedMode === 'single' 
-              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+            selectedMode === 'single'
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
               : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
           }`}
         >
           <div className="flex items-start space-x-4">
-            <div className={`p-3 rounded-xl ${selectedMode === 'single' ? 'bg-blue-500' : 'bg-gray-400'}`}>
+            <div
+              className={`p-3 rounded-xl ${selectedMode === 'single' ? 'bg-blue-500' : 'bg-gray-400'}`}
+            >
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {t('test.singleSubject')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t('test.singleSubjectDesc')}
-              </p>
+              <p className="text-gray-600 dark:text-gray-400">{t('test.singleSubjectDesc')}</p>
               <div className="mt-3 text-sm text-blue-600 dark:text-blue-400 font-medium">
                 • {t('test.chooseOneSubject')}
-                <br />
-                • {t('test.focusedPractice')}
+                <br />• {t('test.focusedPractice')}
               </div>
             </div>
           </div>
         </div>
 
-        <div 
+        <div
           onClick={() => handleModeChange('full')}
           className={`cursor-pointer p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${
-            selectedMode === 'full' 
-              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+            selectedMode === 'full'
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
               : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
           }`}
         >
           <div className="flex items-start space-x-4">
-            <div className={`p-3 rounded-xl ${selectedMode === 'full' ? 'bg-blue-500' : 'bg-gray-400'}`}>
+            <div
+              className={`p-3 rounded-xl ${selectedMode === 'full' ? 'bg-blue-500' : 'bg-gray-400'}`}
+            >
               <Target className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {t('test.fullMockTest')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t('test.fullMockTestDesc')}
-              </p>
+              <p className="text-gray-600 dark:text-gray-400">{t('test.fullMockTestDesc')}</p>
               <div className="mt-3 text-sm text-blue-600 dark:text-blue-400 font-medium">
                 • {t('test.allSubjects')}
-                <br />
-                • {t('test.realExamExperience')}
+                <br />• {t('test.realExamExperience')}
               </div>
             </div>
           </div>
         </div>
 
-        <div 
+        <div
           onClick={() => handleModeChange('creative')}
           className={`cursor-pointer p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${
-            selectedMode === 'creative' 
-              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' 
+            selectedMode === 'creative'
+              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
               : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
           }`}
         >
           <div className="flex items-start space-x-4">
-            <div className={`p-3 rounded-xl ${selectedMode === 'creative' ? 'bg-purple-500' : 'bg-gray-400'}`}>
+            <div
+              className={`p-3 rounded-xl ${selectedMode === 'creative' ? 'bg-purple-500' : 'bg-gray-400'}`}
+            >
               <FileText className="h-6 w-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {t('test.creativeModeTitle')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t('test.creativeModeNote')}
-              </p>
+              <p className="text-gray-600 dark:text-gray-400">{t('test.creativeModeNote')}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Profile pairs for full UBT mode */}
       {selectedMode === 'full' && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
@@ -583,7 +615,7 @@ export default function TestLanding({ onStartTest }) {
                   }`}
                 >
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {pair.label}
+                    {t(pair.label)}
                   </span>
                 </button>
               );
@@ -592,7 +624,6 @@ export default function TestLanding({ onStartTest }) {
         </div>
       )}
 
-      {/* Subject Selection */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
           {selectedMode === 'single' ? t('test.selectSubject') : t('test.selectedSubjects')}
@@ -603,18 +634,24 @@ export default function TestLanding({ onStartTest }) {
             const isProfilePlaceholder = subject.id === 'profile1' || subject.id === 'profile2';
 
             const hasSingleProfile = selectedMode === 'single' && !!selectedProfileSingleSubject;
-            const hasFullProfile = selectedMode === 'full' && Array.isArray(selectedProfileSubjects) && selectedProfileSubjects.length === 2;
+            const hasFullProfile =
+              selectedMode === 'full' &&
+              Array.isArray(selectedProfileSubjects) &&
+              selectedProfileSubjects.length === 2;
 
             const isProfileSelected = isProfilePlaceholder && (hasSingleProfile || hasFullProfile);
             const isSelected = isProfilePlaceholder
               ? isProfileSelected
               : selectedSubjects.includes(subject.id);
 
-            const isDisabled = !isProfilePlaceholder && selectedMode === 'single' && selectedSubjects.length > 0 && !isSelected;
+            const isDisabled =
+              !isProfilePlaceholder &&
+              selectedMode === 'single' &&
+              selectedSubjects.length > 0 &&
+              !isSelected;
 
             const handleClick = () => {
               if (isProfilePlaceholder) {
-                // В режиме полного теста профильные предметы выбираются через PROFILE_PAIRS
                 if (selectedMode === 'full') return;
                 setActiveProfileSlot(subject.id);
                 setShowProfileSubjectModal(true);
@@ -625,17 +662,14 @@ export default function TestLanding({ onStartTest }) {
               }
             };
 
-            // Отображаем на карточках профильных предметов фактически выбранные предметы
             let titleText = t(subject.nameKey);
             let descText = t(subject.description);
 
             if (isProfilePlaceholder) {
               if (hasSingleProfile) {
-                // Жеке пән: одна кнопка Таңдау пән показывает выбранный профильный предмет
                 titleText = t(`test.subjects.${selectedProfileSingleSubject}`);
                 descText = t('test.subjects.profile1Desc');
               } else if (hasFullProfile) {
-                // Толық тест: две кнопки Таңдау пән 1 и 2 показывают выбранную пару профильных предметов
                 const idx = subject.id === 'profile1' ? 0 : 1;
                 const subjId = selectedProfileSubjects[idx];
                 if (subjId) {
@@ -655,8 +689,8 @@ export default function TestLanding({ onStartTest }) {
                   isDisabled
                     ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed'
                     : isSelected
-                    ? `${subject.activeBorder} bg-white dark:bg-gray-900 shadow-md`
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:shadow-sm'
+                      ? `${subject.activeBorder} bg-white dark:bg-gray-900 shadow-md`
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:shadow-sm'
                 }`}
               >
                 <div className="flex items-center space-x-3 mb-2">
@@ -669,13 +703,13 @@ export default function TestLanding({ onStartTest }) {
                   >
                     <Icon className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">
-                    {titleText}
-                  </h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{titleText}</h3>
                 </div>
                 <p
                   className={`text-sm leading-snug ${
-                    isSelected ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400'
+                    isSelected
+                      ? 'text-gray-700 dark:text-gray-300'
+                      : 'text-gray-600 dark:text-gray-400'
                   }`}
                 >
                   {descText}
@@ -686,7 +720,6 @@ export default function TestLanding({ onStartTest }) {
         </div>
       </div>
 
-      {/* Test Info & Start Button */}
       {selectedSubjects.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
@@ -697,7 +730,9 @@ export default function TestLanding({ onStartTest }) {
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-1">
                   <BookOpen className="h-4 w-4" />
-                  <span>{selectedSubjects.length} {t('test.subjects')}</span>
+                  <span>
+                    {selectedSubjects.length} {t('test.subjects')}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
@@ -707,7 +742,9 @@ export default function TestLanding({ onStartTest }) {
                 </div>
                 <div className="flex items-center space-x-1">
                   <Target className="h-4 w-4" />
-                  <span>{summaryMeta.questions} {t('test.questions')}</span>
+                  <span>
+                    {summaryMeta.questions} {t('test.questions')}
+                  </span>
                 </div>
               </div>
             </div>
@@ -728,7 +765,6 @@ export default function TestLanding({ onStartTest }) {
         </div>
       )}
 
-      {/* Test Selection Modal */}
       {showTestModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -752,87 +788,94 @@ export default function TestLanding({ onStartTest }) {
               )}
 
               <div className="space-y-3">
-                {singleSubjectTests
-                  .map((test, index) => {
-                    const lastResult = resultsByTestId[test.id];
-                    const hasTaken = !!lastResult;
+                {singleSubjectTests.map((test, index) => {
+                  const lastResult = resultsByTestId[test.id];
+                  const hasTaken = !!lastResult;
 
-                    const baseSubjectId = singleModeSubjectId
-                      || (Array.isArray(test.subjects) && test.subjects.length > 0
-                        ? test.subjects[0]
-                        : null);
-                    const subjectLabel = baseSubjectId
-                      ? t(`test.subjects.${baseSubjectId}`)
-                      : t('test.singleSubjectTest');
-                    const variantNumber = test.variant || (index + 1);
-                    const titleLine = `${subjectLabel} | ${variantNumber} - нұсқа`;
+                  const baseSubjectId =
+                    singleModeSubjectId ||
+                    (Array.isArray(test.subjects) && test.subjects.length > 0
+                      ? test.subjects[0]
+                      : null);
+                  const subjectLabel = baseSubjectId
+                    ? t(`test.subjects.${baseSubjectId}`)
+                    : t('test.singleSubjectTest');
+                  const variantNumber = test.variant || index + 1;
+                  const titleLine = i18n.t('test.variantTitle', {
+                    v0: subjectLabel,
+                    v1: variantNumber,
+                  });
 
-                    return (
-                      <div
-                        key={test.id}
-                        onClick={() => {
-                          setSelectedTest(test);
-                          setShowTestModal(false);
-                          onStartTest({
-                            testId: test.id,
-                            mode: test.mode,
-                            subjects: test.subjects,
-                            timeLimit: test.timeLimit,
-                            title: test.title,
-                            variant: test.variant || (index + 1),
-                            creativeMode: Boolean(test.creativeMode)
-                          });
-                        }}
-                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition-colors group"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2">
-                              <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                                {titleLine}
-                              </h4>
-                              {test.creativeMode && (
-                                <span className="px-2 py-0.5 rounded-full text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
-                                  Creative
-                                </span>
-                              )}
-                              {hasTaken && (
-                                <span className="px-2 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                                  {t('test.alreadyTaken')}
-                                </span>
-                              )}
-                            </div>
-                            <div className="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
-                              <div className="flex items-center space-x-1">
-                                <Clock className="h-4 w-4" />
-                                <span>{test.timeLimit || 60} {t('test.minutes')}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <FileText className="h-4 w-4" />
-                                <span>{test.totalQuestions || 0} {t('test.questions')}</span>
-                              </div>
-                            </div>
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {test.subjects?.map((subject) => (
-                                <span
-                                  key={subject}
-                                  className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs"
-                                >
-                                  {t(`test.subjects.${subject}`)}
-                                </span>
-                              ))}
-                            </div>
+                  return (
+                    <div
+                      key={test.id}
+                      onClick={() => {
+                        setSelectedTest(test);
+                        setShowTestModal(false);
+                        onStartTest({
+                          testId: test.id,
+                          mode: test.mode,
+                          subjects: test.subjects,
+                          timeLimit: test.timeLimit,
+                          title: test.title,
+                          variant: test.variant || index + 1,
+                          creativeMode: Boolean(test.creativeMode),
+                        });
+                      }}
+                      className="p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition-colors group"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                              {titleLine}
+                            </h4>
+                            {test.creativeMode && (
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+                                {i18n.t('ui.creative')}
+                              </span>
+                            )}
                             {hasTaken && (
-                              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                {t('test.lastScore', { score: lastResult.score })}
-                              </div>
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                {t('test.alreadyTaken')}
+                              </span>
                             )}
                           </div>
-                          <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 ml-4" />
+                          <div className="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-4 w-4" />
+                              <span>
+                                {test.timeLimit || 60} {t('test.minutes')}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <FileText className="h-4 w-4" />
+                              <span>
+                                {test.totalQuestions || 0} {t('test.questions')}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {test.subjects?.map((subject) => (
+                              <span
+                                key={subject}
+                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs"
+                              >
+                                {t(`test.subjects.${subject}`)}
+                              </span>
+                            ))}
+                          </div>
+                          {hasTaken && (
+                            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                              {t('test.lastScore', { score: lastResult.score })}
+                            </div>
+                          )}
                         </div>
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 ml-4" />
                       </div>
-                    );
-                  })}
+                    </div>
+                  );
+                })}
 
                 {singleSubjectTests.length === 0 && (
                   <div className="text-center py-8">
@@ -851,7 +894,6 @@ export default function TestLanding({ onStartTest }) {
         </div>
       )}
 
-      {/* History Modal */}
       {showHistoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-4xl w-full max-h-[80vh] overflow-hidden">
@@ -876,9 +918,7 @@ export default function TestLanding({ onStartTest }) {
               {userResults.length === 0 ? (
                 <div className="text-center py-12">
                   <Trophy className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">
-                    {t('test.noHistoryYet')}
-                  </p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('test.noHistoryYet')}</p>
                 </div>
               ) : (
                 <div className="grid gap-4">
@@ -889,16 +929,24 @@ export default function TestLanding({ onStartTest }) {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${
-                            result.score >= 70 ? 'bg-green-100 dark:bg-green-900/30' :
-                            result.score >= 50 ? 'bg-yellow-100 dark:bg-yellow-900/30' :
-                            'bg-red-100 dark:bg-red-900/30'
-                          }`}>
-                            <Award className={`h-5 w-5 ${
-                              result.score >= 70 ? 'text-green-600 dark:text-green-400' :
-                              result.score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
-                              'text-red-600 dark:text-red-400'
-                            }`} />
+                          <div
+                            className={`p-2 rounded-lg ${
+                              result.score >= 70
+                                ? 'bg-green-100 dark:bg-green-900/30'
+                                : result.score >= 50
+                                  ? 'bg-yellow-100 dark:bg-yellow-900/30'
+                                  : 'bg-red-100 dark:bg-red-900/30'
+                            }`}
+                          >
+                            <Award
+                              className={`h-5 w-5 ${
+                                result.score >= 70
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : result.score >= 50
+                                    ? 'text-yellow-600 dark:text-yellow-400'
+                                    : 'text-red-600 dark:text-red-400'
+                              }`}
+                            />
                           </div>
                           <div>
                             <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -907,21 +955,25 @@ export default function TestLanding({ onStartTest }) {
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                               {new Date(result.finishedAt).toLocaleDateString('kk-KZ', {
                                 year: 'numeric',
-                                month: 'long', 
+                                month: 'long',
                                 day: 'numeric',
                                 hour: '2-digit',
                                 minute: '2-digit',
-                                hourCycle: 'h24'
+                                hourCycle: 'h24',
                               })}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className={`text-2xl font-bold ${
-                            result.score >= 70 ? 'text-green-600 dark:text-green-400' :
-                            result.score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
-                            'text-red-600 dark:text-red-400'
-                          }`}>
+                          <div
+                            className={`text-2xl font-bold ${
+                              result.score >= 70
+                                ? 'text-green-600 dark:text-green-400'
+                                : result.score >= 50
+                                  ? 'text-yellow-600 dark:text-yellow-400'
+                                  : 'text-red-600 dark:text-red-400'
+                            }`}
+                          >
                             {result.score}%
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -929,19 +981,22 @@ export default function TestLanding({ onStartTest }) {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center space-x-4">
                           <span className="text-gray-600 dark:text-gray-300">
-                            {t('test.timeSpent')}: {Math.floor(result.timeSpent / 60)}:{(result.timeSpent % 60).toString().padStart(2, '0')}
+                            {t('test.timeSpent')}: {Math.floor(result.timeSpent / 60)}:
+                            {(result.timeSpent % 60).toString().padStart(2, '0')}
                           </span>
                           {Array.isArray(result.subjects) && result.subjects.length > 0 && (
                             <span className="text-gray-600 dark:text-gray-300">
-                              {result.subjects.map((subjectId) => t(`test.subjects.${subjectId}`)).join(', ')}
+                              {result.subjects
+                                .map((subjectId) => t(`test.subjects.${subjectId}`))
+                                .join(', ')}
                             </span>
                           )}
                         </div>
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedResult(result);
                             setShowCertificateModal(true);
@@ -960,7 +1015,6 @@ export default function TestLanding({ onStartTest }) {
         </div>
       )}
 
-      {/* Certificate Generator Modal */}
       {showCertificateModal && selectedResult && user && (
         <CertificateGenerator
           result={selectedResult}
@@ -971,19 +1025,6 @@ export default function TestLanding({ onStartTest }) {
           }}
         />
       )}
-
-      {/* jQuery effect for streak animation */}
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          if (typeof $ !== 'undefined') {
-            $(document).ready(function() {
-              $('.subject-card').on('click', function() {
-                $(this).find('.streak-animation').fadeIn(200).delay(800).fadeOut(200);
-              });
-            });
-          }
-        `
-      }} />
     </div>
   );
 }

@@ -1,0 +1,8 @@
+node_modules
+dist
+.artifacts
+.vs
+.playwright-cli
+package-lock.json
+**/package-lock.json
+.env*
