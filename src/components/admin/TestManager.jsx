@@ -1,29 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Save, 
-  X, 
+import {
+  Plus,
+  Edit,
+  Trash2,
   FileText,
   Clock,
   Users,
   BarChart3,
-  Image as ImageIcon,
   Folder,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
-import { 
-  createTest, 
-  updateTest, 
-  deleteTest
-} from '../../firebase/testModule';
+import { createTest, updateTest, deleteTest } from '../../firebase/testModule';
 import { fetchAvailableTests, getTestStatistics } from '../../firebase/rtdbApi';
 import TestBuilder from './TestBuilder';
-import SubjectSelector from './SubjectSelector';
-import TestVariantManager from './TestVariantManager';
+
 import AppLoader from '../AppLoader';
 
 export default function TestManager() {
@@ -32,9 +23,7 @@ export default function TestManager() {
   const [loading, setLoading] = useState(true);
   const [editingTest, setEditingTest] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
-  const [selectedTest, setSelectedTest] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [showSubjectSelector, setShowSubjectSelector] = useState(false);
+
   const [testStats, setTestStats] = useState({});
   const [openFolders, setOpenFolders] = useState({});
 
@@ -46,8 +35,7 @@ export default function TestManager() {
     try {
       const testsList = await fetchAvailableTests();
       setTests(testsList);
-      
-      // Load statistics for each test
+
       const stats = {};
       for (const test of testsList) {
         try {
@@ -58,7 +46,6 @@ export default function TestManager() {
       }
       setTestStats(stats);
     } catch (error) {
-      console.error('Error loading tests:', error);
     } finally {
       setLoading(false);
     }
@@ -69,7 +56,7 @@ export default function TestManager() {
       title: '',
       subjects: [],
       timeLimit: 60,
-      language: 'kk'
+      language: 'kk',
     });
     setShowBuilder(true);
   };
@@ -86,12 +73,11 @@ export default function TestManager() {
       } else {
         await createTest(testData);
       }
-      
+
       await loadTests();
       setShowBuilder(false);
       setEditingTest(null);
     } catch (error) {
-      console.error('Error saving test:', error);
       alert(t('common.error') + ': ' + error.message);
     }
   };
@@ -102,13 +88,10 @@ export default function TestManager() {
         await deleteTest(testId);
         await loadTests();
       } catch (error) {
-        console.error('Error deleting test:', error);
         alert(t('common.error'));
       }
     }
   };
-
-  // Subject-based variant management is temporarily hidden per user request
 
   if (loading) {
     return <AppLoader text={t('common.loading')} />;
@@ -127,7 +110,6 @@ export default function TestManager() {
     );
   }
 
-  // Group tests by main subject (each test is a single-subject variant)
   const groups = tests.reduce((acc, test) => {
     const subjects = Array.isArray(test.subjects) ? test.subjects : [];
     const key = subjects[0] || '__NO_SUBJECT__';
@@ -143,13 +125,17 @@ export default function TestManager() {
   });
 
   const renderTestCard = (test) => (
-    <div key={test.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      {/* Test Header */}
+    <div
+      key={test.id}
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+    >
       <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
         <h3 className="font-semibold text-lg truncate">
           {test.title}
           {test.variant && test.variant > 1 && (
-            <span className="text-blue-100 text-sm ml-2">- {t('admin.variant')} {test.variant}</span>
+            <span className="text-blue-100 text-sm ml-2">
+              - {t('admin.variant')} {test.variant}
+            </span>
           )}
         </h3>
         {test.subjects && test.subjects.length > 0 && (
@@ -159,7 +145,6 @@ export default function TestManager() {
         )}
       </div>
 
-      {/* Test Info */}
       <div className="p-4 space-y-3">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center space-x-2">
@@ -176,7 +161,6 @@ export default function TestManager() {
           </div>
         </div>
 
-        {/* Statistics */}
         {testStats[test.id] && (
           <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
             <div className="flex items-center space-x-2">
@@ -194,10 +178,9 @@ export default function TestManager() {
           </div>
         )}
 
-        {/* Subjects */}
         <div className="flex flex-wrap gap-1">
           {test.subjects?.map((subject) => (
-            <span 
+            <span
               key={subject}
               className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs"
             >
@@ -207,7 +190,6 @@ export default function TestManager() {
         </div>
       </div>
 
-      {/* Actions */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
         <button
           onClick={() => handleEditTest(test)}
@@ -215,7 +197,7 @@ export default function TestManager() {
         >
           <Edit className="h-4 w-4" />
         </button>
-        
+
         <button
           onClick={() => handleDeleteTest(test.id)}
           className="flex items-center space-x-1 px-3 py-2 text-sm bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 rounded-lg transition-colors"
@@ -243,16 +225,13 @@ export default function TestManager() {
         </div>
       </div>
 
-      {/* Subject "folders" */}
       {tests.length === 0 && (
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {t('admin.noTestsYet')}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {t('admin.createFirstTest')}
-          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{t('admin.createFirstTest')}</p>
           <button
             onClick={handleCreateTest}
             className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
@@ -264,13 +243,15 @@ export default function TestManager() {
       )}
 
       {folderKeys.map((folderKey) => {
-        const label = folderKey === '__NO_SUBJECT__'
-          ? t('admin.noFolder')
-          : t(`test.subjects.${folderKey}`);
+        const label =
+          folderKey === '__NO_SUBJECT__' ? t('admin.noFolder') : t(`test.subjects.${folderKey}`);
         const groupTests = groups[folderKey];
         const isOpen = openFolders[folderKey] ?? false;
         return (
-          <div key={folderKey} className="bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-200 dark:border-gray-700">
+          <div
+            key={folderKey}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-200 dark:border-gray-700"
+          >
             <button
               type="button"
               onClick={() => setOpenFolders((prev) => ({ ...prev, [folderKey]: !isOpen }))}

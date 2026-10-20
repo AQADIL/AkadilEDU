@@ -1,5 +1,14 @@
 node_modules
-.env
-.env.local
+.env*
+**/.env*
+**/*serviceAccount*.json
+**/*credentials*.json
+**/*.pem
+**/*.key
+.git
+.vs
+.artifacts
+.playwright-cli
+backend
+functions
 *.log
-.DS_Store

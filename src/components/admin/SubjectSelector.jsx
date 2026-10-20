@@ -1,5 +1,14 @@
+import i18n from '../../i18n';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BookOpen, Calculator, FileText, Users, Globe, FlaskConical } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpen,
+  Calculator,
+  FileText,
+  Users,
+  Globe,
+  FlaskConical,
+} from 'lucide-react';
 
 const subjects = [
   { id: 'math_literacy', nameKey: 'test.subjects.math_literacy', icon: Calculator },
@@ -12,7 +21,7 @@ const subjects = [
   { id: 'biology', nameKey: 'test.subjects.biology', icon: FlaskConical },
   { id: 'geography', nameKey: 'test.subjects.geography', icon: Globe },
   { id: 'profile1', nameKey: 'test.subjects.profile1', icon: BookOpen },
-  { id: 'profile2', nameKey: 'test.subjects.profile2', icon: BookOpen }
+  { id: 'profile2', nameKey: 'test.subjects.profile2', icon: BookOpen },
 ];
 
 export default function SubjectSelector({ onSubjectSelect, onBack }) {
@@ -20,7 +29,6 @@ export default function SubjectSelector({ onSubjectSelect, onBack }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
@@ -31,16 +39,15 @@ export default function SubjectSelector({ onSubjectSelect, onBack }) {
           </button>
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Выберите предмет
+              {i18n.t('test.selectSubject')}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Для управления вариантами тестов выберите предмет
+              {i18n.t('ui.selectASubjectToManageTestVariants')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Subjects Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {subjects.map((subject) => {
           const IconComponent = subject.icon;

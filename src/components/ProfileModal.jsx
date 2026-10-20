@@ -1,9 +1,10 @@
+import i18n from '../i18n';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '@headlessui/react';
 import { X, Upload, Trash2, Loader2 } from 'lucide-react';
 import { storage } from '../utils/storage';
-import { uploadAvatar, removeAvatar, onProfileSave } from '../utils/placeholders';
+import { uploadAvatar, removeAvatar, onProfileSave } from '../utils/profile';
 
 export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProfile }) {
   const { t } = useTranslation();
@@ -12,53 +13,51 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
     lastName: '',
     email: '',
     phone: '',
-    avatarUrl: ''
+    avatarUrl: '',
   });
   const [passwords, setPasswords] = useState({
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (isOpen && userProfile) {
-      // Load profile from Firestore via userProfile prop
       setProfile({
         firstName: userProfile.firstName || '',
         lastName: userProfile.lastName || '',
         email: userProfile.email || '',
         phone: userProfile.phone || '',
-        avatarUrl: userProfile.avatarUrl || ''
+        avatarUrl: userProfile.avatarUrl || '',
       });
     }
   }, [isOpen, userProfile]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfile(prev => ({ ...prev, [name]: value }));
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswords(prev => ({ ...prev, [name]: value }));
+    setPasswords((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file
     const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
-      alert('Please select a JPG or PNG image');
+      alert(i18n.t('ui.selectAJpgOrPngImage'));
       return;
     }
 
     if (file.size > maxSize) {
-      alert('Image must be less than 5MB');
+      alert(i18n.t('ui.imageMustBeSmallerThan_5Mb'));
       return;
     }
 
@@ -66,16 +65,14 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
     setUploadProgress(0);
 
     try {
-      // TODO: Replace with Firebase upload in Prompt 2
       const downloadURL = await uploadAvatar(file, (progress) => {
         setUploadProgress(progress);
       });
 
-      setProfile(prev => ({ ...prev, avatarUrl: downloadURL }));
+      setProfile((prev) => ({ ...prev, avatarUrl: downloadURL }));
       onAvatarChange?.(downloadURL);
     } catch (error) {
-      console.error('Avatar upload error:', error);
-      alert('Failed to upload avatar');
+      alert(i18n.t('ui.couldNotUploadAvatar'));
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -88,53 +85,43 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
     if (!confirm(t('profile.removeAvatar') + '?')) return;
 
     try {
-      // TODO: Replace with Firebase delete in Prompt 2
       await removeAvatar(profile.avatarUrl);
-      setProfile(prev => ({ ...prev, avatarUrl: '' }));
+      setProfile((prev) => ({ ...prev, avatarUrl: '' }));
       onAvatarChange?.('');
     } catch (error) {
-      console.error('Avatar remove error:', error);
-      alert('Failed to remove avatar');
+      alert(i18n.t('ui.couldNotRemoveAvatar'));
     }
   };
 
   const handleSave = async () => {
-    // Validate passwords if changing
     if (passwords.newPassword || passwords.confirmPassword) {
       if (passwords.newPassword !== passwords.confirmPassword) {
-        alert('Passwords do not match');
+        alert(i18n.t('ui.passwordsDoNotMatch'));
         return;
       }
-      // TODO: Add password strength validation
     }
 
     try {
-      // Save to localStorage for now
       storage.setProfile(profile);
-      
-      // TODO: Replace with Firebase save in Prompt 2
+
       await onProfileSave({
         ...profile,
-        ...(passwords.newPassword && { password: passwords.newPassword })
+        ...(passwords.newPassword && { password: passwords.newPassword }),
       });
 
       alert(t('common.success'));
       onClose();
     } catch (error) {
-      console.error('Profile save error:', error);
-      alert('Failed to save profile');
+      alert(i18n.t('ui.couldNotSaveProfile'));
     }
   };
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
 
-      {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
-          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
               {t('profile.title')}
@@ -148,21 +135,23 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
             </button>
           </div>
 
-          {/* Content */}
           <div className="p-6 space-y-6">
-            {/* Avatar Upload */}
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-primary-500 flex items-center justify-center overflow-hidden">
                   {profile.avatarUrl ? (
-                    <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={profile.avatarUrl}
+                      alt={i18n.t('ui.avatar')}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="text-white text-3xl font-bold">
                       {profile.firstName?.[0]?.toUpperCase() || 'U'}
                     </span>
                   )}
                 </div>
-                
+
                 {uploading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
                     <Loader2 className="w-8 h-8 text-white animate-spin" />
@@ -204,7 +193,6 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
               )}
             </div>
 
-            {/* Form Fields */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -242,7 +230,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                   value={profile.email}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="user@example.com"
+                  placeholder={i18n.t('ui.userexamplecom')}
                 />
               </div>
 
@@ -256,16 +244,15 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                   value={profile.phone}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="+7 (700) 123-45-67"
+                  placeholder={i18n.t('ui.7_700_1234567')}
                 />
               </div>
 
-              {/* Password Change */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   {t('profile.password')}
                 </h3>
-                
+
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -277,7 +264,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                       value={passwords.newPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
-                      placeholder="••••••••"
+                      placeholder={i18n.t('language.russian2')}
                     />
                   </div>
 
@@ -291,7 +278,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                       value={passwords.confirmPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
-                      placeholder="••••••••"
+                      placeholder={i18n.t('language.russian2')}
                     />
                   </div>
                 </div>
@@ -299,7 +286,6 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
             </div>
           </div>
 
-          {/* Footer */}
           <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
             <button onClick={onClose} className="flex-1 btn-secondary">
               {t('profile.cancel')}

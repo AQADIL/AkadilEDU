@@ -1,3 +1,4 @@
+import i18n from '../../i18n';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save, AlertCircle, Eye, Plus, Trash2, Link } from 'lucide-react';
@@ -17,9 +18,9 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
           A: '',
           B: '',
           C: '',
-          D: ''
+          D: '',
         },
-        correct: 'A'
+        correct: 'A',
       });
     }
     return base;
@@ -28,7 +29,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
   const [questionInlineImageUrls, setQuestionInlineImageUrls] = useState(() =>
     Array(5)
       .fill(null)
-      .map(() => [])
+      .map(() => []),
   );
   const [contextImages, setContextImages] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
@@ -46,7 +47,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
       }
     });
 
-    // Try to restore context from first question's contentHtml (split by <hr />)
     let initialContext = '';
     const firstQ = byOrder[26];
     if (firstQ && typeof firstQ.contentHtml === 'string' && firstQ.contentHtml.includes('<hr')) {
@@ -68,7 +68,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
       const q = byOrder[order];
       if (q) {
         const opts = q.options || {};
-        const correctArr = Array.isArray(q.correct) ? q.correct : (q.correct ? [q.correct] : ['A']);
+        const correctArr = Array.isArray(q.correct) ? q.correct : q.correct ? [q.correct] : ['A'];
         nextItems.push({
           order,
           text: q.contentText || '',
@@ -76,16 +76,16 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
             A: opts.A?.value || '',
             B: opts.B?.value || '',
             C: opts.C?.value || '',
-            D: opts.D?.value || ''
+            D: opts.D?.value || '',
           },
-          correct: correctArr[0] || 'A'
+          correct: correctArr[0] || 'A',
         });
       } else {
         nextItems.push({
           order,
           text: '',
           options: { A: '', B: '', C: '', D: '' },
-          correct: 'A'
+          correct: 'A',
         });
       }
     }
@@ -95,7 +95,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
       setContextText(initialContext);
     }
 
-    // Try to restore inline image URLs for context and all 5 questions (legacy flat inlineImageUrls)
     let restoredContextUrls = [];
     const restoredQuestionUrls = Array(5)
       .fill(null)
@@ -139,7 +138,9 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     let idx = 0;
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(<span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>);
+        parts.push(
+          <span key={`${keyPrefix}-it-${idx}-n`}>{text.slice(lastIndex, match.index)}</span>,
+        );
         idx += 1;
       }
       parts.push(<em key={`${keyPrefix}-it-${idx}-e`}>{match[1]}</em>);
@@ -165,14 +166,14 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
         parts.push(
           <span key={`${keyPrefix}-b-${idx}-n`}>
             {renderItalic(normal, `${keyPrefix}-b-${idx}-n`)}
-          </span>
+          </span>,
         );
         idx += 1;
       }
       parts.push(
         <strong key={`${keyPrefix}-b-${idx}-s`}>
           {renderItalic(match[1], `${keyPrefix}-b-${idx}-s`)}
-        </strong>
+        </strong>,
       );
       idx += 1;
       lastIndex = regex.lastIndex;
@@ -180,9 +181,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     if (lastIndex < text.length) {
       const rest = text.slice(lastIndex);
       parts.push(
-        <span key={`${keyPrefix}-b-rest`}>
-          {renderItalic(rest, `${keyPrefix}-b-rest`)}
-        </span>
+        <span key={`${keyPrefix}-b-rest`}>{renderItalic(rest, `${keyPrefix}-b-rest`)}</span>,
       );
     }
     return parts;
@@ -235,13 +234,14 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
   const renderInlineContent = (content, inlineUrls = []) => {
     if (!content) return null;
 
-    const parts = content.split(/(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi);
+    const parts = content.split(
+      /(\[\[img:\s*[^\]]+\]\]|\bPHOTO\b|data:image\/[^^\s]+|https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|svg))/gi,
+    );
     let photoIndex = 0;
 
     return parts.map((part, index) => {
       if (!part) return null;
 
-      // Inline marker [[img: URL]]
       const markerMatch = part.match(/^\[\[img:\s*([^\]]+)\]\]$/i);
       if (markerMatch) {
         const url = (markerMatch[1] || '').trim();
@@ -258,12 +258,11 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
         );
       }
 
-      // PHOTO placeholder mapped to provided inlineUrls by order
       if (/^PHOTO$/i.test(part.trim())) {
         const url = Array.isArray(inlineUrls) ? inlineUrls[photoIndex] : null;
         photoIndex += 1;
         if (!url) {
-          return <span key={`photo-text-${index}`}>PHOTO</span>;
+          return <span key={`photo-text-${index}`}>{i18n.t('common.photo')}</span>;
         }
         return (
           <img
@@ -277,7 +276,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
         );
       }
 
-      // data:image inline URL inside text
       if (part.match(/^data:image\/[^^\s]+$/i)) {
         const url = part.trim();
         return (
@@ -292,7 +290,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
         );
       }
 
-      // Direct http(s) image URL inside text
       if (part.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)/i)) {
         const url = part.trim();
         return (
@@ -307,16 +304,12 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
         );
       }
 
-      return (
-        <span key={`text-${index}`}>
-          {renderMathInText(part, `txt-${index}`)}
-        </span>
-      );
+      return <span key={`text-${index}`}>{renderMathInText(part, `txt-${index}`)}</span>;
     });
   };
 
   const handleItemChange = (index, field, value) => {
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], [field]: value };
       return next;
@@ -344,7 +337,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
   };
 
   const handleOptionChange = (index, key, value) => {
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       const item = { ...next[index] };
       item.options = { ...item.options, [key]: value };
@@ -354,7 +347,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
   };
 
   const handleCorrectChange = (index, key) => {
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], correct: key };
       return next;
@@ -390,7 +383,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     const item = items[index] || {};
     const value = item.text || '';
     if (!textarea) {
-      setItems(prev => {
+      setItems((prev) => {
         const next = [...prev];
         const updated = { ...next[index] };
         updated.text = `${value}${before}${after}`;
@@ -405,7 +398,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     const beforeText = value.slice(0, start);
     const afterText = value.slice(end);
     const newValue = `${beforeText}${before}${selected || ''}${after}${afterText}`;
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       const updated = { ...next[index] };
       updated.text = newValue;
@@ -437,13 +430,13 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     const clean = url.trim();
     const textarea = contextRef.current;
     const value = contextText || '';
-    const start = textarea ? textarea.selectionStart ?? 0 : value.length;
-    const end = textarea ? textarea.selectionEnd ?? 0 : value.length;
+    const start = textarea ? (textarea.selectionStart ?? 0) : value.length;
+    const end = textarea ? (textarea.selectionEnd ?? 0) : value.length;
     const beforeText = value.slice(0, start);
     const afterText = value.slice(end);
     const newValue = `${beforeText}PHOTO${afterText}`;
     setContextText(newValue);
-    setContextInlineImageUrls(prev => [...prev, clean]);
+    setContextInlineImageUrls((prev) => [...prev, clean]);
     setTimeout(() => {
       const node = contextRef.current;
       if (!node) return;
@@ -460,20 +453,20 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     const textarea = questionRefs.current[index];
     const item = items[index] || {};
     const value = item.text || '';
-    const start = textarea ? textarea.selectionStart ?? 0 : value.length;
-    const end = textarea ? textarea.selectionEnd ?? 0 : value.length;
+    const start = textarea ? (textarea.selectionStart ?? 0) : value.length;
+    const end = textarea ? (textarea.selectionEnd ?? 0) : value.length;
     const beforeText = value.slice(0, start);
     const afterText = value.slice(end);
     const newText = `${beforeText}PHOTO${afterText}`;
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       const updated = { ...next[index] };
       updated.text = newText;
       next[index] = updated;
       return next;
     });
-    setQuestionInlineImageUrls(prev => {
-      const next = prev.map(arr => Array.isArray(arr) ? [...arr] : []);
+    setQuestionInlineImageUrls((prev) => {
+      const next = prev.map((arr) => (Array.isArray(arr) ? [...arr] : []));
       if (!next[index]) {
         next[index] = [];
       }
@@ -492,7 +485,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
   const handleInsertImageIntoOption = (index, key) => {
     const url = prompt(t('admin.enterImageUrl'));
     if (!url || !url.trim()) return;
-    setItems(prev => {
+    setItems((prev) => {
       const next = [...prev];
       const item = { ...next[index] };
       const options = { ...item.options };
@@ -528,10 +521,9 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
       }
     }
 
-    // Legacy flat list (for potential older consumers)
     const legacyInlineImageUrls = [
       ...(contextInlineImageUrls || []),
-      ...questionInlineImageUrls.reduce((acc, arr) => acc.concat(arr || []), [])
+      ...questionInlineImageUrls.reduce((acc, arr) => acc.concat(arr || []), []),
     ];
 
     onSaveBlock(sectionId, {
@@ -540,7 +532,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
       contextImages,
       contextInlineImageUrls,
       questionInlineImageUrls,
-      inlineImageUrls: legacyInlineImageUrls
+      inlineImageUrls: legacyInlineImageUrls,
     });
   };
 
@@ -548,7 +540,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
     <div className="max-w-6xl mx-auto space-y-4 px-3 sm:px-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex items-center space-x-3 sm:space-x-4">
-
           <button
             onClick={onCancel}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -565,7 +556,6 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
           </div>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
-
           <button
             onClick={() => setPreviewMode(!previewMode)}
             className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -578,7 +568,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             <Save className="h-4 w-4" />
-            <span>{t('admin.saveQuestion') || 'Сохранить блок'}</span>
+            <span>{t('admin.saveQuestion') || i18n.t('ui.saveBlock')}</span>
           </button>
         </div>
       </div>
@@ -616,7 +606,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                 <img
                   key={index}
                   src={url}
-                  alt="Context image"
+                  alt={i18n.t('ui.contextImage')}
                   className="max-w-full h-auto rounded-lg shadow-sm"
                   style={{ maxHeight: '300px' }}
                 />
@@ -630,10 +620,13 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                 {t('admin.contextBlock.questionTitle', { order: items[previewIndex].order })}
               </div>
               <div className="text-sm text-gray-900 dark:text-white mb-3 question-content">
-                {renderInlineContent(items[previewIndex].text, questionInlineImageUrls[previewIndex] || [])}
+                {renderInlineContent(
+                  items[previewIndex].text,
+                  questionInlineImageUrls[previewIndex] || [],
+                )}
               </div>
               <div className="space-y-1">
-                {(['A', 'B', 'C', 'D']).map((key) => (
+                {['A', 'B', 'C', 'D'].map((key) => (
                   <div key={key} className="flex items-start space-x-2 text-sm">
                     <span className="font-medium text-gray-900 dark:text-white">{key})</span>
                     <span className="text-gray-900 dark:text-white question-content">
@@ -667,25 +660,25 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                   type="button"
                   onClick={() => applyFormattingToContext('**', '**')}
                   className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="Bold"
+                  title={i18n.t('ui.bold')}
                 >
-                  <span className="font-bold">B</span>
+                  <span className="font-bold">{i18n.t('ui.b')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => applyFormattingToContext('_', '_')}
                   className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 italic"
-                  title="Italic"
+                  title={i18n.t('ui.italic')}
                 >
-                  I
+                  {i18n.t('ui.i')}
                 </button>
                 <button
                   type="button"
                   onClick={handleInsertImageIntoContext}
                   className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="PHOTO"
+                  title={i18n.t('common.photo')}
                 >
-                  PHOTO
+                  {i18n.t('common.photo')}
                 </button>
               </div>
             </div>
@@ -709,7 +702,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                   onClick={() => {
                     const url = prompt(t('admin.enterImageUrl'));
                     if (url && url.trim()) {
-                      setContextImages(prev => [...prev, url.trim()]);
+                      setContextImages((prev) => [...prev, url.trim()]);
                     }
                   }}
                   className="flex items-center space-x-1 px-2 py-1 text-sm text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors"
@@ -722,13 +715,18 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
               {contextImages.length > 0 && (
                 <div className="space-y-2">
                   {contextImages.map((url, index) => (
-                    <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div
+                      key={index}
+                      className="flex items-center space-x-2 p-2 bg-gray-50 dark:bg-gray-700 rounded"
+                    >
                       <Link className="h-4 w-4 text-gray-500" />
-                      <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">{url}</span>
+                      <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
+                        {url}
+                      </span>
                       <button
                         type="button"
                         onClick={() => {
-                          setContextImages(prev => prev.filter((_, i) => i !== index));
+                          setContextImages((prev) => prev.filter((_, i) => i !== index));
                         }}
                         className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded"
                       >
@@ -774,25 +772,25 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                           type="button"
                           onClick={() => applyFormattingToQuestion(index, '**', '**')}
                           className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          title="Bold"
+                          title={i18n.t('ui.bold')}
                         >
-                          <span className="font-bold">B</span>
+                          <span className="font-bold">{i18n.t('ui.b')}</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => applyFormattingToQuestion(index, '_', '_')}
                           className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 italic"
-                          title="Italic"
+                          title={i18n.t('ui.italic')}
                         >
-                          I
+                          {i18n.t('ui.i')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleInsertImageIntoQuestion(index)}
                           className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          title="PHOTO"
+                          title={i18n.t('common.photo')}
                         >
-                          PHOTO
+                          {i18n.t('common.photo')}
                         </button>
                       </div>
                     </div>
@@ -805,13 +803,18 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                       onKeyDown={(e) => handleQuestionKeyDown(e, index)}
                       rows={2}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
-                      placeholder={t('admin.contextBlock.questionPlaceholder', { order: item.order })}
+                      placeholder={t('admin.contextBlock.questionPlaceholder', {
+                        order: item.order,
+                      })}
                     />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-3">
-                    {(['A', 'B', 'C', 'D']).map((key) => (
-                      <div key={key} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                    {['A', 'B', 'C', 'D'].map((key) => (
+                      <div
+                        key={key}
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-gray-900 dark:text-white">
                             {t('admin.contextBlock.optionLabel', { key })}
@@ -821,9 +824,9 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                               type="button"
                               onClick={() => handleInsertImageIntoOption(index, key)}
                               className="px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              title="PHOTO"
+                              title={i18n.t('common.photo')}
                             >
-                              PHOTO
+                              {i18n.t('common.photo')}
                             </button>
                             <label className="flex items-center space-x-1 text-xs cursor-pointer">
                               <input
@@ -833,7 +836,9 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
                                 onChange={() => handleCorrectChange(index, key)}
                                 className="w-3 h-3 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                               />
-                              <span className="text-gray-600 dark:text-gray-300">{t('admin.contextBlock.correctMark')}</span>
+                              <span className="text-gray-600 dark:text-gray-300">
+                                {t('admin.contextBlock.correctMark')}
+                              </span>
                             </label>
                           </div>
                         </div>

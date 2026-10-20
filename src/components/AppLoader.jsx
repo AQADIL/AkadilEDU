@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
   const containerClass = fullScreen
     ? 'min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4'
@@ -7,12 +8,10 @@ export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
     <div className={containerClass}>
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <span className="app-loader-eye" aria-label="Loading" />
+          <span className="app-loader-eye" aria-label={i18n.t('ui.loading')} />
         </div>
         {text && (
-          <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            {text}
-          </p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">{text}</p>
         )}
         <style>{`
           :root {
