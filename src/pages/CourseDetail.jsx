@@ -25,6 +25,7 @@ import { database, getUserCourses, isUserAdmin } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 import VideoPlayer from '../components/VideoPlayer';
 import LessonQuizPlayer from '../components/LessonQuizPlayer';
+import CourseQuotes from '../components/CourseQuotes';
 const AdminLessonQuizManager = lazy(() => import('../components/AdminLessonQuizManager'));
 
 const getGoogleDriveFileId = (url) => {
@@ -821,10 +822,7 @@ export default function CourseDetail() {
               )}
             </>
           ) : isPurchased === true ? (
-            <div className="p-8">
-              <BookOpen className="w-10 h-10 text-primary-600 mb-4" />
-              <p>{t('courseDetail.chooseLesson')}</p>
-            </div>
+            <CourseQuotes />
           ) : (
             <div className="bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg p-8 sm:p-12 text-center border-2 border-primary-200 dark:border-primary-900">
               <div className="max-w-md mx-auto">
