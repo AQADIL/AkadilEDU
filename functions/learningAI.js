@@ -1,5 +1,6 @@
 const functions = require('firebase-functions/v1');
-const admin = require('firebase-admin');
+const { getAuth } = require('firebase-admin/auth');
+const { getDatabase } = require('firebase-admin/database');
 const { buildPrompt, validateQuestions } = require('./ai');
 
 exports.processLearningAI = functions
@@ -7,7 +8,7 @@ exports.processLearningAI = functions
   .https.onCall(async (data, context) => {
     if (!context.auth)
       throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
-    const user = await admin.auth().getUser(context.auth.uid);
+    const user = await getAuth().getUser(context.auth.uid);
     if (user.disabled || user.customClaims?.admin !== true) {
       throw new functions.https.HttpsError('permission-denied', 'Admin access required');
     }
@@ -30,8 +31,7 @@ exports.processLearningAI = functions
       throw new functions.https.HttpsError('failed-precondition', 'Invalid AI endpoint');
     }
     const now = Date.now();
-    const limit = await admin
-      .database()
+    const limit = await getDatabase()
       .ref(`privateRateLimits/ai/${context.auth.uid}`)
       .transaction((current) => {
         const count = current?.window > now - 60000 ? current.count : 0;

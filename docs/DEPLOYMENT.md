@@ -35,7 +35,7 @@ Set the Cloud Functions secret through the interactive CLI:
 firebase functions:secrets:set GEMINI_API_KEY
 ```
 
-Set GEMINI_API_URL in the Functions environment to the chosen Gemini generateContent REST endpoint. It must use HTTPS and generativelanguage.googleapis.com. This endpoint selects the model. Configure billing and quotas for the selected services.
+Set GEMINI_API_URL in the Functions environment to the chosen Gemini generateContent REST endpoint. It must use HTTPS and generativelanguage.googleapis.com. This endpoint selects the model. Set DATABASE_REGION to the Realtime Database region so the catalog trigger runs beside the database. Configure billing and quotas for the selected services.
 
 Revoke any Gemini key previously included in a browser build or repository history. Removing source code does not revoke a key or erase existing bundles.
 
@@ -48,7 +48,39 @@ firebase deploy --only functions
 firebase deploy --only database,storage,hosting
 ```
 
-For Vercel frontend hosting, configure the same public environment variables and deploy Firebase services separately. Push notifications use authenticated callable Functions.
+Push notifications use authenticated callable Functions.
+
+## GitHub Actions
+
+The Firebase workflow runs security checks, lint, tests, the production build,
+dependency audits and Database/Storage emulator tests. Deployment runs only after
+these checks succeed on `main`; pull requests run checks without deployment access.
+The workflow can also be started manually from `main` to retry a release.
+
+Configure these repository variables:
+
+| Variable | Purpose |
+| --- | --- |
+| FIREBASE_PROJECT_ID | Deployment project |
+| FIREBASE_HOSTING_URL | Published site used for verification |
+| FIREBASE_WORKLOAD_IDENTITY_PROVIDER | Repository-scoped Google Cloud identity provider |
+| FIREBASE_DEPLOY_SERVICE_ACCOUNT | Dedicated deployment service account |
+| GEMINI_API_URL | Server-side model endpoint |
+| DATABASE_REGION | Region of the Realtime Database instance |
+
+Store the browser environment as a JSON object in the repository secret
+FIREBASE_WEB_CONFIG, using the VITE keys listed in .env.example. Do not include
+private credentials. The workflow validates the configuration and writes ignored
+environment files before deployment. GEMINI_API_KEY stays in Google Secret Manager.
+
+The identity provider restricts authentication to the repository and owner numeric
+IDs, the main branch, production environment and .github/workflows/check.yml.
+The deployment account can deploy Firebase services and act as the existing
+Functions runtime account. It has no private key and cannot authenticate from a PR.
+
+Production deployments are serialized. The final step compares published asset
+names with dist/index.html and checks that those assets are accessible. If this
+fails, inspect the deployment before rerunning the workflow.
 
 ## Verify
 

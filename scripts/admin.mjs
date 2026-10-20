@@ -1,6 +1,8 @@
 import { createRequire } from 'node:module';
 const require = createRequire(new URL('../functions/package.json', import.meta.url));
-const admin = require('firebase-admin');
+const { initializeApp, applicationDefault, deleteApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getDatabase } = require('firebase-admin/database');
 const { courseSummary } = require('../functions/catalog.js');
 
 const [operation, uid] = process.argv.slice(2).filter((value) => value !== '--apply');
@@ -11,21 +13,21 @@ if (
   throw new Error('Choose grant-admin, sync-catalog, migrate-profiles or audit-password-fields');
 }
 if (!process.env.FIREBASE_DATABASE_URL) throw new Error('FIREBASE_DATABASE_URL is required');
-admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
+const app = initializeApp({
+  credential: applicationDefault(),
   databaseURL: process.env.FIREBASE_DATABASE_URL,
 });
-const database = admin.database();
+const database = getDatabase(app);
 let affected = 0;
 try {
   if (operation === 'grant-admin') {
     if (!uid) throw new Error('A user UID is required');
-    const user = await admin.auth().getUser(uid);
+    const user = await getAuth(app).getUser(uid);
     if (user.disabled || !user.emailVerified)
       throw new Error('An active verified account is required');
     affected = 1;
     if (apply) {
-      await admin.auth().setCustomUserClaims(uid, { ...user.customClaims, admin: true });
+      await getAuth(app).setCustomUserClaims(uid, { ...user.customClaims, admin: true });
       await database.ref(`users/${uid}/role`).set('admin');
     }
   } else if (operation === 'sync-catalog') {
@@ -47,7 +49,7 @@ try {
   } else {
     let pageToken;
     do {
-      const page = await admin.auth().listUsers(1000, pageToken);
+      const page = await getAuth(app).listUsers(1000, pageToken);
       for (const user of page.users) {
         const profile = database.ref(`users/${user.uid}`);
         if ((await profile.get()).exists()) continue;
@@ -73,5 +75,5 @@ try {
     `${JSON.stringify({ operation, mode: apply ? 'applied' : 'dry-run', affected })}\n`,
   );
 } finally {
-  await admin.app().delete();
+  await deleteApp(app);
 }

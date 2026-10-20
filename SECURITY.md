@@ -16,9 +16,15 @@ Previously exposed service-account private keys and browser-exposed Gemini keys 
 the current files does not remove it from Git history or previously deployed assets.
 
 A real service-account private key was found in the historical `backend/README.md`.
-It still requires revocation in Google Cloud. Keep the repository private until the
-credential is revoked and history cleanup is coordinated. Local unpublished commits
-also contain a Gemini key and must not be pushed.
+That key was disabled in Google Cloud on 20 October 2026. Keep the repository private
+until history cleanup is coordinated. Local unpublished commits also contain a
+Gemini key and must not be pushed.
+
+GitHub deployment uses a dedicated service account with short-lived credentials.
+Its identity provider accepts only this repository's numeric ID, owner ID, `main`
+branch, production environment and deployment workflow. Pull requests cannot obtain
+production credentials. Generated `gha-creds-*.json` files are ignored and rejected
+by the staged-file guard.
 
 Practice-test results are calculated in the browser. They are learning records, not
 tamper-proof examination scores or externally accredited certificates.

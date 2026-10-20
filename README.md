@@ -53,3 +53,10 @@ Enable the local commit guard with `git config core.hooksPath .githooks`. It che
 Keep interface text in `src/i18n.js` for all three languages. Use configuration for deployment-specific values. Do not add emojis, debug output, fabricated results or unfinished screens. Add comments only for non-obvious logic. Keep commit subjects short and specific.
 
 Read [security guidance](SECURITY.md) and [deployment requirements](docs/DEPLOYMENT.md). Exam practice runs in the browser and is not a tamper-proof assessment system.
+
+## Deployment
+
+GitHub Actions checks pull requests and pushes to `main`. After the checks pass on
+`main`, it deploys Functions, Database/Storage rules and Hosting to Firebase, then
+verifies that Hosting serves the generated build. Authentication uses Workload
+Identity Federation; no service-account private key is stored in GitHub.

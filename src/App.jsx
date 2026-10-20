@@ -112,7 +112,7 @@ function App() {
         );
         const sessionKey = 'akadil_session_' + firebaseUser.uid;
         let sessionId = localStorage.getItem(sessionKey);
-        const token = await firebaseUser.getIdTokenResult();
+        const token = await firebaseUser.getIdTokenResult(true);
         if (!sessionId && token.claims.admin !== true) {
           const session = await createSessionProfile();
           sessionId = session.sessionId;

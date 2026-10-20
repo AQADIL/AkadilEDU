@@ -1,17 +1,20 @@
 const functions = require('firebase-functions/v1');
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getDatabase } = require('firebase-admin/database');
+const { getMessaging } = require('firebase-admin/messaging');
+const { getStorage } = require('firebase-admin/storage');
 const { validId, expiryTimestamp, validNotification } = require('./validation');
 
-admin.initializeApp();
+initializeApp();
 
 async function verifyAdmin(uid) {
-  const user = await admin.auth().getUser(uid);
+  const user = await getAuth().getUser(uid);
   if (user.disabled || user.customClaims?.admin !== true) {
     throw new functions.https.HttpsError('permission-denied', 'Admin access required');
   }
   const profile = (
-    await admin
-      .database()
+    await getDatabase()
       .ref('users/' + uid)
       .get()
   ).val();
@@ -23,8 +26,7 @@ async function verifyAdmin(uid) {
 
 async function throttlePush(uid) {
   const now = Date.now();
-  const result = await admin
-    .database()
+  const result = await getDatabase()
     .ref('privateRateLimits/push/' + uid)
     .transaction((previous) => {
       if (typeof previous === 'number' && now - previous < 60000) return;
@@ -57,19 +59,21 @@ exports.deleteUser = functions.https.onCall(async (data, context) => {
   await verifyAdmin(requesterUid);
 
   try {
-    await admin.auth().deleteUser(targetUid);
+    await getAuth().deleteUser(targetUid);
 
-    await admin.database().ref(`/users/${targetUid}`).remove();
-    await admin.database().ref(`/auth_logs/${targetUid}`).remove();
+    await getDatabase().ref(`/users/${targetUid}`).remove();
+    await getDatabase().ref(`/auth_logs/${targetUid}`).remove();
 
     try {
-      const bucket = admin.storage().bucket();
-      await bucket.deleteFiles({
-        prefix: `user_uploads/${targetUid}/`,
-      });
+      const bucket = getStorage().bucket();
+      await Promise.all(
+        ['user_uploads', 'user_avatars'].map((directory) =>
+          bucket.deleteFiles({ prefix: `${directory}/${targetUid}/` }),
+        ),
+      );
     } catch (storageError) {}
 
-    await admin.database().ref('/adminLogs').push({
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'deleteUser',
       targetUid,
@@ -100,18 +104,17 @@ exports.assignCourseServer = functions.https.onCall(async (data, context) => {
   await verifyAdmin(requesterUid);
 
   try {
-    const courseSnapshot = await admin.database().ref(`/courses/${courseId}`).once('value');
+    const courseSnapshot = await getDatabase().ref(`/courses/${courseId}`).once('value');
     if (!courseSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'Course not found');
     }
 
-    const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
+    const userSnapshot = await getDatabase().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'User not found');
     }
 
-    await admin
-      .database()
+    await getDatabase()
       .ref(`/users/${uid}/courses/${courseId}`)
       .set({
         expiryDate: parseExpiry(expiresAt),
@@ -120,7 +123,7 @@ exports.assignCourseServer = functions.https.onCall(async (data, context) => {
         assignedAt: new Date().toISOString(),
       });
 
-    await admin.database().ref('/adminLogs').push({
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'assignCourse',
       targetUid: uid,
@@ -155,7 +158,7 @@ exports.sendPushToUser = functions.https.onCall(async (data, context) => {
   await verifyAdmin(requesterUid);
 
   try {
-    const userSnapshot = await admin.database().ref(`/users/${uid}`).once('value');
+    const userSnapshot = await getDatabase().ref(`/users/${uid}`).once('value');
     if (!userSnapshot.exists()) {
       throw new functions.https.HttpsError('not-found', 'User not found');
     }
@@ -183,9 +186,9 @@ exports.sendPushToUser = functions.https.onCall(async (data, context) => {
       token: fcmToken,
     };
 
-    await admin.messaging().send(message);
+    await getMessaging().send(message);
 
-    await admin.database().ref('/adminLogs').push({
+    await getDatabase().ref('/adminLogs').push({
       adminUid: requesterUid,
       action: 'sendPush',
       targetUid: uid,
@@ -228,8 +231,7 @@ exports.bulkAssignCourse = functions.https.onCall(async (data, context) => {
   parseExpiry(expiresAt);
   if (
     !(
-      await admin
-        .database()
+      await getDatabase()
         .ref('courses/' + courseId)
         .get()
     ).exists()
@@ -245,15 +247,13 @@ exports.bulkAssignCourse = functions.https.onCall(async (data, context) => {
     try {
       if (
         !(
-          await admin
-            .database()
+          await getDatabase()
             .ref('users/' + uid)
             .get()
         ).exists()
       )
         throw new Error('missing-user');
-      await admin
-        .database()
+      await getDatabase()
         .ref(`/users/${uid}/courses/${courseId}`)
         .set({
           expiryDate: parseExpiry(expiresAt),
@@ -267,8 +267,7 @@ exports.bulkAssignCourse = functions.https.onCall(async (data, context) => {
     }
   }
 
-  await admin
-    .database()
+  await getDatabase()
     .ref('/adminLogs')
     .push({
       adminUid: requesterUid,
@@ -298,7 +297,7 @@ exports.sendPushToAll = functions
     await throttlePush(requesterUid);
 
     try {
-      const usersSnapshot = await admin.database().ref('/users').once('value');
+      const usersSnapshot = await getDatabase().ref('/users').once('value');
 
       if (!usersSnapshot.exists()) {
         return {
@@ -404,7 +403,7 @@ exports.sendPushToAll = functions
         }
 
         try {
-          const batchResponse = await admin.messaging().sendEachForMulticast(multicastMessage);
+          const batchResponse = await getMessaging().sendEachForMulticast(multicastMessage);
 
           successCount += batchResponse.successCount || 0;
           failureCount += batchResponse.failureCount || 0;
@@ -432,8 +431,7 @@ exports.sendPushToAll = functions
 
       const totalUsers = tokens.length;
 
-      await admin
-        .database()
+      await getDatabase()
         .ref('/adminLogs')
         .push({
           adminUid: requesterUid,
@@ -461,7 +459,7 @@ exports.sendPushToAll = functions
   });
 
 exports.createUserProfileOnSignup = functions.auth.user().onCreate(async (user) => {
-  const db = admin.database();
+  const db = getDatabase();
   const userRef = db.ref(`users/${user.uid}`);
 
   try {
@@ -491,12 +489,12 @@ exports.createUserProfileOnSignup = functions.auth.user().onCreate(async (user) 
 });
 
 exports.processLearningAI = require('./learningAI').processLearningAI;
-exports.syncCourseCatalog = functions.database
-  .ref('/courses/{courseId}')
+exports.syncCourseCatalog = functions
+  .region(process.env.DATABASE_REGION)
+  .database.ref('/courses/{courseId}')
   .onWrite(async (change, context) => {
     const { courseSummary } = require('./catalog');
-    return admin
-      .database()
+    return getDatabase()
       .ref('courseCatalog/' + context.params.courseId)
       .set(courseSummary(change.after.val()));
   });
@@ -513,14 +511,14 @@ exports.setUserRole = functions.https.onCall(async (data, context) => {
       'Use another administrator to change your role',
     );
   }
-  const user = await admin.auth().getUser(data.uid);
-  await admin
-    .auth()
-    .setCustomUserClaims(data.uid, { ...user.customClaims, admin: data.role === 'admin' });
-  await admin
-    .database()
+  const user = await getAuth().getUser(data.uid);
+  await getAuth().setCustomUserClaims(data.uid, {
+    ...user.customClaims,
+    admin: data.role === 'admin',
+  });
+  await getDatabase()
     .ref('users/' + data.uid + '/role')
     .set(data.role);
-  await admin.auth().revokeRefreshTokens(data.uid);
+  await getAuth().revokeRefreshTokens(data.uid);
   return { success: true };
 });

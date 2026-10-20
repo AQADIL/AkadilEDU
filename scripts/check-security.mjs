@@ -26,6 +26,7 @@ for (const file of [...new Set(files)]) {
   if (
     (/^\.env(?:\.|$)/.test(basename) && basename !== '.env.example') ||
     /(?:serviceAccount|service-account|credentials).*\.json$/i.test(basename) ||
+    /^gha-creds-.*\.json$/.test(basename) ||
     /\.(?:pem|key)$/.test(basename) ||
     /^(?:dist|node_modules|\.vs|\.firebase)\//.test(normalized)
   ) {
@@ -55,6 +56,7 @@ const ignored = [
   '.vs/session.json',
   'functions/serviceAccountKey.json',
   'dist/index.html',
+  'gha-creds-session.json',
 ];
 for (const file of ignored) {
   try {
