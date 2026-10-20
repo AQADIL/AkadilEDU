@@ -108,7 +108,7 @@ export default function CourseEditor({ course, isOpen, onClose }) {
         await createCourse(formData, auth.currentUser.uid);
       }
       onClose();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotSaveCourse'));
     } finally {
       setSaving(false);

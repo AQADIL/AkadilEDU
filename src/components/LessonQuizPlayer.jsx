@@ -432,7 +432,6 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
         .qz-glow-btn { animation: qz-glow-pulse 2.5s ease-in-out infinite }
         @keyframes qz-thinking { 0%,80%,100%{transform:scale(0.4);opacity:0.4} 40%{transform:scale(1);opacity:1} }
         .qz-thinking-dot { animation: qz-thinking 1.3s ease-in-out infinite both }
-        /* SANA AI button – gradient border via ::before */
         .qz-sana-btn {
           position: relative;
           background: #ffffff;
@@ -455,7 +454,6 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
           z-index: -1;
         }
         .dark .qz-sana-btn { background: #ffffff; color: #111827; }
-        /* iOS 26 Liquid Glass */
         .qz-liquid-glass {
           background: rgba(255,255,255,0.2);
           backdrop-filter: blur(48px) saturate(200%) brightness(1.04);
@@ -567,10 +565,13 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
                           {[...attempts].reverse().map((attempt, revIdx) => {
                             const origIdx = attempts.length - 1 - revIdx;
                             const attemptDate = attempt.timestamp
-                              ? new Date(attempt.timestamp).toLocaleDateString('ru-RU', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                })
+                              ? new Date(attempt.timestamp).toLocaleDateString(
+                                  i18n.resolvedLanguage,
+                                  {
+                                    day: 'numeric',
+                                    month: 'short',
+                                  },
+                                )
                               : '';
                             const attemptAnswers = attempt.answers || [];
                             const correctInAttempt = attemptAnswers.filter((a) => a.correct).length;
@@ -695,7 +696,9 @@ export default function LessonQuizPlayer({ quiz, courseId, lessonId, onComplete 
                     </h3>
                     {reviewAttemptMeta?.timestamp && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {new Date(reviewAttemptMeta.timestamp).toLocaleString('ru-RU')}
+                        {new Date(reviewAttemptMeta.timestamp).toLocaleString(
+                          i18n.resolvedLanguage,
+                        )}
                       </p>
                     )}
                   </div>

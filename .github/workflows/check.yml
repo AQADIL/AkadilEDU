@@ -21,16 +21,13 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             functions/package-lock.json
-            backend/package-lock.json
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with:
           distribution: temurin
           java-version: '21'
       - run: npm ci
       - run: npm ci --prefix functions
-      - run: npm ci --prefix backend
       - run: npm run check
       - run: npm audit --audit-level=high
       - run: npm audit --prefix functions --audit-level=high
-      - run: npm audit --prefix backend --audit-level=high
       - run: npx --yes firebase-tools@15.28.1 emulators:exec --only database,storage --project demo-akadiledu-audit "node --test tests/database.rules.test.cjs tests/storage.rules.test.cjs"

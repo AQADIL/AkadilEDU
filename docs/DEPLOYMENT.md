@@ -6,7 +6,7 @@ These changes require coordinated deployment. A frontend-only release will not c
 
 1. Back up Realtime Database and record the currently deployed rules.
 2. Use a staging Firebase project first. Select the intended project explicitly with the Firebase CLI.
-3. Install dependencies in the root, functions and optional backend directories. Run `npm run check` and emulator rule tests.
+3. Install dependencies in the root and functions directories. Run `npm run check` and emulator rule tests.
 4. Fill local .env from .env.example. Firebase web configuration is public; restrict the web API key appropriately in Google Cloud. Never put an AI key in a VITE variable.
 5. Set FIREBASE_DATABASE_URL and Application Default Credentials in the administrative shell. Keep credential files outside Git.
 
@@ -48,7 +48,7 @@ firebase deploy --only functions
 firebase deploy --only database,storage,hosting
 ```
 
-For Vercel frontend hosting, configure the same public environment variables and deploy Firebase services separately. The optional Express backend requires its own process and environment.
+For Vercel frontend hosting, configure the same public environment variables and deploy Firebase services separately. Push notifications use authenticated callable Functions.
 
 ## Verify
 

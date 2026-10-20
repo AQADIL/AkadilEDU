@@ -11,14 +11,19 @@ import {
   Folder,
   ChevronDown,
 } from 'lucide-react';
-import { createTest, updateTest, deleteTest } from '../../firebase/testModule';
-import { fetchAvailableTests, getTestStatistics } from '../../firebase/rtdbApi';
+import {
+  createTest,
+  updateTest,
+  deleteTest,
+  fetchAvailableTests,
+  getTestStatistics,
+} from '../../firebase/tests';
 import TestBuilder from './TestBuilder';
 
 import AppLoader from '../AppLoader';
 
 export default function TestManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingTest, setEditingTest] = useState(null);
@@ -40,12 +45,12 @@ export default function TestManager() {
       for (const test of testsList) {
         try {
           stats[test.id] = await getTestStatistics(test.id);
-        } catch (error) {
+        } catch {
           stats[test.id] = { totalAttempts: 0, averageScore: 0 };
         }
       }
       setTestStats(stats);
-    } catch (error) {
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -87,7 +92,7 @@ export default function TestManager() {
       try {
         await deleteTest(testId);
         await loadTests();
-      } catch (error) {
+      } catch {
         alert(t('common.error'));
       }
     }
@@ -121,7 +126,7 @@ export default function TestManager() {
   const folderKeys = Object.keys(groups).sort((a, b) => {
     if (a === '__NO_SUBJECT__') return 1;
     if (b === '__NO_SUBJECT__') return -1;
-    return a.localeCompare(b, 'kk-KZ');
+    return a.localeCompare(b, i18n.resolvedLanguage);
   });
 
   const renderTestCard = (test) => (
@@ -266,7 +271,7 @@ export default function TestManager() {
                     {label}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {groupTests.length} {t('admin.tests') || 'tests'}
+                    {groupTests.length} {t('admin.tests')}
                   </div>
                 </div>
               </div>

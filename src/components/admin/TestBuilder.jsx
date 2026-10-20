@@ -61,7 +61,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       } else {
         window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
       }
-    } catch (e) {
+    } catch {
       window.alert(i18n.t('ui.couldNotCopyAiInstructions'));
     }
   };
@@ -170,7 +170,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
     if (nextOrder > 40) {
       try {
         window.alert(i18n.t('ui.upTo_40QuestionsPerSubject'));
-      } catch (_) {}
+      } catch {}
       return;
     }
 
@@ -369,7 +369,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       insertAIQuestions(aiTargetSection, res.questions || []);
       setShowAiModal(false);
       setAiInput('');
-    } catch (e) {
+    } catch {
     } finally {
       setAiLoading(false);
     }
@@ -562,7 +562,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
       } else {
         window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
       }
-    } catch (e) {
+    } catch {
       window.alert(i18n.t('ui.couldNotExportQuestions'));
     }
   };
@@ -572,7 +572,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
     if (!block.trim()) {
       try {
         window.alert(i18n.t('ui.thisQuestionHasNoContentToExport'));
-      } catch (_) {}
+      } catch {}
       return;
     }
 
@@ -585,16 +585,16 @@ export default function TestBuilder({ test, onSave, onCancel }) {
         await navigator.clipboard.writeText(block);
         try {
           window.alert(i18n.t('ui.questionCopied'));
-        } catch (_) {}
+        } catch {}
       } else {
         try {
           window.alert(i18n.t('ui.clipboardUnavailableUseASecureBrowserConnection'));
-        } catch (_) {}
+        } catch {}
       }
-    } catch (e) {
+    } catch {
       try {
         window.alert(i18n.t('ui.couldNotCopyQuestion'));
-      } catch (_) {}
+      } catch {}
     }
   };
 
@@ -828,7 +828,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
                   disabled={aiLoading || !aiTargetSection || !aiInput.trim()}
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
                 >
-                  {aiLoading ? 'Parsing…' : 'Parse'}
+                  {i18n.t(aiLoading ? 'test.parsing' : 'test.parse')}
                 </button>
               </div>
             </div>
@@ -874,7 +874,7 @@ export default function TestBuilder({ test, onSave, onCancel }) {
               value={formData.variant}
               onChange={(e) => handleInputChange('variant', parseInt(e.target.value) || 1)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder={i18n.t('ui.1')}
+              placeholder={i18n.t('test.variantPlaceholder')}
             />
           </div>
 

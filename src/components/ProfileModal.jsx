@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '@headlessui/react';
 import { X, Upload, Trash2, Loader2 } from 'lucide-react';
-import { storage } from '../utils/storage';
 import { uploadAvatar, removeAvatar, onProfileSave } from '../utils/profile';
 
 export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProfile }) {
@@ -71,7 +70,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
 
       setProfile((prev) => ({ ...prev, avatarUrl: downloadURL }));
       onAvatarChange?.(downloadURL);
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotUploadAvatar'));
     } finally {
       setUploading(false);
@@ -88,7 +87,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
       await removeAvatar(profile.avatarUrl);
       setProfile((prev) => ({ ...prev, avatarUrl: '' }));
       onAvatarChange?.('');
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotRemoveAvatar'));
     }
   };
@@ -102,8 +101,6 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
     }
 
     try {
-      storage.setProfile(profile);
-
       await onProfileSave({
         ...profile,
         ...(passwords.newPassword && { password: passwords.newPassword }),
@@ -111,7 +108,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
 
       alert(t('common.success'));
       onClose();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotSaveProfile'));
     }
   };
@@ -147,7 +144,8 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                     />
                   ) : (
                     <span className="text-white text-3xl font-bold">
-                      {profile.firstName?.[0]?.toUpperCase() || 'U'}
+                      {profile.firstName?.[0]?.toUpperCase() ||
+                        i18n.t('common.unknownUser').charAt(0)}
                     </span>
                   )}
                 </div>
@@ -230,7 +228,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                   value={profile.email}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder={i18n.t('ui.userexamplecom')}
+                  placeholder={i18n.t('auth.emailPlaceholder')}
                 />
               </div>
 
@@ -244,7 +242,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                   value={profile.phone}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder={i18n.t('ui.7_700_1234567')}
+                  placeholder={i18n.t('profile.phonePlaceholder')}
                 />
               </div>
 
@@ -264,7 +262,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                       value={passwords.newPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
-                      placeholder={i18n.t('language.russian2')}
+                      placeholder={i18n.t('auth.passwordPlaceholder')}
                     />
                   </div>
 
@@ -278,7 +276,7 @@ export default function ProfileModal({ isOpen, onClose, onAvatarChange, userProf
                       value={passwords.confirmPassword}
                       onChange={handlePasswordChange}
                       className="input-field"
-                      placeholder={i18n.t('language.russian2')}
+                      placeholder={i18n.t('auth.passwordPlaceholder')}
                     />
                   </div>
                 </div>

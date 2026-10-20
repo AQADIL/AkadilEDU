@@ -5,6 +5,14 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   kk: {
     translation: {
+      'app.description': 'Курстарды оқып, пәндік тесттерге дайындалыңыз.',
+      'common.unknown': 'Белгісіз',
+      'common.invalidJson': 'JSON пішімі жарамсыз. Деректерді тексеріп, қайталап көріңіз.',
+      'courses.invalidExpiry': 'Кіру мерзімінің аяқталу күні болашақта болуы керек.',
+      'cookie.accepted': 'Қабылданды',
+      'cookie.notAccepted': 'Қабылданбады',
+      'test.parsing': 'Талдау жүріп жатыр…',
+      'test.parse': 'Талдау',
       'common.cancel': 'Болдырмау',
       'header.logo': 'AkadilEDU',
       'header.theme.light': 'Ашық режим',
@@ -13,14 +21,11 @@ const resources = {
       'sidebar.courses': 'Курстар',
       'sidebar.myCourses': 'Менің курстарым',
       'sidebar.testUBT': 'Тест ҰБТ',
-      'sidebar.shop': 'Дүкен',
+
       'sidebar.admin': 'Әкімші',
       'courses.title': 'Курстар',
       'courses.availableCourses': 'Қолжетімді курстар',
-      'courses.all': 'Барлық курстар',
-      'courses.featured': 'Таңдаулы курстар',
-      'courses.enrollIn': 'Курсқа қол жеткізуді сұрау',
-      'courses.enroll': 'Қол жеткізуді сұрау',
+
       'courses.noCourses': 'Әзірге курстар жоқ',
       'courses.buyCourses': 'Курстарды сатып алыңыз немесе оқытушы сізге тағайындағанша күтіңіз',
       'courses.viewAllCourses': 'Барлық курстарды көру',
@@ -29,23 +34,19 @@ const resources = {
       'courses.adminNoCoursesMessage': 'Студенттеріңіз үшін бірінші курсты жасаңыз',
       'courses.createFirst': 'Бірінші курсты жасау',
       'courses.viewCourse': 'Курсты көру',
-      'courses.startLearning': 'Оқуды бастау',
+
       'courses.modules': 'модуль',
       'courses.students': 'студент',
       'courses.management': 'Курстарды басқару',
       'courses.createCourse': 'Курс жасау',
       'courses.create': 'Жасау',
-      'courses.previewMode': 'Пайдаланушыларға алдын-ала қарау',
-      'courses.adminMode': 'Әкімші режимі',
-      'courses.preview': 'Алдын-ала қарау',
-      'courses.previewBanner':
-        'Қарап шығу режимі: Сіз бетті қарапайым пайдаланушылар көретіндей көресіз',
+
       'courses.noDescription': 'Курс сипаттамасы жоқ',
       'courses.edit': 'Өңдеу',
       'courses.delete': 'Жою',
       'courses.deleteConfirm': 'Бұл курсты жойғыңыз келетініне сенімдісіз бе?',
       'courses.coverUrl': 'Мұқаба URL (1920x480)',
-      'courses.coverUrlPlaceholder': 'https://example.com/cover.jpg',
+
       'courses.coverUrlHint':
         ' Ұсынылған өлшем: 1920x480. Көрсетілмесе - әдемі градиент автоматты түрде жасалады',
       'courses.coverPreview': 'Алдын-ала қарау',
@@ -55,17 +56,12 @@ const resources = {
       'courses.expired': 'Мерзімі өтті',
       'courses.buyAgain': 'Қайтадан сатып алу',
       'courses.deleteError': 'Курсты жою кезінде қате кетті',
-      'courseDetail.backToCourses': 'Курстарға оралу',
+
       'courseDetail.courseContent': 'Курс мазмұны',
-      'courseDetail.locked': 'Жабық',
-      'courseDetail.unlocked': 'Ашық',
-      'courseDetail.lesson': 'Сабақ',
-      'courseDetail.homework': 'Үй жұмысы',
+
       'courseDetail.formulas': 'Формулалар жинағы',
       'courseDetail.video': 'Бейне',
-      'courseDetail.allLocked': 'Барлық сабақтар жабық. Курсты сатып алыңыз.',
-      'courseDetail.noModules': 'Бұл курста әлі модульдер жоқ',
-      'courseDetail.resumeBadge': 'Сіз {{time}} тоқтадыңыз',
+
       'courseDetail.videoUnavailable': 'Бейне қолжетімсіз',
       'courseDetail.homeworkTitle': 'Үй жұмысы',
       'courseDetail.homeworkOpen': 'Тапсырманы ашу',
@@ -80,7 +76,7 @@ const resources = {
       'courseDetail.quizNoQuestionsFound': 'Сұрақтар табылмады. Форматты тексеріңіз.',
       'courseDetail.quizImportText': 'Текстен импорттау',
       'courseDetail.quizImportHint': 'Сұрақтарды мына форматта жазыңыз:',
-      'courseDetail.quizImport': 'Импорттау',
+
       'courseDetail.quizAddManual': 'Қолмен қосу',
       'courseDetail.quizQuestionText': 'Сұрақ мәтіні',
       'courseDetail.quizExplanation': 'Түсіндірме (міндетті емес)',
@@ -88,37 +84,25 @@ const resources = {
       'courseDetail.quizCheckKnowledge': 'Білімді тексер! Жауап бермей келесіге өтуге болмайды.',
       'courseDetail.quizStart': 'Бастау',
       'courseDetail.quizCorrect': 'Дұрыс! ',
-      'courseDetail.quizGreat': 'Тамаша! ',
-      'courseDetail.quizPerfect': 'Керемет! ',
+
       'courseDetail.quizStreakFire': ' Серия жалғасуда!',
       'courseDetail.quizWrong': 'Қате ',
-      'courseDetail.quizCorrectCount': 'дұрыс',
+
       'courseDetail.quizNext': 'Келесі',
       'courseDetail.quizResults': 'Нәтижелер',
       'courseDetail.quizExcellent': 'Керемет! Тамаша нәтиже!',
       'courseDetail.quizGood': 'Жақсы! Аздап жаттығу керек',
-      'courseDetail.quizNotBad': 'Жаман емес, қайталау керек!',
+
       'courseDetail.quizRetry': 'Сабақты қайта қараңыз!',
-      'courseDetail.quizRetake': 'Қайта тапсыру',
+
       'courseDetail.quizBestLabel': 'Үздік',
-      'courseDetail.quizAlreadyTaken':
-        'Сіз бұл тестті бұрын тапсырдыңыз. Қайта тексергіңіз келе ме?',
-      'courseDetail.quizRetakeShort': 'Қайта тексеру',
+
       'courseDetail.quizQuestionLabel': 'Сұрақ',
-      'courseDetail.quizAiHintLoading': 'ИИ кеңес дайындауда...',
-      'courseDetail.quizAiHintTitle': 'Оқытушы кеңесі',
-      'courseDetail.quizWorkOnMistakes': 'Қателерді талдау',
-      'courseDetail.quizAiOnce': 'Жасанды интеллект кеңесі тек бір рет беріледі',
-      'courseDetail.quizViewLastFeedback': 'Алдыңғы кеңесті қарау',
-      'courseDetail.quizHideFeedback': 'Жасыру',
-      'courseDetail.quizLastScore': 'Соңғы',
-      'courseDetail.quizAttempts': 'Әрекеттер',
+
       'courseDetail.quizResultLabel': 'Нәтиже',
       'courseDetail.quizLatest': 'соңғы',
       'courseDetail.quizPreviousAnswers': 'Алдыңғы жауаптар',
-      'courseDetail.quizCheckWithSana': 'SANA AI арқылы тексеру',
-      'courseDetail.quizSanaDesc': 'ИИ қателерді талдап, кеңес береді (тек 1 рет)',
-      'courseDetail.quizSanaExplain': 'Жауаптарыңызды және мұғалім берген түсіндірмелерді қараңыз.',
+
       'courseDetail.quizReviewTitle': 'Тестті талдау',
       'courseDetail.quizReviewOpen': 'Тестті ашу',
       'courseDetail.quizBack': 'Артқа',
@@ -129,9 +113,7 @@ const resources = {
       'courseDetail.quizCorrectAnswer': 'Дұрыс жауап',
       'courseDetail.quizReviewCorrect': 'Дұрыс',
       'courseDetail.quizReviewWrong': 'Қате',
-      'courseDetail.quizAiErrorNoAnswers': 'Жауаптар табылмады',
-      'courseDetail.quizAiErrorNoKey': 'AI импорты қолжетімсіз. Әкімшіге хабарласыңыз.',
-      'courseDetail.quizAiErrorNoMistakes': 'Барлық жауаптар дұрыс',
+
       'courseDetail.quizAiErrorGeneric':
         'Импорт сәтсіз. Құжатта жауап кілті бар екенін тексеріп, қайталаңыз.',
       'courseDetail.quizPdfOnly': 'Тек PDF файл жүктеңіз',
@@ -144,15 +126,11 @@ const resources = {
       'courseDetail.quizPreviewTitle': 'Парсинг нәтижесі',
       'courseDetail.quizConfirmSave': '{{count}} сұрақты сақтау',
       'courseDetail.moduleAdd': 'Модуль қосу',
-      'courseDetail.moduleAddDesc': 'Жаңа модуль құру',
-      'courseDetail.moduleName': 'Модуль атауы',
+
       'courseDetail.moduleNamePlaceholder': 'Модуль атауы',
-      'courseDetail.moduleColor': 'Түс',
-      'courseDetail.moduleUrl': 'Сілтеме URL',
+
       'courseDetail.moduleUrlPlaceholder': 'HTTPS сілтемесін енгізіңіз',
-      'courseDetail.moduleCancel': 'Болдырмау',
-      'courseDetail.moduleOpen': 'Ашу',
-      'courseEditor.title': 'Курс редакторы',
+
       'courseEditor.createCourse': 'Жаңа курс жасау',
       'courseEditor.editCourse': 'Курсты өңдеу',
       'courseEditor.courseName': 'Курс атауы *',
@@ -164,19 +142,11 @@ const resources = {
       'courseEditor.moduleName': 'Модуль атауы',
       'courseEditor.addLesson': 'Сабақ қосу',
       'courseEditor.lessonName': 'Сабақ атауы',
-      'courseEditor.lessonType': 'Сабақ түрі',
-      'courseEditor.videoUrl': 'Бейне URL (YouTube)',
-      'courseEditor.fileUrl': 'Файл URL (Google Drive)',
+
       'courseEditor.duration': 'Ұзақтығы',
-      'courseEditor.save': 'Сақтау',
-      'courseEditor.saving': 'Сақталуда...',
-      'courseEditor.cancel': 'Болдырмау',
+
       'courseEditor.noModules': 'Модульдер жоқ. Бірінші модульді қосыңыз!',
-      'courseEditor.lessonTypes': {
-        video: 'Бейне сабақ',
-        homework: 'Үй жұмысы',
-        formulas: 'Формулалар жинағы',
-      },
+
       'profile.title': 'Профиль баптаулары',
       'profile.firstName': 'Аты',
       'profile.lastName': 'Тегі',
@@ -217,22 +187,16 @@ const resources = {
       'auth.alreadyHaveAccount': 'Аккаунт бар ма?',
       'auth.signInHere': 'Осында кіріңіз',
       'auth.signUpHere': 'Тіркелу',
-      'auth.accountCreated': 'Аккаунт жасалды!',
-      'auth.verificationSent': 'Растау хаты жіберілді',
-      'auth.verificationEmailSent': 'Растау хаты жіберілді',
+
       'auth.checkEmail': 'Хат жәшігіңізді тексеріңіз',
-      'auth.redirecting': 'Кіру бетіне бағытталуда...',
+
       'auth.errors.userNotFound': 'Бұл email бойынша аккаунт табылмады',
       'auth.errors.invalidEmail': 'Жарамсыз email мекенжайы',
       'auth.errors.resetFailed': 'Құпия сөзді қалпына келтіру сәтсіз. Қайталап көріңіз',
       'auth.errors.wrongPassword': 'Құпия сөз қате',
       'auth.errors.tooManyRequests': 'Тым көп әрекет. Кейінірек қайталаңыз',
       'auth.errors.resendFailed': 'Хат жіберу сәтсіз. Қайталап көріңіз',
-      'auth.hello': 'Сәлем',
-      'auth.verificationLinkSent': 'Поштаңа растау сілтемесі жіберілді!',
-      'auth.sentToEmail': 'Растау хаты жіберілді',
-      'auth.checkSpam': 'Егер хатты көрмесең, Спам бөлімің да тексер!',
-      'auth.clickLinkToVerify': 'Хаттағы сілтемені басып, аккаунтты расташы.',
+
       'auth.emailVerificationNote':
         'Поштаңа растау сілтемесі жіберіледі. Кейде хат Спамға түсіп кете еді — тексеріп шық!',
       'auth.verifyFirst': 'Алдымен почтаңды раста',
@@ -242,7 +206,7 @@ const resources = {
       'emailVerification.resending': 'Жіберілуде...',
       'emailVerification.resendSuccess': 'Растау хаты қайта жіберілді! Поштаңды тексер.',
       'auth.verifying': 'Растау үстінде...',
-      'auth.verifyingMessage': 'Email мекенжайыңызды растап жатырмыз. Күте тұрыңыз.',
+
       'auth.emailVerified': 'Email расталды',
       'auth.emailVerifiedMessage': 'Email мекенжайыңыз сәтті расталды!',
       'auth.nowYouCanLogin': 'Енді аккаунтқа кіре аласыз!',
@@ -284,13 +248,7 @@ const resources = {
       'emailVerification.resendEmail': 'Хатты қайта жіберу',
       'emailVerification.logoutAndTryAnother': 'Шығу және басқа емайл жасау',
       'emailVerification.needHelp': 'Көмек керек пе? youtub.maj@gmail.com',
-      'notFound.oops': 'Өй!',
-      'notFound.pageNotFound': 'Бет табылмады',
-      'notFound.message': 'Сіз іздеген бет жоқ немесе жылжытылған',
-      'notFound.goHome': 'Бас бетке',
-      'notFound.goBack': 'Артқа қайту',
-      'notFound.funFact': 'Қызықты факт:',
-      'notFound.fact': '404 қатесі HTTP протоколының бірінші нұсқасында пайда болды!',
+
       'home.welcome': 'AkadilEDU платформасына қош келдіңіз',
       'cookie.title': 'Cookie келісімі',
       'cookie.message':
@@ -311,29 +269,23 @@ const resources = {
         'Сіздің аккаунтқа басқа құрылғыдан кіру болды. Қауіпсіздік себептері бойынша алдыңғы сессия автоматты түрде аяқталды. Тек бір құрылғыдан қарауға болады.',
       'security.sessionRevoked.button': 'Түсінікті, қайта кіру',
       'security.sessionRevoked.help': 'Егер бұл сіз болмасаңыз, құпия сөзді дереу өзгертіңіз',
-      'security.singleDeviceRule': 'Аккаунтқа тек бір құрылғыдан кіруге болады',
-      'security.alert': 'Қауіпсіздік ескертуі',
-      'security.loginFromAnotherDevice':
-        'Біз сіздің аккаунтыңызға басқа құрылғыдан кіргенін анықтадық',
-      'security.pleaseLoginAgain': 'Қайта кіруді растаңыз',
+
       'security.accountBlocked': 'Сіздің аккаунтыңыз бұғатталған',
-      'security.contactSupport': 'Техникалық қолдауға хабарласыңыз',
+
       'security.blockedExplanation':
         'Сіздің аккаунтыңыз қауіпсіздік немесе саясатты бұзу себебінен бұғатталды',
       'security.blockedInstructions': 'Көмек алу үшін төмендегі байланыс мәліметтерін қолданыңыз',
-      'security.contactEmail': 'Email арқылы байланысу',
-      'security.contactWhatsApp': 'WhatsApp арқылы байланысу',
+
       'security.threatLevel': 'Қауіп деңгейі: ЖОҒАРЫ',
       'security.blockedForSecurity': 'Аккаунт қауіпсіздік мәселелері бойынша бұғатталды',
-      'security.contactViaWhatsApp': 'WhatsApp арқылы байланысу',
-      'security.contactViaTelegram': 'Telegram арқылы байланысу',
+
       'course.addDays': 'Күн қосу',
       'course.removeDays': 'Күн алу',
       'course.days': 'күн',
       'course.update': 'Жаңарту',
       'course.cancel': 'Болдырмау',
       'course.expired': 'Мерзімі аяқталған',
-      'course.expiresOn': 'Аяқталу күні',
+
       'course.editExpiry': 'Мерзімді өзгерту',
       'course.delete': 'Курсты жою',
       'course.confirmDelete': 'Сіз шынымен курсты жойғыңыз келе ме?',
@@ -400,7 +352,7 @@ const resources = {
       'test.answered': 'Жауап берілген',
       'test.total': 'Жалпы',
       'test.saving': 'Сақталуда...',
-      'test.save': 'Сақтау',
+
       'test.previous': 'Алдыңғы',
       'test.next': 'Келесі',
       'test.submit': 'Жіберу',
@@ -418,17 +370,13 @@ const resources = {
         'Шығармашылық режимі: тек Қазақстан тарихы және оқу сауаттылығы, 70 минут',
       'test.creativeModeTitle': 'Шығармашылық режим',
       'test.chooseProfileSubjects': 'Профильдік екі пәнді таңдаңыз',
-      'test.invalidProfileCombo': 'Мұндай профильдік пәндер жұбына рұқсат етілмейді',
-      'test.restoredFromDraft': 'Алдыңғы сақталған жоба қалпына келтірілді',
-      'test.autoSaved': 'Автожазба орындалды',
+
       'test.warning5min': '5 минут қалды',
       'test.warning1min': '1 минут қалды',
-      'test.selectedAnswers': 'Таңдалған жауаптар',
+
       'test.imageLoadError': 'Сурет жүктелмеді',
       'test.questionNotFound': 'Сұрақ табылмады',
-      'test.remaining': 'Қалған',
-      'test.current': 'Ағымдағы',
-      'test.totalQuestions': 'Жалпы сұрақтар',
+
       'test.prev': 'Алдыңғы',
       'test.testCompleted': 'Тест аяқталды',
       'test.accuracy': 'Дәлдік',
@@ -447,7 +395,7 @@ const resources = {
       'test.viewAnswers': 'Жауаптарды қарау',
       'test.hideAnswers': 'Жауаптарды жасыру',
       'test.needMinScore': 'Жауаптарды көру үшін кемінде 50% қажет',
-      'test.shareResult': 'Нәтижемен бөлісу',
+
       'test.takeAnotherTest': 'Басқа тест тапсыру',
       'test.answerReview': 'Жауаптарды шолу',
       'test.yourAnswer': 'Сіздің жауабыңыз',
@@ -459,10 +407,7 @@ const resources = {
       'test.recommendation3': 'Қиын тақырыптарға көңіл бөліңіз',
       'test.congratulations': 'Құттықтаймыз!',
       'test.excellentPerformance': 'Сіз өте жақсы нәтиже көрсеттіңіз!',
-      'test.shareText':
-        'Мен ҰБТ тестінен {{score}}% алдым! ({{correct}}/{{total}}) - {{testTitle}}',
-      'test.myTestResult': 'Менің тест нәтижем',
-      'test.linkCopied': 'Сілтеме көшірілді',
+
       'test.errorLoadingTest': 'Тестті жүктеу қатесі',
       'test.errorSubmittingTest': 'Тестті жіберу қатесі',
       'admin.testManagement': 'Тест басқару',
@@ -472,7 +417,7 @@ const resources = {
       'admin.testConfiguration': 'Тест конфигурациясы',
       'admin.testTitle': 'Тест атауы',
       'admin.enterTestTitle': 'Тест атауын енгізіңіз',
-      'admin.testMode': 'Тест режимі',
+
       'admin.timeLimit': 'Уақыт шегі',
       'admin.language': 'Тіл',
       'admin.selectSubjects': 'Пәндерді таңдау',
@@ -481,7 +426,7 @@ const resources = {
       'admin.totalQuestions': 'Барлық сұрақтар',
       'admin.questions': 'сұрақ',
       'admin.addQuestion': 'Сұрақ қосу',
-      'admin.manageQuestions': 'Сұрақтарды басқару',
+
       'admin.attempts': 'әрекет',
       'admin.avgScore': 'орт. балл',
       'admin.noTestsYet': 'Әлі тесттер жоқ',
@@ -519,8 +464,7 @@ const resources = {
       'test.selectTest': 'Тест таңдау',
       'test.noTestsAvailable': 'Қолжетімді тесттер жоқ',
       'test.noTestsForSubject': 'Бұл пән үшін тесттер құрылмаған',
-      'test.historyTitle': 'Сіз өткен тесттер тарихы',
-      'test.lastAttempt': 'Соңғы тапсыру уақыты: {{date}}',
+
       'test.alreadyTaken': 'Сіз бұл тестті тапсырдыңыз',
       'test.lastScore': 'Сіздің соңғы нәтижеңіз: {{score}}%',
       'test.uncompletedTestWarning': 'Сізде аяқталмаған тест бар',
@@ -551,8 +495,7 @@ const resources = {
       'admin.enterImageUrl': 'Сурет URL-ін енгізіңіз',
       'admin.testVariant': 'Тест нұсқасы',
       'admin.variant': 'Нұсқа',
-      'admin.testVariants': 'Тест нұсқалары',
-      'admin.manageBySubjects': 'Пәндер бойынша басқару',
+
       'ui.loadingPage': 'Бет жүктелуде…',
       'ui.selectACourse': 'Курсты таңдаңыз',
       'ui.couldNotAssignCourse': 'Курсты тағайындау мүмкін болмады',
@@ -598,7 +541,7 @@ const resources = {
       'ui.x': '∑x²',
       'ui.addOption': 'Нұсқа қосу',
       'ui.removeOption': 'Нұсқаны жою',
-      'ui.selectASubjectToManageTestVariants': 'Тест нұсқаларын басқару үшін пәнді таңдаңыз',
+
       'ui.aiInstructionsCopied': 'AI нұсқаулығы көшірілді',
       'ui.clipboardUnavailableUseASecureBrowserConnection':
         'Алмасу буфері қолжетімсіз. Қауіпсіз браузер қосылымын пайдаланыңыз.',
@@ -617,7 +560,7 @@ const resources = {
       'ui.sourceText': 'Бастапқы мәтін',
       'ui.needInstructionsForAnotherAiTool': 'Басқа AI құралына нұсқаулық қажет пе?',
       'ui.copyAiInstructions': 'AI нұсқаулығын көшіру',
-      'ui.1': '1',
+      'test.variantPlaceholder': '1',
       'language.kazakh': 'Қазақша',
       'language.russian': 'Русский',
       'ui.english': 'English',
@@ -625,11 +568,7 @@ const resources = {
       'ui.export': 'Экспорттау',
       'ui.questionText': 'Сұрақ мәтіні',
       'ui.options': 'нұсқа',
-      'ui.testVariantsBySubject': 'Пән бойынша тест нұсқалары',
-      'ui.createVariant': 'Нұсқа құру',
-      'ui.noTestVariants': 'Тест нұсқалары жоқ',
-      'ui.createTheFirstTestVariantForThis': 'Осы пән үшін алғашқы тест нұсқасын құрыңыз',
-      'ui.createFirstVariant': 'Алғашқы нұсқаны құру',
+
       'ui.enterTheNumberOfDays': 'Күн санын енгізіңіз',
       'ui.couldNotChangeNotifications': 'Хабарландыруларды өзгерту мүмкін болмады',
       'ui.riskLevel': 'Тәуекел деңгейі:',
@@ -681,31 +620,18 @@ const resources = {
       'ui.creativeTest': 'Шығармашылық тест',
       'ui.completionRecord': 'АЯҚТАУ НӘТИЖЕСІ',
       'ui.untPracticeTestCompleted': 'ҰБТ дайындық тесті аяқталды',
-      'ui.untPracticeTestCompleted2': 'ҰБТ дайындық тесті аяқталды',
+
       'ui.reviewYourAnswersToPlanYourNext':
         'Келесі дайындықты жоспарлау үшін жауаптарыңызды талдаңыз',
-      'ui.reviewYourAnswersToPlanYourNext2':
-        'Келесі дайындықты жоспарлау үшін жауаптарыңызды талдаңыз',
-      'ui.january': 'Қаңтар',
-      'ui.february': 'Ақпан',
-      'ui.march': 'Наурыз',
-      'ui.april': 'Сәуір',
-      'ui.may': 'Мамыр',
-      'ui.june': 'Маусым',
-      'ui.july': 'Шілде',
-      'ui.august': 'Тамыз',
-      'ui.september': 'Қыркүйек',
-      'ui.october': 'Қазан',
-      'ui.november': 'Қараша',
-      'ui.december': 'Желтоқсан',
+
       'ui.learningPlatform': 'Білім беру платформасы',
-      'ui.learningPlatform2': 'Білім беру платформасы',
+
       'ui.excellent': 'ӨТЕ ЖАҚСЫ',
-      'ui.excellent2': 'ӨТЕ ЖАҚСЫ',
+
       'ui.good': 'ЖАҚСЫ',
-      'ui.good2': 'ЖАҚСЫ',
+
       'ui.keepPractising': 'ДАЙЫНДЫҚТЫ ЖАЛҒАСТЫРЫҢЫЗ',
-      'ui.keepPractising2': 'ДАЙЫНДЫҚТЫ ЖАЛҒАСТЫРЫҢЫЗ',
+
       'ui.essentialStorage': 'Қажетті сақтау деректері',
       'ui.usedForAuthenticationAndSavedPreferences':
         'Кіру және сақталған баптаулар үшін қолданылады.',
@@ -720,8 +646,7 @@ const resources = {
       'ui.usersprofile': 'users.profile',
       'ui.yourProfileInformation': 'Профиль ақпаратыңыз',
       'ui.status': 'Күйі:',
-      'ui.playbackSpeed': 'Ойнату жылдамдығы',
-      'ui.normal': 'Қалыпты',
+
       'ui.toggleMenu': 'Мәзірді ашу немесе жабу',
       'ui.akadileduLogo': 'AkadilEDU логотипі',
       'ui.akadil': 'Akadil',
@@ -731,7 +656,7 @@ const resources = {
       'ui.profile': 'Профиль',
       'ui.signOut': 'Шығу',
       'ui.x2': 'x',
-      'ui.quiz': 'Тест',
+
       'ui.copiedToClipboard2': 'Алмасу буферіне көшірілді',
       'ui.openTheReviewToInspectYourAnswers': 'Жауаптарыңызды тексеру үшін талдауды ашыңыз',
       'ui.reviewIncorrectAnswers': 'Қате жауаптарды талдау',
@@ -744,9 +669,9 @@ const resources = {
       'ui.passwordsDoNotMatch': 'Парольдер сәйкес келмейді',
       'ui.couldNotSaveProfile': 'Профильді сақтау мүмкін болмады',
       'ui.avatar': 'Аватар',
-      'ui.userexamplecom': 'user@example.com',
-      'ui.7_700_1234567': '+7 (700) 123-45-67',
-      'language.russian2': '••••••••',
+
+      'profile.phonePlaceholder': '+7 (700) 123-45-67',
+      'auth.passwordPlaceholder': '••••••••',
       'ui.chooseAllowInYourBrowser': 'Браузерде Рұқсат беру түймесін таңдаңыз',
       'ui.enableNotifications2': 'Хабарландыруларды қосу',
       'ui.receiveLessonAndTestUpdates': 'Сабақтар мен тесттер туралы жаңалықтарды алыңыз.',
@@ -756,7 +681,7 @@ const resources = {
       'ui.yourAnswer': 'Сіздің жауабыңыз:',
       'ui.correctAnswer': 'Дұрыс жауап:',
       'ui.solution3': 'Шешімі:',
-      'ui.exportAllQuestions': 'Барлық сұрақтарды экспорттау',
+
       'ui.sanaAi': 'SANA',
       'ui.exportAll': 'Барлығын экспорттау',
       'ui.noQuestionsInThisTest': 'Бұл тестте сұрақтар жоқ',
@@ -795,15 +720,13 @@ const resources = {
       'ui.courseNotFound': 'Курс табылмады',
       'ui.signInToContinue': 'Жалғастыру үшін кіріңіз',
       'ui.testNotFound': 'Тест табылмады',
-      'ui.administratorSessionPolicy': 'Әкімші сессиясының саясаты',
-      'ui.noSessionsFound': 'Сессиялар табылмады',
+
       'ui.onlyJpgAndPngImagesAreAllowed': 'Тек JPG және PNG суреттеріне рұқсат етіледі',
       'ui.maximumFileSizeIs_5Mb': 'Файл көлемі 5 МБ-тан аспауы керек',
-      'ui.onlyJpgPngAndWebpImagesAre': 'Тек JPG, PNG және WebP суреттеріне рұқсат етіледі',
-      'ui.maximumFileSizeIs_10Mb': 'Файл көлемі 10 МБ-тан аспауы керек',
+
       'ui.databaseIsUnavailable2': 'Дерекқор қолжетімсіз',
       'ui.couldNotVerifyTheSavedTest': 'Сақталған тестті тексеру мүмкін болмады',
-      'ui.databaseIsUnavailable3': 'Дерекқор қолжетімсіз',
+
       'ui.test': 'Тест',
       'ui.couldNotSendNotification': 'Хабарландыру жіберу мүмкін болмады',
       'ui.totalUsers': 'Барлық пайдаланушылар',
@@ -901,11 +824,11 @@ const resources = {
         'Курс материалдарына қол жеткізуді әкімші береді',
       'ui.download': 'Жүктеп алу',
       'ui.emailSentTo': 'Хат жіберілді:',
-      'ui.youremailcom': 'your@email.com',
+      'auth.emailPlaceholder': 'your@email.com',
       'ui.tooManyAttemptsTryAgainLater': 'Әрекеттер саны тым көп. Кейін қайталаңыз.',
       'ui.signinCancelled': 'Кіру тоқтатылды',
       'ui.googleSigninFailedTryAgain': 'Google арқылы кіру сәтсіз. Қайталаңыз.',
-      'ui.7': '+7 (___) ___-__-__',
+
       'ui.invalidOrExpiredLink': 'Сілтеме қате немесе мерзімі өткен',
       'ui.thisLinkHasExpiredRequestANew': 'Сілтеменің мерзімі өтті. Жаңасын сұраңыз.',
       'ui.thisLinkIsInvalidOrAlreadyUsed': 'Сілтеме қате немесе қолданылған.',
@@ -945,13 +868,7 @@ const resources = {
       'ui.ipLookupFailed': 'IP анықталмады',
       'ui.signInToUploadAnAvatar': 'Аватар жүктеу үшін кіріңіз',
       'ui.signInToSaveYourProfile': 'Профильді сақтау үшін кіріңіз',
-      'ui.trustedDevice': 'Сенімді құрылғы',
-      'ui.signinFromANewIpAddress': 'Жаңа IP мекенжайынан кіру',
-      'ui.accessAllowed': 'Қол жеткізу рұқсат етілген',
-      'ui.emailVerificationSuggested': 'Пошта арқылы растау ұсынылады',
-      'ui.additionalReviewSuggested': 'Қосымша тексеру ұсынылады',
-      'ui.concurrentSessionLimitReached': 'Бір мезгілдегі сессиялар шегіне жетті',
-      'ui.unknownAction': 'Белгісіз әрекет',
+
       'configuration.unavailable': 'Қолданба бапталмаған. Әкімшіге хабарласыңыз.',
       'home.introduction':
         'Тағайындалған курстарды оқып, пәндік тесттермен дайындалыңыз және жауаптарыңызды талдаңыз.',
@@ -978,27 +895,23 @@ const resources = {
       'common.urlPlaceholder': 'HTTPS сілтемесі',
       'common.loadError': 'Деректер жүктелмеді. Қайталап көріңіз.',
       'common.retry': 'Қайталау',
-      'common.unavailable': 'Қолжетімсіз',
+
       'test.variantTitle': '{{v0}} | {{v1}}-нұсқа',
       'review.mistakes': '{{v0}} қате / {{v1}} сұрақ',
       'review.allCorrect': '{{v0}} сұрақ, барлығы дұрыс',
       'security.pendingCount': '{{v0}} ескерту тексеруді күтуде',
-      'security.ipCount': '24 сағатта {{v0}} IP мекенжайы',
-      'security.deviceCount': '24 сағатта {{v0}} құрылғы',
-      'security.ipChange': 'IP {{v0}} минут ішінде өзгерді',
-      'security.activeIps': '{{v0}} IP мекенжайынан белсенді сессиялар',
-      'security.concurrent': '{{v1}} IP мекенжайынан {{v0}} сессия',
+
       'notFound.title': 'Бет табылмады',
       'notFound.description': 'Мекенжайды тексеріңіз немесе басты бетке оралыңыз.',
       'common.home': 'Басты бетке',
-      'video.unavailable': 'Бейне қолжетімсіз',
+
       'common.photo': 'Фото',
       'common.unknownUser': 'Белгісіз пайдаланушы',
       'common.noReason': 'Себебі көрсетілмеген',
       'common.untitledTest': 'Атаусыз тест',
       'common.resumedTest': 'Жалғастырылған тест',
       'admin.pushResult': 'Жеткізілді: {{success}} / {{total}}. Қате: {{failed}}.',
-      'app.description': 'Курстарды оқып, пәндік тесттерге дайындалыңыз.',
+
       'auth.errors.loginFailed': 'Кіру сәтсіз. Қайталап көріңіз.',
       'auth.errors.signupFailed': 'Тіркелу сәтсіз. Қайталап көріңіз.',
       'courseDetail.invalidMaterialUrl': 'Материал сілтемесі жарамсыз. Әкімшіге хабарласыңыз.',
@@ -1006,6 +919,14 @@ const resources = {
   },
   ru: {
     translation: {
+      'app.description': 'Изучайте курсы и готовьтесь по предметным тестам.',
+      'common.unknown': 'Неизвестно',
+      'common.invalidJson': 'Некорректный JSON. Проверьте данные и повторите попытку.',
+      'courses.invalidExpiry': 'Дата окончания доступа должна быть в будущем.',
+      'cookie.accepted': 'Принято',
+      'cookie.notAccepted': 'Не принято',
+      'test.parsing': 'Обработка…',
+      'test.parse': 'Разобрать',
       'common.cancel': 'Отмена',
       'header.logo': 'AkadilEDU',
       'header.theme.light': 'Светлая тема',
@@ -1014,7 +935,7 @@ const resources = {
       'sidebar.courses': 'Курсы',
       'sidebar.myCourses': 'Мои курсы',
       'sidebar.testUBT': 'Тест ЕНТ',
-      'sidebar.shop': 'Магазин',
+
       'sidebar.admin': 'Админ',
       'courses.title': 'Курсы',
       'courses.availableCourses': 'Доступно курсов',
@@ -1026,23 +947,19 @@ const resources = {
       'courses.adminNoCoursesMessage': 'Создайте первый курс для ваших студентов',
       'courses.createFirst': 'Создать первый курс',
       'courses.viewCourse': 'Посмотреть курс',
-      'courses.startLearning': 'Начать обучение',
+
       'courses.modules': 'модулей',
       'courses.students': 'студентов',
       'courses.management': 'Управление курсами',
       'courses.createCourse': 'Создать курс',
       'courses.create': 'Создать',
-      'courses.previewMode': 'Превью для юзеров',
-      'courses.adminMode': 'Режим админа',
-      'courses.preview': 'Превью',
-      'courses.previewBanner':
-        'Режим превью: Вы видите страницу так, как её видят обычные пользователи',
+
       'courses.noDescription': 'Нет описания курса',
       'courses.edit': 'Редактировать',
       'courses.delete': 'Удалить',
       'courses.deleteConfirm': 'Вы уверены что хотите удалить этот курс?',
       'courses.coverUrl': 'URL Обложки (1920x480)',
-      'courses.coverUrlPlaceholder': 'https://example.com/cover.jpg',
+
       'courses.coverUrlHint':
         ' Рекомендуемый размер: 1920x480. Если не указать - сгенерируется красивый градиент автоматически',
       'courses.coverPreview': 'Превью',
@@ -1052,17 +969,12 @@ const resources = {
       'courses.expired': 'Срок истек',
       'courses.buyAgain': 'Купить снова',
       'courses.deleteError': 'Ошибка при удалении курса',
-      'courseDetail.backToCourses': 'Вернуться к курсам',
+
       'courseDetail.courseContent': 'Содержание курса',
-      'courseDetail.locked': 'Закрыто',
-      'courseDetail.unlocked': 'Открыто',
-      'courseDetail.lesson': 'Урок',
-      'courseDetail.homework': 'Домашнее задание',
+
       'courseDetail.formulas': 'Набор формул',
       'courseDetail.video': 'Видео',
-      'courseDetail.allLocked': 'Все уроки закрыты. Купите курс.',
-      'courseDetail.noModules': 'В этом курсе пока нет модулей',
-      'courseDetail.resumeBadge': 'Вы остановились на {{time}}',
+
       'courseDetail.videoUnavailable': 'Видео недоступно',
       'courseDetail.homeworkTitle': 'Домашнее задание',
       'courseDetail.homeworkOpen': 'Открыть задание',
@@ -1077,7 +989,7 @@ const resources = {
       'courseDetail.quizNoQuestionsFound': 'Вопросы не найдены. Проверьте формат.',
       'courseDetail.quizImportText': 'Импорт из текста',
       'courseDetail.quizImportHint': 'Введите вопросы в следующем формате:',
-      'courseDetail.quizImport': 'Импортировать',
+
       'courseDetail.quizAddManual': 'Добавить вручную',
       'courseDetail.quizQuestionText': 'Текст вопроса',
       'courseDetail.quizExplanation': 'Объяснение (необязательно)',
@@ -1085,37 +997,25 @@ const resources = {
       'courseDetail.quizCheckKnowledge': 'Проверь свои знания! Нельзя перейти без ответа.',
       'courseDetail.quizStart': 'Начать',
       'courseDetail.quizCorrect': 'Правильно! ',
-      'courseDetail.quizGreat': 'Отлично! ',
-      'courseDetail.quizPerfect': 'Превосходно! ',
+
       'courseDetail.quizStreakFire': ' Серия продолжается!',
       'courseDetail.quizWrong': 'Неправильно ',
-      'courseDetail.quizCorrectCount': 'правильно',
+
       'courseDetail.quizNext': 'Далее',
       'courseDetail.quizResults': 'Результаты',
       'courseDetail.quizExcellent': 'Отлично! Превосходный результат!',
       'courseDetail.quizGood': 'Хорошо! Нужно немного практики',
-      'courseDetail.quizNotBad': 'Неплохо, но нужно повторить!',
+
       'courseDetail.quizRetry': 'Пересмотрите урок и повторите!',
-      'courseDetail.quizRetake': 'Пройти заново',
+
       'courseDetail.quizBestLabel': 'Лучший',
-      'courseDetail.quizAlreadyTaken': 'Вы уже проходили этот тест. Хотите проверить себя снова?',
-      'courseDetail.quizRetakeShort': 'Пройти снова',
+
       'courseDetail.quizQuestionLabel': 'Вопрос',
-      'courseDetail.quizAiHintLoading': 'ИИ готовит подсказку...',
-      'courseDetail.quizAiHintTitle': 'Совет от учителя',
-      'courseDetail.quizWorkOnMistakes': 'Работа над ошибками',
-      'courseDetail.quizAiOnce': 'Подсказка ИИ доступна только один раз',
-      'courseDetail.quizViewLastFeedback': 'Посмотреть прошлую подсказку',
-      'courseDetail.quizHideFeedback': 'Скрыть',
-      'courseDetail.quizLastScore': 'Последний',
-      'courseDetail.quizAttempts': 'Попытки',
+
       'courseDetail.quizResultLabel': 'Результат',
       'courseDetail.quizLatest': 'последний',
       'courseDetail.quizPreviousAnswers': 'Предыдущие ответы',
-      'courseDetail.quizCheckWithSana': 'Проверить через SANA AI',
-      'courseDetail.quizSanaDesc': 'ИИ проанализирует ошибки и даст совет (только 1 раз)',
-      'courseDetail.quizSanaExplain':
-        'Просмотрите свои ответы и объяснения, добавленные преподавателем.',
+
       'courseDetail.quizReviewTitle': 'Разбор теста',
       'courseDetail.quizReviewOpen': 'Открыть тест',
       'courseDetail.quizBack': 'Назад',
@@ -1126,9 +1026,7 @@ const resources = {
       'courseDetail.quizCorrectAnswer': 'Правильный ответ',
       'courseDetail.quizReviewCorrect': 'Верно',
       'courseDetail.quizReviewWrong': 'Неверно',
-      'courseDetail.quizAiErrorNoAnswers': 'Ответы не найдены',
-      'courseDetail.quizAiErrorNoKey': 'Импорт с ИИ недоступен. Обратитесь к администратору.',
-      'courseDetail.quizAiErrorNoMistakes': 'Все ответы верны',
+
       'courseDetail.quizAiErrorGeneric':
         'Импорт не выполнен. Проверьте наличие ключа ответов и повторите попытку.',
       'courseDetail.quizPdfOnly': 'Загрузите только PDF файл',
@@ -1140,15 +1038,11 @@ const resources = {
       'courseDetail.quizPreviewTitle': 'Результат парсинга',
       'courseDetail.quizConfirmSave': 'Сохранить {{count}} вопросов',
       'courseDetail.moduleAdd': 'Добавить модуль',
-      'courseDetail.moduleAddDesc': 'Создать новый модуль',
-      'courseDetail.moduleName': 'Название модуля',
+
       'courseDetail.moduleNamePlaceholder': 'Название модуля',
-      'courseDetail.moduleColor': 'Цвет',
-      'courseDetail.moduleUrl': 'URL ссылки',
+
       'courseDetail.moduleUrlPlaceholder': 'Вставьте HTTPS-ссылку',
-      'courseDetail.moduleCancel': 'Отмена',
-      'courseDetail.moduleOpen': 'Открыть',
-      'courseEditor.title': 'Редактор курса',
+
       'courseEditor.createCourse': 'Создать новый курс',
       'courseEditor.editCourse': 'Редактировать курс',
       'courseEditor.courseName': 'Название курса *',
@@ -1160,19 +1054,11 @@ const resources = {
       'courseEditor.moduleName': 'Название модуля',
       'courseEditor.addLesson': 'Добавить урок',
       'courseEditor.lessonName': 'Название урока',
-      'courseEditor.lessonType': 'Тип урока',
-      'courseEditor.videoUrl': 'Видео URL (YouTube)',
-      'courseEditor.fileUrl': 'URL файла (Google Drive)',
+
       'courseEditor.duration': 'Длительность',
-      'courseEditor.save': 'Сохранить',
-      'courseEditor.saving': 'Сохранение...',
-      'courseEditor.cancel': 'Отмена',
+
       'courseEditor.noModules': 'Нет модулей. Добавьте первый модуль!',
-      'courseEditor.lessonTypes': {
-        video: 'Видео урок',
-        homework: 'Домашнее задание',
-        formulas: 'Набор формул',
-      },
+
       'profile.title': 'Настройки профиля',
       'profile.firstName': 'Имя',
       'profile.lastName': 'Фамилия',
@@ -1212,22 +1098,16 @@ const resources = {
       'auth.alreadyHaveAccount': 'Уже есть аккаунт?',
       'auth.signInHere': 'Войдите здесь',
       'auth.signUpHere': 'Зарегистрируйтесь',
-      'auth.accountCreated': 'Аккаунт создан!',
-      'auth.verificationSent': 'Письмо подтверждения отправлено',
-      'auth.verificationEmailSent': 'Письмо подтверждения отправлено на',
+
       'auth.checkEmail': 'Проверьте вашу почту',
-      'auth.redirecting': 'Перенаправление на страницу входа...',
+
       'auth.errors.userNotFound': 'Пользователь с таким email не найден',
       'auth.errors.invalidEmail': 'Неверный email адрес',
       'auth.errors.resetFailed': 'Сброс пароля не удался. Попробуйте еще раз',
       'auth.errors.wrongPassword': 'Неверный пароль',
       'auth.errors.tooManyRequests': 'Слишком много попыток. Попробуйте позже',
       'auth.errors.resendFailed': 'Не удалось отправить письмо. Попробуйте еще раз',
-      'auth.hello': 'Привет',
-      'auth.verificationLinkSent': 'Ссылка для подтверждения отправлена на почту!',
-      'auth.sentToEmail': 'Письмо подтверждения отправлено на',
-      'auth.checkSpam': 'Если не видишь письмо, проверь папку Спам!',
-      'auth.clickLinkToVerify': 'Нажми на ссылку в письме, чтобы подтвердить аккаунт.',
+
       'auth.emailVerificationNote':
         'На почту будет отправлена ссылка для подтверждения. Иногда письмо попадает в Спам — проверь!',
       'auth.verifyFirst': 'Сначала подтверди почту',
@@ -1237,7 +1117,7 @@ const resources = {
       'emailVerification.resending': 'Отправка...',
       'emailVerification.resendSuccess': 'Письмо отправлено повторно! Проверь почту.',
       'auth.verifying': 'Проверка...',
-      'auth.verifyingMessage': 'Подтверждаем ваш email. Пожалуйста, подождите.',
+
       'auth.emailVerified': 'Email подтвержден',
       'auth.emailVerifiedMessage': 'Ваш email успешно подтвержден!',
       'auth.nowYouCanLogin': 'Теперь вы можете войти в аккаунт!',
@@ -1279,13 +1159,7 @@ const resources = {
       'emailVerification.resendEmail': 'Отправить письмо снова',
       'emailVerification.logoutAndTryAnother': 'Выйти и попробовать другой email',
       'emailVerification.needHelp': 'Нужна помощь? youtub.maj@gmail.com',
-      'notFound.oops': 'Упс!',
-      'notFound.pageNotFound': 'Страница не найдена',
-      'notFound.message': 'Страница, которую вы ищете, не существует или была перемещена',
-      'notFound.goHome': 'На главную',
-      'notFound.goBack': 'Назад',
-      'notFound.funFact': 'Интересный факт:',
-      'notFound.fact': 'Ошибка 404 использовалась еще в первой версии HTTP протокола!',
+
       'home.welcome': 'Добро пожаловать в AkadilEDU',
       'cookie.title': 'Согласие на использование cookie',
       'cookie.message':
@@ -1306,29 +1180,24 @@ const resources = {
         'Был выполнен вход в ваш аккаунт с другого устройства. В целях безопасности предыдущая сессия была автоматически завершена. Только один может смотреть одновременно.',
       'security.sessionRevoked.button': 'Понятно, войти снова',
       'security.sessionRevoked.help': 'Если это были не вы, немедленно смените пароль',
-      'security.singleDeviceRule': 'Вход разрешён только с одного устройства',
-      'security.alert': 'Предупреждение безопасности',
-      'security.loginFromAnotherDevice': 'Мы зафиксировали вход с другого устройства',
-      'security.pleaseLoginAgain': 'Пожалуйста, войдите снова',
+
       'security.accountBlocked': 'Ваш аккаунт заблокирован',
-      'security.contactSupport': 'Свяжитесь с технической поддержкой',
+
       'security.blockedExplanation':
         'Ваш аккаунт был заблокирован по причине безопасности или нарушения правил',
       'security.blockedInstructions':
         'Используйте контактную информацию ниже, чтобы получить помощь',
-      'security.contactEmail': 'Связаться по Email',
-      'security.contactWhatsApp': 'Связаться через WhatsApp',
+
       'security.threatLevel': 'Уровень угрозы: ВЫСОКИЙ',
       'security.blockedForSecurity': 'Аккаунт заблокирован по соображениям безопасности',
-      'security.contactViaWhatsApp': 'Связаться через WhatsApp',
-      'security.contactViaTelegram': 'Связаться через Telegram',
+
       'course.addDays': 'Добавить дни',
       'course.removeDays': 'Убрать дни',
       'course.days': 'дней',
       'course.update': 'Обновить',
       'course.cancel': 'Отмена',
       'course.expired': 'Истёк',
-      'course.expiresOn': 'Срок действия до',
+
       'duration.hoursAndMinutes': '{{hours}} часов {{minutes}} минут',
       'duration.hoursOnly': '{{hours}} часов',
       'duration.minutesOnly': '{{minutes}} минут',
@@ -1395,7 +1264,7 @@ const resources = {
       'test.answered': 'Отвечено',
       'test.total': 'Всего',
       'test.saving': 'Сохранение...',
-      'test.save': 'Сохранить',
+
       'test.previous': 'Предыдущий',
       'test.next': 'Следующий',
       'test.submit': 'Отправить',
@@ -1413,17 +1282,13 @@ const resources = {
       'test.creativeModeNote':
         'Творческий режим: только История Казахстана и Грамотность чтения, 70 минут',
       'test.chooseProfileSubjects': 'Выберите два профильных предмета',
-      'test.invalidProfileCombo': 'Такую пару профильных предметов выбрать нельзя',
-      'test.restoredFromDraft': 'Восстановлен ранее сохранённый черновик теста',
-      'test.autoSaved': 'Автосохранение выполнено',
+
       'test.warning5min': 'Осталось 5 минут',
       'test.warning1min': 'Осталась 1 минута',
-      'test.selectedAnswers': 'Выбранные ответы',
+
       'test.imageLoadError': 'Изображение не загружено',
       'test.questionNotFound': 'Вопрос не найден',
-      'test.remaining': 'Осталось',
-      'test.current': 'Текущий',
-      'test.totalQuestions': 'Всего вопросов',
+
       'test.prev': 'Назад',
       'test.testCompleted': 'Тест завершен',
       'test.accuracy': 'Точность',
@@ -1442,7 +1307,7 @@ const resources = {
       'test.viewAnswers': 'Посмотреть ответы',
       'test.hideAnswers': 'Скрыть ответы',
       'test.needMinScore': 'Для просмотра ответов нужно набрать минимум 50%',
-      'test.shareResult': 'Поделиться результатом',
+
       'test.takeAnotherTest': 'Пройти другой тест',
       'test.answerReview': 'Обзор ответов',
       'test.yourAnswer': 'Ваш ответ',
@@ -1454,9 +1319,7 @@ const resources = {
       'test.recommendation3': 'Уделите внимание сложным темам',
       'test.congratulations': 'Поздравляем!',
       'test.excellentPerformance': 'Вы показали отличный результат!',
-      'test.shareText': 'Я набрал {{score}}% в тесте ЕНТ! ({{correct}}/{{total}}) - {{testTitle}}',
-      'test.myTestResult': 'Мой результат теста',
-      'test.linkCopied': 'Ссылка скопирована',
+
       'test.errorLoadingTest': 'Ошибка загрузки теста',
       'test.errorSubmittingTest': 'Ошибка отправки теста',
       'admin.testManagement': 'Управление тестами',
@@ -1466,7 +1329,7 @@ const resources = {
       'admin.testConfiguration': 'Конфигурация теста',
       'admin.testTitle': 'Название теста',
       'admin.enterTestTitle': 'Введите название теста',
-      'admin.testMode': 'Режим теста',
+
       'admin.timeLimit': 'Ограничение времени',
       'admin.language': 'Язык',
       'admin.selectSubjects': 'Выбор предметов',
@@ -1475,7 +1338,7 @@ const resources = {
       'admin.totalQuestions': 'Всего вопросов',
       'admin.questions': 'вопросов',
       'admin.addQuestion': 'Добавить вопрос',
-      'admin.manageQuestions': 'Управление вопросами',
+
       'admin.attempts': 'попыток',
       'admin.avgScore': 'средний балл',
       'admin.noTestsYet': 'Пока нет тестов',
@@ -1493,8 +1356,7 @@ const resources = {
       'test.selectTest': 'Выберите тест',
       'test.noTestsAvailable': 'Доступных тестов нет',
       'test.noTestsForSubject': 'Для этого предмета тесты не созданы',
-      'test.historyTitle': 'История пройденных тестов',
-      'test.lastAttempt': 'Последняя попытка: {{date}}',
+
       'test.alreadyTaken': 'Вы уже сдавали этот тест',
       'test.lastScore': 'Ваш последний результат: {{score}}%',
       'test.uncompletedTestWarning': 'У вас есть незавершенный тест',
@@ -1545,8 +1407,7 @@ const resources = {
       'admin.contextBlock.correctRequired': 'Укажите правильный ответ для вопроса №{{order}}.',
       'admin.testVariant': 'Вариант теста',
       'admin.variant': 'Вариант',
-      'admin.testVariants': 'Варианты тестов',
-      'admin.manageBySubjects': 'Управление по предметам',
+
       'ui.loadingPage': 'Загрузка страницы…',
       'ui.selectACourse': 'Выберите курс',
       'ui.couldNotAssignCourse': 'Не удалось назначить курс',
@@ -1594,7 +1455,7 @@ const resources = {
       'ui.x': '∑x²',
       'ui.addOption': 'Добавить вариант',
       'ui.removeOption': 'Удалить вариант',
-      'ui.selectASubjectToManageTestVariants': 'Выберите предмет для управления вариантами тестов',
+
       'ui.aiInstructionsCopied': 'Инструкция для ИИ скопирована',
       'ui.clipboardUnavailableUseASecureBrowserConnection':
         'Буфер обмена недоступен. Используйте защищённое подключение.',
@@ -1613,7 +1474,7 @@ const resources = {
       'ui.sourceText': 'Исходный текст',
       'ui.needInstructionsForAnotherAiTool': 'Нужна инструкция для другого ИИ?',
       'ui.copyAiInstructions': 'Скопировать инструкцию для ИИ',
-      'ui.1': '1',
+      'test.variantPlaceholder': '1',
       'language.kazakh': 'Қазақша',
       'language.russian': 'Русский',
       'ui.english': 'English',
@@ -1621,11 +1482,7 @@ const resources = {
       'ui.export': 'Экспорт',
       'ui.questionText': 'Текст вопроса',
       'ui.options': 'вариантов',
-      'ui.testVariantsBySubject': 'Варианты тестов по предмету',
-      'ui.createVariant': 'Создать вариант',
-      'ui.noTestVariants': 'Нет вариантов тестов',
-      'ui.createTheFirstTestVariantForThis': 'Создайте первый вариант теста для этого предмета',
-      'ui.createFirstVariant': 'Создать первый вариант',
+
       'ui.enterTheNumberOfDays': 'Укажите количество дней',
       'ui.couldNotChangeNotifications': 'Не удалось изменить уведомления',
       'ui.riskLevel': 'Уровень риска:',
@@ -1677,31 +1534,18 @@ const resources = {
       'ui.creativeTest': 'Творческий тест',
       'ui.completionRecord': 'РЕЗУЛЬТАТ ПРОХОЖДЕНИЯ',
       'ui.untPracticeTestCompleted': 'Подготовительный тест ЕНТ завершён',
-      'ui.untPracticeTestCompleted2': 'Подготовительный тест ЕНТ завершён',
+
       'ui.reviewYourAnswersToPlanYourNext':
         'Разберите ответы, чтобы спланировать следующую тренировку',
-      'ui.reviewYourAnswersToPlanYourNext2':
-        'Разберите ответы, чтобы спланировать следующую тренировку',
-      'ui.january': 'январь',
-      'ui.february': 'февраль',
-      'ui.march': 'март',
-      'ui.april': 'апрель',
-      'ui.may': 'май',
-      'ui.june': 'июнь',
-      'ui.july': 'июль',
-      'ui.august': 'август',
-      'ui.september': 'сентябрь',
-      'ui.october': 'октябрь',
-      'ui.november': 'ноябрь',
-      'ui.december': 'декабрь',
+
       'ui.learningPlatform': 'Образовательная платформа',
-      'ui.learningPlatform2': 'Образовательная платформа',
+
       'ui.excellent': 'ОТЛИЧНО',
-      'ui.excellent2': 'ОТЛИЧНО',
+
       'ui.good': 'ХОРОШО',
-      'ui.good2': 'ХОРОШО',
+
       'ui.keepPractising': 'ПРОДОЛЖАЙТЕ ТРЕНИРОВКУ',
-      'ui.keepPractising2': 'ПРОДОЛЖАЙТЕ ТРЕНИРОВКУ',
+
       'ui.essentialStorage': 'Необходимые данные',
       'ui.usedForAuthenticationAndSavedPreferences':
         'Используются для входа и сохранённых настроек.',
@@ -1716,8 +1560,7 @@ const resources = {
       'ui.usersprofile': 'users.profile',
       'ui.yourProfileInformation': 'Информация вашего профиля',
       'ui.status': 'Статус:',
-      'ui.playbackSpeed': 'Скорость воспроизведения',
-      'ui.normal': 'Обычная',
+
       'ui.toggleMenu': 'Открыть или закрыть меню',
       'ui.akadileduLogo': 'Логотип AkadilEDU',
       'ui.akadil': 'Akadil',
@@ -1727,7 +1570,7 @@ const resources = {
       'ui.profile': 'Профиль',
       'ui.signOut': 'Выйти',
       'ui.x2': 'x',
-      'ui.quiz': 'Тест',
+
       'ui.copiedToClipboard2': 'Скопировано в буфер обмена',
       'ui.openTheReviewToInspectYourAnswers': 'Откройте разбор, чтобы проверить ответы',
       'ui.reviewIncorrectAnswers': 'Разобрать неверные ответы',
@@ -1740,9 +1583,9 @@ const resources = {
       'ui.passwordsDoNotMatch': 'Пароли не совпадают',
       'ui.couldNotSaveProfile': 'Не удалось сохранить профиль',
       'ui.avatar': 'Аватар',
-      'ui.userexamplecom': 'user@example.com',
-      'ui.7_700_1234567': '+7 (700) 123-45-67',
-      'language.russian2': '••••••••',
+
+      'profile.phonePlaceholder': '+7 (700) 123-45-67',
+      'auth.passwordPlaceholder': '••••••••',
       'ui.chooseAllowInYourBrowser': 'Нажмите Разрешить в браузере',
       'ui.enableNotifications2': 'Включить уведомления',
       'ui.receiveLessonAndTestUpdates': 'Получайте новости об уроках и тестах.',
@@ -1752,7 +1595,7 @@ const resources = {
       'ui.yourAnswer': 'Ваш ответ:',
       'ui.correctAnswer': 'Правильный ответ:',
       'ui.solution3': 'Решение:',
-      'ui.exportAllQuestions': 'Экспортировать все вопросы',
+
       'ui.sanaAi': 'SANA',
       'ui.exportAll': 'Экспортировать всё',
       'ui.noQuestionsInThisTest': 'В этом тесте нет вопросов',
@@ -1791,15 +1634,13 @@ const resources = {
       'ui.courseNotFound': 'Курс не найден',
       'ui.signInToContinue': 'Войдите, чтобы продолжить',
       'ui.testNotFound': 'Тест не найден',
-      'ui.administratorSessionPolicy': 'Политика сессий администратора',
-      'ui.noSessionsFound': 'Сессии не найдены',
+
       'ui.onlyJpgAndPngImagesAreAllowed': 'Разрешены только изображения JPG и PNG',
       'ui.maximumFileSizeIs_5Mb': 'Максимальный размер файла — 5 МБ',
-      'ui.onlyJpgPngAndWebpImagesAre': 'Разрешены только изображения JPG, PNG и WebP',
-      'ui.maximumFileSizeIs_10Mb': 'Максимальный размер файла — 10 МБ',
+
       'ui.databaseIsUnavailable2': 'База данных недоступна',
       'ui.couldNotVerifyTheSavedTest': 'Не удалось проверить сохранённый тест',
-      'ui.databaseIsUnavailable3': 'База данных недоступна',
+
       'ui.test': 'Тест',
       'ui.couldNotSendNotification': 'Не удалось отправить уведомление',
       'ui.totalUsers': 'Всего пользователей',
@@ -1896,11 +1737,11 @@ const resources = {
         'Доступ к материалам курса назначает администратор',
       'ui.download': 'Скачать',
       'ui.emailSentTo': 'Письмо отправлено на:',
-      'ui.youremailcom': 'your@email.com',
+      'auth.emailPlaceholder': 'your@email.com',
       'ui.tooManyAttemptsTryAgainLater': 'Слишком много попыток. Повторите позже.',
       'ui.signinCancelled': 'Вход отменён',
       'ui.googleSigninFailedTryAgain': 'Не удалось войти через Google. Повторите попытку.',
-      'ui.7': '+7 (___) ___-__-__',
+
       'ui.invalidOrExpiredLink': 'Ссылка недействительна или устарела',
       'ui.thisLinkHasExpiredRequestANew': 'Срок действия ссылки истёк. Запросите новую.',
       'ui.thisLinkIsInvalidOrAlreadyUsed': 'Ссылка недействительна или уже использована.',
@@ -1941,13 +1782,7 @@ const resources = {
       'ui.ipLookupFailed': 'Не удалось определить IP',
       'ui.signInToUploadAnAvatar': 'Войдите для загрузки аватара',
       'ui.signInToSaveYourProfile': 'Войдите для сохранения профиля',
-      'ui.trustedDevice': 'Доверенное устройство',
-      'ui.signinFromANewIpAddress': 'Вход с нового IP-адреса',
-      'ui.accessAllowed': 'Доступ разрешён',
-      'ui.emailVerificationSuggested': 'Рекомендуется подтверждение по email',
-      'ui.additionalReviewSuggested': 'Рекомендуется дополнительная проверка',
-      'ui.concurrentSessionLimitReached': 'Достигнут лимит одновременных сессий',
-      'ui.unknownAction': 'Неизвестное действие',
+
       'configuration.unavailable': 'Приложение не настроено. Обратитесь к администратору.',
       'home.introduction':
         'Изучайте назначенные курсы, готовьтесь по предметным тестам и разбирайте ответы.',
@@ -1969,35 +1804,28 @@ const resources = {
       'admin.externalGuide':
         'Пронумеруйте вопросы и обозначьте варианты буквами A–F. Для каждого вопроса укажите явный ключ Correct:. Сохраните формулы и ссылки на изображения. Не придумывайте отсутствующие ответы.',
       'test.profileSubjects': 'Профильные предметы',
-      'courses.all': 'Все курсы',
-      'courses.featured': 'Избранные курсы',
-      'courses.enrollIn': 'Запросить доступ к курсу',
-      'courses.enroll': 'Запросить доступ',
+
       'courseDetail.quizPastePlaceholder': 'Вставьте вопросы, варианты и явный ключ ответов.',
       'common.urlPlaceholder': 'HTTPS-ссылка',
       'common.loadError': 'Не удалось загрузить данные. Повторите попытку.',
       'common.retry': 'Повторить',
-      'common.unavailable': 'Недоступно',
+
       'test.variantTitle': '{{v0}} | Вариант {{v1}}',
       'review.mistakes': '{{v0}} ошибок / {{v1}} вопросов',
       'review.allCorrect': '{{v0}} вопросов, все ответы верны',
       'security.pendingCount': '{{v0}} оповещений ожидают проверки',
-      'security.ipCount': '{{v0}} IP-адресов за 24 часа',
-      'security.deviceCount': '{{v0}} устройств за 24 часа',
-      'security.ipChange': 'IP изменился за {{v0}} минут',
-      'security.activeIps': 'Активные сессии с {{v0}} IP-адресов',
-      'security.concurrent': '{{v0}} одновременных сессий с {{v1}} IP-адресов',
+
       'notFound.title': 'Страница не найдена',
       'notFound.description': 'Проверьте адрес или вернитесь на главную.',
       'common.home': 'На главную',
-      'video.unavailable': 'Видео недоступно',
+
       'common.photo': 'Фото',
       'common.unknownUser': 'Неизвестный пользователь',
       'common.noReason': 'Причина не указана',
       'common.untitledTest': 'Тест без названия',
       'common.resumedTest': 'Продолженный тест',
       'admin.pushResult': 'Доставлено: {{success}} из {{total}}. Ошибок: {{failed}}.',
-      'app.description': 'Изучайте курсы и готовьтесь по предметным тестам.',
+
       'auth.errors.loginFailed': 'Не удалось войти. Повторите попытку.',
       'auth.errors.signupFailed': 'Не удалось зарегистрироваться. Повторите попытку.',
       'courseDetail.invalidMaterialUrl':
@@ -2006,6 +1834,14 @@ const resources = {
   },
   en: {
     translation: {
+      'app.description': 'Study courses and prepare with subject practice tests.',
+      'common.unknown': 'Unknown',
+      'common.invalidJson': 'Invalid JSON. Check the data and try again.',
+      'courses.invalidExpiry': 'The access expiry date must be in the future.',
+      'cookie.accepted': 'Accepted',
+      'cookie.notAccepted': 'Not accepted',
+      'test.parsing': 'Parsing…',
+      'test.parse': 'Parse',
       'common.cancel': 'Cancel',
       'header.logo': 'AkadilEDU',
       'header.theme.light': 'Light mode',
@@ -2014,7 +1850,7 @@ const resources = {
       'sidebar.courses': 'Courses',
       'sidebar.myCourses': 'My Courses',
       'sidebar.testUBT': 'UBT Test',
-      'sidebar.shop': 'Shop',
+
       'sidebar.admin': 'Admin',
       'courses.title': 'Courses',
       'courses.availableCourses': 'Available courses',
@@ -2026,22 +1862,19 @@ const resources = {
       'courses.adminNoCoursesMessage': 'Create the first course for your students',
       'courses.createFirst': 'Create first course',
       'courses.viewCourse': 'View Course',
-      'courses.startLearning': 'Start Learning',
+
       'courses.modules': 'modules',
       'courses.students': 'students',
       'courses.management': 'Course Management',
       'courses.createCourse': 'Create Course',
       'courses.create': 'Create',
-      'courses.previewMode': 'Preview for users',
-      'courses.adminMode': 'Admin mode',
-      'courses.preview': 'Preview',
-      'courses.previewBanner': 'Preview mode: You see the page as regular users see it',
+
       'courses.noDescription': 'No course description',
       'courses.edit': 'Edit',
       'courses.delete': 'Delete',
       'courses.deleteConfirm': 'Are you sure you want to delete this course?',
       'courses.coverUrl': 'Cover URL (1920x480)',
-      'courses.coverUrlPlaceholder': 'https://example.com/cover.jpg',
+
       'courses.coverUrlHint':
         ' Recommended size: 1920x480. If not specified - a beautiful gradient will be generated automatically',
       'courses.coverPreview': 'Preview',
@@ -2051,17 +1884,12 @@ const resources = {
       'courses.expired': 'Expired',
       'courses.buyAgain': 'Buy Again',
       'courses.deleteError': 'Failed to delete course',
-      'courseDetail.backToCourses': 'Back to Courses',
+
       'courseDetail.courseContent': 'Course Content',
-      'courseDetail.locked': 'Locked',
-      'courseDetail.unlocked': 'Unlocked',
-      'courseDetail.lesson': 'Lesson',
-      'courseDetail.homework': 'Homework',
+
       'courseDetail.formulas': 'Formula Set',
       'courseDetail.video': 'Video',
-      'courseDetail.allLocked': 'All lessons are locked. Purchase the course.',
-      'courseDetail.noModules': 'This course has no modules yet',
-      'courseDetail.resumeBadge': 'You stopped at {{time}}',
+
       'courseDetail.videoUnavailable': 'Video unavailable',
       'courseDetail.homeworkTitle': 'Homework',
       'courseDetail.homeworkOpen': 'Open assignment',
@@ -2076,7 +1904,7 @@ const resources = {
       'courseDetail.quizNoQuestionsFound': 'No questions found. Check the format.',
       'courseDetail.quizImportText': 'Import from text',
       'courseDetail.quizImportHint': 'Enter questions in the following format:',
-      'courseDetail.quizImport': 'Import',
+
       'courseDetail.quizAddManual': 'Add manually',
       'courseDetail.quizQuestionText': 'Question text',
       'courseDetail.quizExplanation': 'Explanation (optional)',
@@ -2084,34 +1912,23 @@ const resources = {
       'courseDetail.quizCheckKnowledge': 'Test your knowledge! You must answer to continue.',
       'courseDetail.quizStart': 'Start',
       'courseDetail.quizCorrect': 'Correct! ',
-      'courseDetail.quizGreat': 'Great! ',
-      'courseDetail.quizPerfect': 'Perfect! ',
+
       'courseDetail.quizStreakFire': ' Streak continues!',
       'courseDetail.quizWrong': 'Wrong ',
-      'courseDetail.quizCorrectCount': 'correct',
+
       'courseDetail.quizNext': 'Next',
       'courseDetail.quizResults': 'Results',
       'courseDetail.quizExcellent': 'Excellent! Amazing result!',
       'courseDetail.quizGood': 'Good! A little more practice needed',
-      'courseDetail.quizNotBad': 'Not bad, but review needed!',
+
       'courseDetail.quizRetry': 'Review the lesson and try again!',
-      'courseDetail.quizRetake': 'Retake',
+
       'courseDetail.quizBestLabel': 'Best',
-      'courseDetail.quizAlreadyTaken':
-        'You have already taken this quiz. Want to check yourself again?',
-      'courseDetail.quizRetakeShort': 'Try again',
+
       'courseDetail.quizQuestionLabel': 'Question',
-      'courseDetail.quizAiHintLoading': 'AI preparing hint...',
-      'courseDetail.quizAiHintTitle': "Teacher's Advice",
-      'courseDetail.quizWorkOnMistakes': 'Work on Mistakes',
-      'courseDetail.quizAiOnce': 'AI feedback can only be generated once per quiz',
-      'courseDetail.quizViewLastFeedback': 'View previous AI feedback',
-      'courseDetail.quizHideFeedback': 'Hide',
-      'courseDetail.quizLastScore': 'Last',
-      'courseDetail.quizAttempts': 'Attempts',
+
       'courseDetail.quizPreviousAnswers': 'Previous answers',
-      'courseDetail.quizCheckWithSana': 'Check with SANA AI',
-      'courseDetail.quizSanaDesc': 'AI will analyze mistakes and give advice (once only)',
+
       'courseDetail.quizPdfOnly': 'Please upload a PDF file only',
       'courseDetail.quizUploadPdf': 'Upload PDF',
       'courseDetail.quizPdfHint': 'Upload a PDF file, AI will automatically extract questions',
@@ -2120,7 +1937,7 @@ const resources = {
       'courseDetail.quizAiImport': 'AI Import',
       'courseDetail.quizPreviewTitle': 'Parsing result',
       'courseDetail.quizConfirmSave': 'Save {{count}} questions',
-      'courseEditor.title': 'Course Editor',
+
       'courseEditor.createCourse': 'Create New Course',
       'courseEditor.editCourse': 'Edit Course',
       'courseEditor.courseName': 'Course Name *',
@@ -2132,19 +1949,11 @@ const resources = {
       'courseEditor.moduleName': 'Module Name',
       'courseEditor.addLesson': 'Add Lesson',
       'courseEditor.lessonName': 'Lesson Name',
-      'courseEditor.lessonType': 'Lesson Type',
-      'courseEditor.videoUrl': 'Video URL (YouTube)',
-      'courseEditor.fileUrl': 'File URL (Google Drive)',
+
       'courseEditor.duration': 'Duration',
-      'courseEditor.save': 'Save',
-      'courseEditor.saving': 'Saving...',
-      'courseEditor.cancel': 'Cancel',
+
       'courseEditor.noModules': 'No modules. Add the first module!',
-      'courseEditor.lessonTypes': {
-        video: 'Video Lesson',
-        homework: 'Homework',
-        formulas: 'Formula Set',
-      },
+
       'profile.title': 'Profile Settings',
       'profile.firstName': 'First Name',
       'profile.lastName': 'Last Name',
@@ -2185,22 +1994,16 @@ const resources = {
       'auth.alreadyHaveAccount': 'Already have an account?',
       'auth.signInHere': 'Sign in here',
       'auth.signUpHere': 'Sign up',
-      'auth.accountCreated': 'Account Created!',
-      'auth.verificationSent': 'Verification email sent',
-      'auth.verificationEmailSent': "We've sent a verification email to",
+
       'auth.checkEmail': 'Check your email',
-      'auth.redirecting': 'Redirecting to login page...',
+
       'auth.errors.userNotFound': 'No account found with this email',
       'auth.errors.invalidEmail': 'Invalid email address',
       'auth.errors.resetFailed': 'Password reset failed. Please try again',
       'auth.errors.wrongPassword': 'Incorrect password',
       'auth.errors.tooManyRequests': 'Too many attempts. Please try again later',
       'auth.errors.resendFailed': 'Failed to send email. Please try again',
-      'auth.hello': 'Hello',
-      'auth.verificationLinkSent': 'Verification link sent to your email!',
-      'auth.sentToEmail': 'Verification email sent to',
-      'auth.checkSpam': "If you don't see the email, check your Spam folder!",
-      'auth.clickLinkToVerify': 'Click the link in the email to verify your account.',
+
       'auth.emailVerificationNote':
         'A verification link will be sent to your email. Sometimes it goes to Spam — check it!',
       'auth.verifyFirst': 'Please verify your email first',
@@ -2210,7 +2013,7 @@ const resources = {
       'emailVerification.resending': 'Sending...',
       'emailVerification.resendSuccess': 'Verification email resent! Check your inbox.',
       'auth.verifying': 'Verifying...',
-      'auth.verifyingMessage': 'Verifying your email address. Please wait.',
+
       'auth.emailVerified': 'Email Verified',
       'auth.emailVerifiedMessage': 'Your email has been successfully verified!',
       'auth.nowYouCanLogin': 'You can now log in to your account!',
@@ -2252,13 +2055,7 @@ const resources = {
       'emailVerification.resendEmail': 'Resend Email',
       'emailVerification.logoutAndTryAnother': 'Logout and try another email',
       'emailVerification.needHelp': 'Need help? youtub.maj@gmail.com',
-      'notFound.oops': 'Oops!',
-      'notFound.pageNotFound': 'Page Not Found',
-      'notFound.message': "The page you're looking for doesn't exist or has been moved",
-      'notFound.goHome': 'Go Home',
-      'notFound.goBack': 'Go Back',
-      'notFound.funFact': 'Fun Fact:',
-      'notFound.fact': 'The 404 error has been used since the first version of HTTP protocol!',
+
       'home.welcome': 'Welcome to AkadilEDU',
       'cookie.title': 'Cookie Consent',
       'cookie.message': 'We use essential cookies to store your theme and language preferences.',
@@ -2278,28 +2075,23 @@ const resources = {
         'Someone logged into your account from another device. For security reasons, the previous session was automatically ended. Only one can watch at a time.',
       'security.sessionRevoked.button': 'Got it, sign in again',
       'security.sessionRevoked.help': "If this wasn't you, change your password immediately",
-      'security.singleDeviceRule': 'Only one device can be logged in at a time',
-      'security.alert': 'Security Alert',
-      'security.loginFromAnotherDevice': 'We detected a login from another device',
-      'security.pleaseLoginAgain': 'Please log in again',
+
       'security.accountBlocked': 'Your account has been blocked',
-      'security.contactSupport': 'Please contact support',
+
       'security.blockedExplanation':
         'Your account has been blocked due to security concerns or policy violations',
       'security.blockedInstructions': 'Use the contact information below to get help',
-      'security.contactEmail': 'Contact via Email',
-      'security.contactWhatsApp': 'Contact via WhatsApp',
+
       'security.threatLevel': 'Threat Level: HIGH',
       'security.blockedForSecurity': 'Account blocked for security reasons',
-      'security.contactViaWhatsApp': 'Contact via WhatsApp',
-      'security.contactViaTelegram': 'Contact via Telegram',
+
       'course.addDays': 'Add days',
       'course.removeDays': 'Remove days',
       'course.days': 'days',
       'course.update': 'Update',
       'course.cancel': 'Cancel',
       'course.expired': 'Expired',
-      'course.expiresOn': 'Expires on',
+
       'course.editExpiry': 'Edit expiry',
       'course.delete': 'Delete course',
       'course.confirmDelete': 'Are you sure you want to delete this course?',
@@ -2366,7 +2158,7 @@ const resources = {
       'test.answered': 'Answered',
       'test.total': 'Total',
       'test.saving': 'Saving...',
-      'test.save': 'Save',
+
       'test.previous': 'Previous',
       'test.next': 'Next',
       'test.submit': 'Submit',
@@ -2383,17 +2175,13 @@ const resources = {
       'test.creativeModeNote':
         'Creative mode: only Kazakh History and Reading Literacy, 70 minutes',
       'test.chooseProfileSubjects': 'Choose two profile subjects',
-      'test.invalidProfileCombo': 'This combination of profile subjects is not allowed',
-      'test.restoredFromDraft': 'Previously saved test draft has been restored',
-      'test.autoSaved': 'Auto-saved',
+
       'test.warning5min': '5 minutes left',
       'test.warning1min': '1 minute left',
-      'test.selectedAnswers': 'Selected answers',
+
       'test.imageLoadError': 'Image failed to load',
       'test.questionNotFound': 'Question not found',
-      'test.remaining': 'Remaining',
-      'test.current': 'Current',
-      'test.totalQuestions': 'Total questions',
+
       'test.prev': 'Previous',
       'test.testCompleted': 'Test completed',
       'test.accuracy': 'Accuracy',
@@ -2412,7 +2200,7 @@ const resources = {
       'test.viewAnswers': 'View answers',
       'test.hideAnswers': 'Hide answers',
       'test.needMinScore': 'Minimum 50% required to view answers',
-      'test.shareResult': 'Share result',
+
       'test.takeAnotherTest': 'Take another test',
       'test.answerReview': 'Answer review',
       'test.yourAnswer': 'Your answer',
@@ -2424,10 +2212,7 @@ const resources = {
       'test.recommendation3': 'Focus on difficult topics',
       'test.congratulations': 'Congratulations!',
       'test.excellentPerformance': 'You showed excellent performance!',
-      'test.shareText':
-        'I scored {{score}}% on the UBT test! ({{correct}}/{{total}}) - {{testTitle}}',
-      'test.myTestResult': 'My test result',
-      'test.linkCopied': 'Link copied',
+
       'test.errorLoadingTest': 'Error loading test',
       'test.errorSubmittingTest': 'Error submitting test',
       'admin.testManagement': 'Test Management',
@@ -2437,7 +2222,7 @@ const resources = {
       'admin.testConfiguration': 'Test Configuration',
       'admin.testTitle': 'Test Title',
       'admin.enterTestTitle': 'Enter test title',
-      'admin.testMode': 'Test Mode',
+
       'admin.timeLimit': 'Time Limit',
       'admin.language': 'Language',
       'admin.selectSubjects': 'Select Subjects',
@@ -2446,7 +2231,7 @@ const resources = {
       'admin.totalQuestions': 'Total Questions',
       'admin.questions': 'questions',
       'admin.addQuestion': 'Add Question',
-      'admin.manageQuestions': 'Manage Questions',
+
       'admin.attempts': 'attempts',
       'admin.avgScore': 'avg score',
       'admin.noTestsYet': 'No tests yet',
@@ -2464,8 +2249,7 @@ const resources = {
       'test.selectTest': 'Select Test',
       'test.noTestsAvailable': 'No tests available',
       'test.noTestsForSubject': 'No tests created for this subject',
-      'test.historyTitle': 'Your test history',
-      'test.lastAttempt': 'Last attempt: {{date}}',
+
       'test.alreadyTaken': 'You have already taken this test',
       'test.lastScore': 'Your last score: {{score}}%',
       'test.uncompletedTestWarning': 'You have an uncompleted test',
@@ -2515,8 +2299,7 @@ const resources = {
       'admin.contextBlock.correctRequired': 'Select the correct answer for question №{{order}}.',
       'admin.testVariant': 'Test Variant',
       'admin.variant': 'Variant',
-      'admin.testVariants': 'Test Variants',
-      'admin.manageBySubjects': 'Manage by Subjects',
+
       'ui.loadingPage': 'Loading page…',
       'ui.selectACourse': 'Select a course',
       'ui.couldNotAssignCourse': 'Could not assign course',
@@ -2562,7 +2345,7 @@ const resources = {
       'ui.x': '∑x²',
       'ui.addOption': 'Add option',
       'ui.removeOption': 'Remove option',
-      'ui.selectASubjectToManageTestVariants': 'Select a subject to manage test variants',
+
       'ui.aiInstructionsCopied': 'AI instructions copied',
       'ui.clipboardUnavailableUseASecureBrowserConnection':
         'Clipboard unavailable. Use a secure browser connection.',
@@ -2581,7 +2364,7 @@ const resources = {
       'ui.sourceText': 'Source text',
       'ui.needInstructionsForAnotherAiTool': 'Need instructions for another AI tool?',
       'ui.copyAiInstructions': 'Copy AI instructions',
-      'ui.1': '1',
+      'test.variantPlaceholder': '1',
       'language.kazakh': 'Қазақша',
       'language.russian': 'Русский',
       'ui.english': 'English',
@@ -2589,11 +2372,7 @@ const resources = {
       'ui.export': 'Export',
       'ui.questionText': 'Question text',
       'ui.options': 'options',
-      'ui.testVariantsBySubject': 'Test variants by subject',
-      'ui.createVariant': 'Create variant',
-      'ui.noTestVariants': 'No test variants',
-      'ui.createTheFirstTestVariantForThis': 'Create the first test variant for this subject',
-      'ui.createFirstVariant': 'Create first variant',
+
       'ui.enterTheNumberOfDays': 'Enter the number of days',
       'ui.couldNotChangeNotifications': 'Could not change notifications',
       'ui.riskLevel': 'Risk level:',
@@ -2645,31 +2424,18 @@ const resources = {
       'ui.creativeTest': 'Creative test',
       'ui.completionRecord': 'COMPLETION RECORD',
       'ui.untPracticeTestCompleted': 'UNT practice test completed',
-      'ui.untPracticeTestCompleted2': 'UNT practice test completed',
+
       'ui.reviewYourAnswersToPlanYourNext':
         'Review your answers to plan your next practice session',
-      'ui.reviewYourAnswersToPlanYourNext2':
-        'Review your answers to plan your next practice session',
-      'ui.january': 'January',
-      'ui.february': 'February',
-      'ui.march': 'March',
-      'ui.april': 'April',
-      'ui.may': 'May',
-      'ui.june': 'June',
-      'ui.july': 'July',
-      'ui.august': 'August',
-      'ui.september': 'September',
-      'ui.october': 'October',
-      'ui.november': 'November',
-      'ui.december': 'December',
+
       'ui.learningPlatform': 'Learning platform',
-      'ui.learningPlatform2': 'Learning platform',
+
       'ui.excellent': 'EXCELLENT',
-      'ui.excellent2': 'EXCELLENT',
+
       'ui.good': 'GOOD',
-      'ui.good2': 'GOOD',
+
       'ui.keepPractising': 'KEEP PRACTISING',
-      'ui.keepPractising2': 'KEEP PRACTISING',
+
       'ui.essentialStorage': 'Essential storage',
       'ui.usedForAuthenticationAndSavedPreferences':
         'Used for authentication and saved preferences.',
@@ -2684,8 +2450,7 @@ const resources = {
       'ui.usersprofile': 'users.profile',
       'ui.yourProfileInformation': 'Your profile information',
       'ui.status': 'Status:',
-      'ui.playbackSpeed': 'Playback speed',
-      'ui.normal': 'Normal',
+
       'ui.toggleMenu': 'Toggle menu',
       'ui.akadileduLogo': 'AkadilEDU logo',
       'ui.akadil': 'Akadil',
@@ -2695,7 +2460,7 @@ const resources = {
       'ui.profile': 'Profile',
       'ui.signOut': 'Sign out',
       'ui.x2': 'x',
-      'ui.quiz': 'Quiz',
+
       'ui.copiedToClipboard2': 'Copied to clipboard',
       'ui.openTheReviewToInspectYourAnswers': 'Open the review to inspect your answers',
       'ui.reviewIncorrectAnswers': 'Review incorrect answers',
@@ -2708,9 +2473,9 @@ const resources = {
       'ui.passwordsDoNotMatch': 'Passwords do not match',
       'ui.couldNotSaveProfile': 'Could not save profile',
       'ui.avatar': 'Avatar',
-      'ui.userexamplecom': 'user@example.com',
-      'ui.7_700_1234567': '+7 (700) 123-45-67',
-      'language.russian2': '••••••••',
+
+      'profile.phonePlaceholder': '+7 (700) 123-45-67',
+      'auth.passwordPlaceholder': '••••••••',
       'ui.chooseAllowInYourBrowser': 'Choose Allow in your browser',
       'ui.enableNotifications2': 'Enable notifications',
       'ui.receiveLessonAndTestUpdates': 'Receive lesson and test updates.',
@@ -2720,7 +2485,7 @@ const resources = {
       'ui.yourAnswer': 'Your answer:',
       'ui.correctAnswer': 'Correct answer:',
       'ui.solution3': 'Solution:',
-      'ui.exportAllQuestions': 'Export all questions',
+
       'ui.sanaAi': 'SANA',
       'ui.exportAll': 'Export all',
       'ui.noQuestionsInThisTest': 'No questions in this test',
@@ -2759,15 +2524,13 @@ const resources = {
       'ui.courseNotFound': 'Course not found',
       'ui.signInToContinue': 'Sign in to continue',
       'ui.testNotFound': 'Test not found',
-      'ui.administratorSessionPolicy': 'Administrator session policy',
-      'ui.noSessionsFound': 'No sessions found',
+
       'ui.onlyJpgAndPngImagesAreAllowed': 'Only JPG and PNG images are allowed',
       'ui.maximumFileSizeIs_5Mb': 'Maximum file size is 5 MB',
-      'ui.onlyJpgPngAndWebpImagesAre': 'Only JPG, PNG and WebP images are allowed',
-      'ui.maximumFileSizeIs_10Mb': 'Maximum file size is 10 MB',
+
       'ui.databaseIsUnavailable2': 'Database is unavailable',
       'ui.couldNotVerifyTheSavedTest': 'Could not verify the saved test',
-      'ui.databaseIsUnavailable3': 'Database is unavailable',
+
       'ui.test': 'Test',
       'ui.couldNotSendNotification': 'Could not send notification',
       'ui.totalUsers': 'Total users',
@@ -2863,11 +2626,11 @@ const resources = {
         'Your administrator assigns access to course materials',
       'ui.download': 'Download',
       'ui.emailSentTo': 'Email sent to:',
-      'ui.youremailcom': 'your@email.com',
+      'auth.emailPlaceholder': 'your@email.com',
       'ui.tooManyAttemptsTryAgainLater': 'Too many attempts. Try again later.',
       'ui.signinCancelled': 'Sign-in cancelled',
       'ui.googleSigninFailedTryAgain': 'Google sign-in failed. Try again.',
-      'ui.7': '+7 (___) ___-__-__',
+
       'ui.invalidOrExpiredLink': 'Invalid or expired link',
       'ui.thisLinkHasExpiredRequestANew': 'This link has expired. Request a new one.',
       'ui.thisLinkIsInvalidOrAlreadyUsed': 'This link is invalid or already used.',
@@ -2907,13 +2670,7 @@ const resources = {
       'ui.ipLookupFailed': 'IP lookup failed',
       'ui.signInToUploadAnAvatar': 'Sign in to upload an avatar',
       'ui.signInToSaveYourProfile': 'Sign in to save your profile',
-      'ui.trustedDevice': 'Trusted device',
-      'ui.signinFromANewIpAddress': 'Sign-in from a new IP address',
-      'ui.accessAllowed': 'Access allowed',
-      'ui.emailVerificationSuggested': 'Email verification suggested',
-      'ui.additionalReviewSuggested': 'Additional review suggested',
-      'ui.concurrentSessionLimitReached': 'Concurrent session limit reached',
-      'ui.unknownAction': 'Unknown action',
+
       'configuration.unavailable': 'The application is not configured. Contact the administrator.',
       'home.introduction':
         'Access your assigned courses, practise with subject tests and review your answers.',
@@ -2935,14 +2692,10 @@ const resources = {
       'admin.externalGuide':
         'Number each question. Label options A–F. Include an explicit Correct: answer key for every question. Preserve formulas and image links. Do not invent missing answers.',
       'test.profileSubjects': 'Profile subjects',
-      'courses.all': 'All courses',
-      'courses.featured': 'Featured courses',
-      'courses.enrollIn': 'Request course access',
-      'courses.enroll': 'Request access',
+
       'courseDetail.quizResultLabel': 'Result',
       'courseDetail.quizLatest': 'latest',
-      'courseDetail.quizSanaExplain':
-        'Review your answers and the explanations supplied by your teacher.',
+
       'courseDetail.quizReviewTitle': 'Test review',
       'courseDetail.quizReviewOpen': 'Open test',
       'courseDetail.quizBack': 'Back',
@@ -2953,47 +2706,38 @@ const resources = {
       'courseDetail.quizCorrectAnswer': 'Correct answer',
       'courseDetail.quizReviewCorrect': 'Correct',
       'courseDetail.quizReviewWrong': 'Incorrect',
-      'courseDetail.quizAiErrorNoAnswers': 'No answers found',
-      'courseDetail.quizAiErrorNoKey': 'AI import is unavailable. Contact the administrator.',
-      'courseDetail.quizAiErrorNoMistakes': 'All answers are correct',
+
       'courseDetail.quizAiErrorGeneric':
         'Import failed. Check that the document includes an answer key and retry.',
       'courseDetail.moduleAdd': 'Add module',
-      'courseDetail.moduleAddDesc': 'Create a new module',
-      'courseDetail.moduleName': 'Module name',
+
       'courseDetail.moduleNamePlaceholder': 'Module title',
-      'courseDetail.moduleColor': 'Color',
-      'courseDetail.moduleUrl': 'Link URL',
+
       'courseDetail.moduleUrlPlaceholder': 'Paste an HTTPS link',
-      'courseDetail.moduleCancel': 'Cancel',
-      'courseDetail.moduleOpen': 'Open',
+
       'courseDetail.quizPastePlaceholder':
         'Paste questions, answer options and an explicit answer key.',
       'test.creativeModeTitle': 'Creative mode',
       'common.urlPlaceholder': 'HTTPS URL',
       'common.loadError': 'Could not load data. Please retry.',
       'common.retry': 'Retry',
-      'common.unavailable': 'Unavailable',
+
       'test.variantTitle': '{{v0}} | Variant {{v1}}',
       'review.mistakes': '{{v0}} incorrect / {{v1}} questions',
       'review.allCorrect': '{{v0}} questions, all correct',
       'security.pendingCount': '{{v0}} alerts awaiting review',
-      'security.ipCount': '{{v0}} IP addresses in 24 hours',
-      'security.deviceCount': '{{v0}} devices in 24 hours',
-      'security.ipChange': 'IP changed within {{v0}} minutes',
-      'security.activeIps': 'Active sessions from {{v0}} IP addresses',
-      'security.concurrent': '{{v0}} concurrent sessions from {{v1}} IP addresses',
+
       'notFound.title': 'Page not found',
       'notFound.description': 'Check the address or return to the home page.',
       'common.home': 'Go home',
-      'video.unavailable': 'Video unavailable',
+
       'common.photo': 'Photo',
       'common.unknownUser': 'Unknown user',
       'common.noReason': 'No reason provided',
       'common.untitledTest': 'Untitled test',
       'common.resumedTest': 'Resumed test',
       'admin.pushResult': 'Delivered: {{success}} of {{total}}. Failed: {{failed}}.',
-      'app.description': 'Study courses and prepare with subject practice tests.',
+
       'auth.errors.loginFailed': 'Sign-in failed. Please retry.',
       'auth.errors.signupFailed': 'Registration failed. Please retry.',
       'courseDetail.invalidMaterialUrl':

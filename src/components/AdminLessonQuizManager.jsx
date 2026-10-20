@@ -514,8 +514,8 @@ export default function AdminLessonQuizManager({
                           });
                           saveQuizToFirebase({ ...quiz, questions: updated });
                           alert(i18n.t('ui.solutionsImported'));
-                        } catch (e) {
-                          alert('Invalid JSON: ' + e.message);
+                        } catch {
+                          alert(i18n.t('common.invalidJson'));
                         }
                       }}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors"

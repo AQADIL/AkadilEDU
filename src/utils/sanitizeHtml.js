@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 
-export function sanitizeHtml(html) {
+function sanitizeHtml(html) {
   if (!html) return '';
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [

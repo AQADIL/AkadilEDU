@@ -2,7 +2,7 @@ import i18n from '../i18n';
 import { updatePassword, updateProfile } from 'firebase/auth';
 
 import { uploadUserAvatar, deleteUserAvatar } from '../firebase/storage';
-import { updateUserProfile, isUserAdmin } from '../firebase/realtimeDb';
+import { updateUserProfile } from '../firebase/realtimeDb';
 import { getCurrentUser } from '../firebase/auth';
 
 export async function uploadAvatar(file, onProgress) {
@@ -29,13 +29,4 @@ export async function onProfileSave(profileData) {
   const name = [firstName, lastName].filter(Boolean).join(' ');
   await updateProfile(user, { displayName: name, photoURL: avatarUrl || null });
   return updateUserProfile(user.uid, { firstName, lastName, name, phone, avatarUrl });
-}
-
-export async function checkAdminClaim() {
-  const user = getCurrentUser();
-  if (!user) {
-    return false;
-  }
-
-  return await isUserAdmin(user.uid);
 }

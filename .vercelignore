@@ -9,6 +9,5 @@ node_modules
 .vs
 .artifacts
 .playwright-cli
-backend
 functions
 *.log

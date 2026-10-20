@@ -1,6 +1,6 @@
 import i18n from '../i18n';
 
-export function getDeviceInfo() {
+function getDeviceInfo() {
   const ua = navigator.userAgent;
 
   let browser = 'Unknown';
@@ -88,12 +88,12 @@ async function hashIP(ip) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
-  } catch (error) {
+  } catch {
     return ip;
   }
 }
 
-export async function getUserIP() {
+async function getUserIP() {
   const endpoint = import.meta.env.VITE_IP_LOOKUP_URL;
   if (!endpoint) return { ip: 'unknown', timestamp: new Date().toISOString() };
   try {
@@ -110,32 +110,6 @@ function isValidIP(ip) {
   const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
   const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
   return ipv4Regex.test(ip) || ipv6Regex.test(ip) || ip.includes(':');
-}
-
-export async function getIPLocation(ip) {
-  if (!ip || ip === 'unknown' || !import.meta.env.VITE_IP_LOCATION_URL) return null;
-
-  try {
-    const response = await fetch(
-      import.meta.env.VITE_IP_LOCATION_URL.replace('{ip}', encodeURIComponent(ip)),
-      { signal: AbortSignal.timeout(5000) },
-    );
-    const data = await response.json();
-
-    return {
-      country: data.country_name,
-      countryCode: data.country_code,
-      region: data.region,
-      city: data.city,
-      timezone: data.timezone,
-      coordinates: {
-        lat: data.latitude,
-        lng: data.longitude,
-      },
-    };
-  } catch (error) {
-    return null;
-  }
 }
 
 export async function createSessionProfile() {
@@ -161,102 +135,4 @@ export async function createSessionProfile() {
 
 function generateSessionId() {
   return crypto.randomUUID();
-}
-
-export function detectSuspiciousActivity(userSessions, currentSession) {
-  const flags = [];
-
-  if (!userSessions || Object.keys(userSessions).length === 0) {
-    return { suspicious: false, flags: [], riskLevel: 'low' };
-  }
-
-  const sessions = Object.values(userSessions);
-  const recentSessions = sessions.filter((s) => {
-    const sessionTime = new Date(s.timestamp);
-    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    return sessionTime > dayAgo;
-  });
-
-  const uniqueIPs = new Set(recentSessions.map((s) => s.ip).filter(Boolean));
-
-  if (uniqueIPs.size > 2) {
-    flags.push({
-      type: 'multiple_ips',
-      severity: 'high',
-      message: i18n.t('security.ipCount', { v0: uniqueIPs.size }),
-      ips: Array.from(uniqueIPs),
-    });
-  }
-
-  const uniqueDevices = new Set(recentSessions.map((s) => s.device?.fingerprint).filter(Boolean));
-
-  if (uniqueDevices.size > 3) {
-    flags.push({
-      type: 'multiple_devices',
-      severity: 'high',
-      message: i18n.t('security.deviceCount', { v0: uniqueDevices.size }),
-      deviceCount: uniqueDevices.size,
-    });
-  }
-
-  const sortedSessions = recentSessions.sort(
-    (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
-  );
-  const lastSession = sortedSessions[1];
-
-  if (lastSession && currentSession && currentSession.ip !== lastSession.ip) {
-    const timeDiff = Math.abs(new Date(currentSession.timestamp) - new Date(lastSession.timestamp));
-    const twoHoursInMs = 2 * 60 * 60 * 1000;
-
-    if (timeDiff < twoHoursInMs && timeDiff > 0) {
-      flags.push({
-        type: 'rapid_ip_change',
-        severity: 'medium',
-        message: i18n.t('security.ipChange', { v0: Math.round(timeDiff / 60000) }),
-        oldIP: lastSession.ip,
-        newIP: currentSession.ip,
-      });
-    }
-  }
-
-  const now = Date.now();
-  const activeSessions = recentSessions.filter((s) => {
-    const sessionTime = new Date(s.timestamp).getTime();
-    const fifteenMinutes = 15 * 60 * 1000;
-    return now - sessionTime < fifteenMinutes;
-  });
-
-  const simultaneousIPs = new Set(activeSessions.map((s) => s.ip).filter(Boolean));
-  if (simultaneousIPs.size > 1) {
-    flags.push({
-      type: 'simultaneous_sessions',
-      severity: 'critical',
-      message: i18n.t('security.activeIps', { v0: simultaneousIPs.size }),
-      ips: Array.from(simultaneousIPs),
-    });
-  }
-
-  const result = {
-    suspicious: flags.length > 0,
-    flags,
-    riskLevel: calculateRiskLevel(flags),
-  };
-
-  return result;
-}
-
-function calculateRiskLevel(flags) {
-  const severityScores = {
-    low: 1,
-    medium: 3,
-    high: 5,
-    critical: 10,
-  };
-
-  const totalScore = flags.reduce((sum, flag) => sum + (severityScores[flag.severity] || 0), 0);
-
-  if (totalScore >= 10) return 'critical';
-  if (totalScore >= 5) return 'high';
-  if (totalScore >= 3) return 'medium';
-  return 'low';
 }

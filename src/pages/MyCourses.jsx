@@ -56,7 +56,7 @@ const formatTimeFromSeconds = (seconds) => {
 };
 
 export default function MyCourses() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [courses, setCourses] = useState([]);
@@ -144,7 +144,7 @@ export default function MyCourses() {
           auth.currentUser.uid,
           newOrder.map((c) => c.id),
         );
-      } catch (error) {}
+      } catch {}
     }
   };
 
@@ -420,7 +420,9 @@ export default function MyCourses() {
                       <Calendar className="w-4 h-4" />
                       <span>
                         {t('course.receivedOn')}:{' '}
-                        {new Date(course.enrollment.enrolledAt).toLocaleDateString('kk-KZ')}
+                        {new Date(course.enrollment.enrolledAt).toLocaleDateString(
+                          i18n.resolvedLanguage,
+                        )}
                       </span>
                     </div>
                   )}
@@ -429,7 +431,9 @@ export default function MyCourses() {
                       <Clock className="w-4 h-4" />
                       <span>
                         {t('course.validUntil')}:{' '}
-                        {new Date(course.enrollment.expiryDate).toLocaleDateString('kk-KZ')}
+                        {new Date(course.enrollment.expiryDate).toLocaleDateString(
+                          i18n.resolvedLanguage,
+                        )}
                       </span>
                     </div>
                   )}

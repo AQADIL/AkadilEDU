@@ -131,7 +131,7 @@ const VideoPlayer = ({
       const onReadySeek = () => {
         try {
           player.currentTime = seekSeconds;
-        } catch (e) {}
+        } catch {}
         player.off('ready', onReadySeek);
       };
       player.on('ready', onReadySeek);

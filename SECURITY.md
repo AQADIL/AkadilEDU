@@ -15,5 +15,10 @@ Before deploying security changes, complete the migration steps in `docs/DEPLOYM
 Previously exposed service-account private keys and browser-exposed Gemini keys must be revoked and replaced. Removing a key from
 the current files does not remove it from Git history or previously deployed assets.
 
+A real service-account private key was found in the historical `backend/README.md`.
+It still requires revocation in Google Cloud. Keep the repository private until the
+credential is revoked and history cleanup is coordinated. Local unpublished commits
+also contain a Gemini key and must not be pushed.
+
 Practice-test results are calculated in the browser. They are learning records, not
 tamper-proof examination scores or externally accredited certificates.

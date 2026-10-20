@@ -1,7 +1,7 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../firebase/config';
 
-export async function requestAI(data) {
+async function requestAI(data) {
   const callable = httpsCallable(
     getFunctions(app, import.meta.env.VITE_FIREBASE_FUNCTIONS_REGION),
     'processLearningAI',

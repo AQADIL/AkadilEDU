@@ -11,7 +11,6 @@ Requires Node.js 22.12 or later and a configured Firebase project.
 ```sh
 npm ci
 npm ci --prefix functions
-npm ci --prefix backend
 ```
 
 Copy `.env.example` to `.env` and fill in the Firebase web configuration, local host and port. Enable the authentication providers you use and authorize the application domain in Firebase Authentication.
@@ -34,7 +33,6 @@ Administrators require the Firebase Auth custom claim `admin: true`. A database 
 npm run check
 npm audit
 npm audit --prefix functions
-npm audit --prefix backend
 ```
 
 The check command runs candidate-file security checks, lint, unit tests and the production build. Database rule tests run when `FIREBASE_DATABASE_EMULATOR_HOST` is set; CI runs them against an isolated Firebase demo project.
@@ -45,15 +43,13 @@ The check command runs candidate-file security checks, lint, unit tests and the 
 | --- | --- |
 | src | React application and shared translations in i18n.js |
 | functions | Privileged Firebase operations, course catalog and AI import |
-| backend | Optional authenticated push notification service |
 | scripts | Security checks and administrative migration tools |
-| tests | Validation, HTTP authorization and database rule tests |
+| tests | Validation, localization and Database/Storage rule tests |
 
 ## Contributing
 
 Enable the local commit guard with `git config core.hooksPath .githooks`. It checks the staged snapshot for credentials and prohibited client patterns. CI repeats the checks.
 
-
 Keep interface text in `src/i18n.js` for all three languages. Use configuration for deployment-specific values. Do not add emojis, debug output, fabricated results or unfinished screens. Add comments only for non-obvious logic. Keep commit subjects short and specific.
 
-Read [security guidance](SECURITY.md), [deployment requirements](docs/DEPLOYMENT.md) and the [review report](docs/REVIEW.md). Exam practice runs in the browser and is not a tamper-proof assessment system.
+Read [security guidance](SECURITY.md) and [deployment requirements](docs/DEPLOYMENT.md). Exam practice runs in the browser and is not a tamper-proof assessment system.

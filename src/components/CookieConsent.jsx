@@ -161,7 +161,7 @@ function SettingsDialog({ isOpen, onClose, onClearData }) {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 {i18n.t('ui.status')}
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {hasConsent ? 'Accepted' : 'Not accepted'}
+                  {i18n.t(hasConsent ? 'cookie.accepted' : 'cookie.notAccepted')}
                 </span>
               </p>
 

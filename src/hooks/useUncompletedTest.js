@@ -67,7 +67,7 @@ export function useUncompletedTest() {
             localStorage.removeItem(progressKey);
             setUncompletedTest(null);
           }
-        } catch (error) {
+        } catch {
           localStorage.removeItem(progressKey);
         }
       }

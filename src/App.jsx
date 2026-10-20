@@ -149,7 +149,7 @@ function App() {
         setLocalSessionId(null);
         setShowSessionRevokedModal(false);
         window.location.href = '/login';
-      } catch (error) {}
+      } catch {}
     }, 3000);
   };
 

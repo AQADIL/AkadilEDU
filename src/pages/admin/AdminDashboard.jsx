@@ -83,7 +83,7 @@ export default function AdminDashboard() {
       } else {
         setSystemHealth('healthy');
       }
-    } catch (error) {
+    } catch {
       setSystemHealth('error');
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
         setPushMessage('');
         setPushImageUrl('');
       }
-    } catch (error) {
+    } catch {
       let errorMessage = i18n.t('ui.couldNotSendNotification');
 
       setSendResult({
@@ -263,13 +263,13 @@ export default function AdminDashboard() {
                 {i18n.t('ui.manageUsers')}
               </button>
             </Link>
-            <Link to="/admin/courses" className="block">
+            <Link to="/courses" className="block">
               <button className="w-full btn-primary py-3 flex items-center justify-center gap-2">
                 <BookOpen className="w-5 h-5" />
                 {i18n.t('courses.management')}
               </button>
             </Link>
-            <Link to="/admin/security-alerts" className="block">
+            <Link to="/admin/security" className="block">
               <button className="w-full btn-secondary py-3 flex items-center justify-center gap-2">
                 <Shield className="w-5 h-5" />
                 {i18n.t('ui.securityAlerts3')}
@@ -395,7 +395,7 @@ export default function AdminDashboard() {
                 </li>
               </ul>
               <div className="mt-4">
-                <Link to="/admin/security-alerts">
+                <Link to="/admin/security">
                   <button className="btn-secondary text-sm py-2 px-4">
                     {i18n.t('ui.view')}
                     {stats.securityAlerts}

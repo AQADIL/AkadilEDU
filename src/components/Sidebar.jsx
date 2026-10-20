@@ -37,7 +37,7 @@ export default function Sidebar({ isOpen, onClose }) {
         const adminStatus = await isUserAdmin(user.uid);
 
         setIsAdmin(adminStatus);
-      } catch (error) {
+      } catch {
         setIsAdmin(false);
       }
     };

@@ -21,7 +21,7 @@ export default function AdminGuard({ children }) {
         const adminStatus = await isUserAdmin(user.uid);
 
         setIsAdmin(adminStatus);
-      } catch (error) {
+      } catch {
         setIsAdmin(false);
       } finally {
         setLoading(false);

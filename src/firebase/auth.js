@@ -23,7 +23,7 @@ export async function initializeAuth() {
 
   try {
     await setPersistence(auth, browserLocalPersistence);
-  } catch (error) {}
+  } catch {}
 }
 
 export async function signupWithEmail(email, password, profileData = {}) {
@@ -55,7 +55,7 @@ export async function signupWithEmail(email, password, profileData = {}) {
       emailVerified: false,
     });
     await updateUserProfile(user.uid, { name: displayName, phone: profileData.phone || '' });
-  } catch (dbError) {}
+  } catch {}
 
   return userCredential;
 }

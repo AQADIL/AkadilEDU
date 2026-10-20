@@ -18,7 +18,7 @@ import {
   FlaskConical,
 } from 'lucide-react';
 import CertificateGenerator from '../CertificateGenerator';
-import { fetchAvailableTests, fetchUserResults } from '../../firebase/rtdbApi';
+import { fetchAvailableTests, fetchUserResults } from '../../firebase/tests';
 import { getCurrentUser } from '../../firebase/auth';
 import AppLoader from '../AppLoader';
 
@@ -177,7 +177,7 @@ export default function TestLanding({ onStartTest }) {
     try {
       const tests = await fetchAvailableTests();
       setAvailableTests(tests || []);
-    } catch (error) {
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -198,7 +198,7 @@ export default function TestLanding({ onStartTest }) {
         }
       });
       setResultsByTestId(map);
-    } catch (error) {}
+    } catch {}
   };
 
   const handleModeChange = (mode) => {
@@ -953,14 +953,17 @@ export default function TestLanding({ onStartTest }) {
                               {getResultDisplayTitle(result)}
                             </h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {new Date(result.finishedAt).toLocaleDateString('kk-KZ', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hourCycle: 'h24',
-                              })}
+                              {new Date(result.finishedAt).toLocaleDateString(
+                                i18n.resolvedLanguage,
+                                {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hourCycle: 'h24',
+                                },
+                              )}
                             </p>
                           </div>
                         </div>

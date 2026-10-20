@@ -67,7 +67,7 @@ export default function TestUBT() {
               }
 
               navigate('/test-ubt', { replace: true });
-            } catch (error) {
+            } catch {
               navigate('/test-ubt', { replace: true });
             }
           } else {
@@ -119,7 +119,7 @@ export default function TestUBT() {
               };
               setSelectedTest(testConfig);
               setCurrentView('test');
-            } catch (error) {}
+            } catch {}
           }
         }
       }

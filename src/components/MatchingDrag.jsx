@@ -156,7 +156,7 @@ export default function MatchingDrag({ pairs, value, onChange, disabled, renderL
           }
         }
       }
-    } catch (_) {}
+    } catch {}
     setDraggingRightId(null);
     setDraggingTouchPos(null);
     if (e && typeof e.preventDefault === 'function' && e.cancelable) {
@@ -181,14 +181,14 @@ export default function MatchingDrag({ pairs, value, onChange, disabled, renderL
 
     try {
       window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    } catch (_) {
+    } catch {
       window.addEventListener('touchmove', handleTouchMove);
     }
 
     return () => {
       try {
         window.removeEventListener('touchmove', handleTouchMove);
-      } catch (_) {}
+      } catch {}
     };
   }, [draggingRightId, disabled]);
 

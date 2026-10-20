@@ -10,7 +10,7 @@ let messaging = null;
 if (app && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   try {
     messaging = getMessaging(app);
-  } catch (error) {}
+  } catch {}
 }
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
@@ -37,7 +37,7 @@ export async function requestNotificationPermission(userId) {
     } else {
       return null;
     }
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -61,12 +61,12 @@ async function getFCMToken(userId) {
     } else {
       return null;
     }
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export function isNotificationSupported() {
+function isNotificationSupported() {
   return 'Notification' in window && 'serviceWorker' in navigator;
 }
 
@@ -74,5 +74,3 @@ export function getNotificationPermissionStatus() {
   if (!isNotificationSupported()) return 'unsupported';
   return Notification.permission;
 }
-
-export { messaging };

@@ -28,7 +28,7 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
 
       if (onSuccess) onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotAssignCourse'));
     } finally {
       setAssigning(false);
@@ -45,7 +45,7 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
 
       setCourses(allCourses);
       setUserCourses(enrolled);
-    } catch (error) {
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -168,7 +168,9 @@ export default function AssignCourseModal({ user, isOpen, onClose, onSuccess }) 
                       const isExpired =
                         course.enrollment?.expiryDate && course.enrollment.expiryDate < Date.now();
                       const expiryDateStr = course.enrollment?.expiryDate
-                        ? new Date(course.enrollment.expiryDate).toLocaleDateString('ru-RU')
+                        ? new Date(course.enrollment.expiryDate).toLocaleDateString(
+                            i18n.resolvedLanguage,
+                          )
                         : i18n.t('ui.permanent');
 
                       return (

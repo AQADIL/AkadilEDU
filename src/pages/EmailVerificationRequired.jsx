@@ -51,7 +51,7 @@ export default function EmailVerificationRequired() {
         setResendError(t('emailVerification.notYetVerified'));
         setTimeout(() => setResendError(''), 3000);
       }
-    } catch (error) {
+    } catch {
       setResendError(t('emailVerification.checkFailed'));
     } finally {
       setChecking(false);
@@ -62,7 +62,7 @@ export default function EmailVerificationRequired() {
     try {
       await logout();
       navigate('/login');
-    } catch (error) {}
+    } catch {}
   };
 
   return (

@@ -42,7 +42,7 @@ export default function PushPermissionRequest({ userId }) {
 
       setVisible(false);
       setRequesting(false);
-    } catch (e) {
+    } catch {
       setRequesting(false);
       setVisible(false);
     }

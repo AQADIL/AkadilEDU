@@ -416,10 +416,10 @@ export default function CourseDetail() {
                         </div>
                         <div className="text-left flex-1 min-w-0">
                           <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base truncate">
-                            {m.title || (m.type || 'file').toUpperCase()}
+                            {m.title || m.type?.toUpperCase() || i18n.t('ui.material')}
                           </h4>
                           <p className="text-xs text-slate-700 dark:text-slate-300 truncate">
-                            {m.type ? m.type.toUpperCase() : 'FILE'}
+                            {m.type ? m.type.toUpperCase() : i18n.t('ui.material')}
                           </p>
                         </div>
                       </div>
@@ -456,7 +456,7 @@ export default function CourseDetail() {
 
       const purchased = userCourse !== undefined && !isExpired;
       setIsPurchased(purchased);
-    } catch (error) {
+    } catch {
       setIsPurchased(false);
     }
   }, [id]);
@@ -498,7 +498,7 @@ export default function CourseDetail() {
     try {
       const admin = await isUserAdmin(auth.currentUser.uid);
       setIsAdmin(admin);
-    } catch (e) {
+    } catch {
       setIsAdmin(false);
     }
   }, []);

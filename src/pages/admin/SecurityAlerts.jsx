@@ -22,7 +22,7 @@ export default function SecurityAlerts() {
         resolved: true,
         resolvedAt: new Date().toISOString(),
       });
-    } catch (error) {}
+    } catch {}
   };
 
   const getRiskColor = (level) => {
@@ -46,7 +46,7 @@ export default function SecurityAlerts() {
       if (snapshot.exists()) {
         const userData = snapshot.val();
         const userInfo = {
-          email: userData.email || 'Unknown',
+          email: userData.email || i18n.t('common.unknown'),
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
           fullName:
@@ -56,9 +56,9 @@ export default function SecurityAlerts() {
         setUserCache((previous) => ({ ...previous, [uid]: userInfo }));
         return userInfo;
       }
-    } catch (error) {}
+    } catch {}
 
-    return { email: 'Unknown', fullName: i18n.t('ui.unnamedUser') };
+    return { email: i18n.t('common.unknown'), fullName: i18n.t('ui.unnamedUser') };
   }, []);
 
   useEffect(() => {
@@ -260,18 +260,18 @@ export default function SecurityAlerts() {
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {i18n.t('ui.user')}
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {userCache[alert.uid]?.fullName || 'Loading...'}
+                        {userCache[alert.uid]?.fullName || i18n.t('common.loading')}
                       </span>
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {i18n.t('ui.email')}
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {userCache[alert.uid]?.email || 'Loading...'}
+                        {userCache[alert.uid]?.email || i18n.t('common.loading')}
                       </span>
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {i18n.t('ui.time')}
-                      {new Date(alert.timestamp).toLocaleString('ru-RU')}
+                      {new Date(alert.timestamp).toLocaleString(i18n.resolvedLanguage)}
                     </p>
                   </div>
 

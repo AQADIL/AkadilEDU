@@ -41,6 +41,25 @@ test('all languages contain the same non-empty messages and interpolation fields
 
 test('static translation calls, including conditional keys, resolve in every language', () => {
   const failures = [];
+  function checkRenderedText(node, file) {
+    if (!node) return;
+    if (node.type === 'StringLiteral' && /\p{L}/u.test(node.value))
+      failures.push(`${file}: untranslated rendered string`);
+    if (
+      node.type === 'TemplateLiteral' &&
+      node.quasis.some((part) => /\p{L}/u.test(part.value.raw))
+    )
+      failures.push(`${file}: untranslated rendered template`);
+    if (node.type === 'ConditionalExpression') {
+      checkRenderedText(node.consequent, file);
+      checkRenderedText(node.alternate, file);
+    }
+    if (node.type === 'LogicalExpression') checkRenderedText(node.right, file);
+    if (node.type === 'BinaryExpression' && node.operator === '+') {
+      checkRenderedText(node.left, file);
+      checkRenderedText(node.right, file);
+    }
+  }
   function checkKey(node, file) {
     if (node?.type === 'StringLiteral' && !keys.includes(node.value))
       failures.push(`${file}: ${node.value}`);
@@ -56,7 +75,7 @@ test('static translation calls, including conditional keys, resolve in every lan
         visit(file);
         continue;
       }
-      if (!/\.(js|jsx)$/.test(file) || entry.name === 'i18n.js') continue;
+      if (!/\.(js|jsx)$/.test(file)) continue;
       const tree = parser.parse(readFileSync(file, 'utf8'), {
         sourceType: 'module',
         plugins: ['jsx'],
@@ -65,6 +84,29 @@ test('static translation calls, including conditional keys, resolve in every lan
         CallExpression({ node }) {
           if (node.callee.name === 't' || node.callee.property?.name === 't')
             checkKey(node.arguments[0], file);
+          if (
+            ['alert', 'confirm', 'prompt'].includes(node.callee.name) ||
+            node.callee.property?.name === 'fillText'
+          )
+            checkRenderedText(node.arguments[0], file);
+          if (
+            ['toLocaleDateString', 'toLocaleTimeString', 'toLocaleString'].includes(
+              node.callee.property?.name,
+            ) &&
+            node.arguments[0]?.type === 'StringLiteral'
+          )
+            failures.push(`${file}: hardcoded formatting locale`);
+        },
+        JSXExpressionContainer({ node, parent }) {
+          if (
+            parent.type === 'JSXElement' &&
+            !['style', 'script'].includes(parent.openingElement.name.name)
+          )
+            checkRenderedText(node.expression, file);
+        },
+        AssignmentPattern({ node }) {
+          if (['text', 'title', 'label', 'placeholder'].includes(node.left.name))
+            checkRenderedText(node.right, file);
         },
         JSXText({ node }) {
           if (/[\p{L}]/u.test(node.value.trim())) failures.push(`${file}: untranslated JSX text`);

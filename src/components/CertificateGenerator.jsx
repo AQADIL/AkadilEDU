@@ -138,22 +138,12 @@ export default function CertificateGenerator({ result, user, onClose }) {
     ctx.font = 'bold 42px Arial, sans-serif';
     ctx.textAlign = 'center';
 
-    const titleText =
-      i18n.language === 'kk'
-        ? i18n.t('ui.completionRecord')
-        : i18n.language === 'ru'
-          ? i18n.t('ui.completionRecord')
-          : 'CERTIFICATE';
+    const titleText = i18n.t('ui.completionRecord');
     ctx.fillText(titleText, canvas.width / 2, certY + 90);
 
     ctx.font = '18px Arial, sans-serif';
     ctx.fillStyle = '#4a5568';
-    const subtitleText =
-      i18n.language === 'kk'
-        ? i18n.t('ui.untPracticeTestCompleted')
-        : i18n.language === 'ru'
-          ? i18n.t('ui.untPracticeTestCompleted2')
-          : 'for completing UBT preparation test';
+    const subtitleText = i18n.t('ui.untPracticeTestCompleted');
     ctx.fillText(subtitleText, canvas.width / 2, certY + 125);
 
     ctx.font = 'bold 28px Arial, sans-serif';
@@ -185,12 +175,7 @@ export default function CertificateGenerator({ result, user, onClose }) {
 
     ctx.font = 'italic 18px Arial, sans-serif';
     ctx.fillStyle = '#667eea';
-    const quote =
-      i18n.language === 'kk'
-        ? i18n.t('ui.reviewYourAnswersToPlanYourNext')
-        : i18n.language === 'ru'
-          ? i18n.t('ui.reviewYourAnswersToPlanYourNext2')
-          : 'This is just one step, ahead you will reach even higher levels with us';
+    const quote = i18n.t('ui.reviewYourAnswersToPlanYourNext');
 
     const maxWidth = certWidth - 200;
     const words = quote.split(' ');
@@ -236,11 +221,11 @@ export default function CertificateGenerator({ result, user, onClose }) {
       const logoY = certY + 150;
       ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
       ctx.globalAlpha = 1;
-    } catch (error) {
+    } catch {
       ctx.globalAlpha = 0.08;
       ctx.font = 'bold 40px Arial, sans-serif';
       ctx.fillStyle = '#667eea';
-      ctx.fillText('AkadilEDU', canvas.width / 2, certY + 370);
+      ctx.fillText(t('header.logo'), canvas.width / 2, certY + 370);
       ctx.globalAlpha = 1;
     }
 
@@ -258,43 +243,22 @@ export default function CertificateGenerator({ result, user, onClose }) {
 
     ctx.fillStyle = '#4a5568';
     ctx.font = '14px Arial, sans-serif';
-    ctx.fillText(' akadiledu.web.app   |   tg / inst: @akadiledu', canvas.width / 2, contactY - 5);
+    ctx.fillText(t('header.logo'), canvas.width / 2, contactY - 5);
 
     ctx.font = '13px Arial, sans-serif';
     ctx.fillStyle = '#667eea';
-    const footerText =
-      'AkadilEDU - ' +
-      (i18n.language === 'kk'
-        ? i18n.t('ui.learningPlatform')
-        : i18n.language === 'ru'
-          ? i18n.t('ui.learningPlatform2')
-          : 'Educational Platform');
+    const footerText = t('ui.learningPlatform');
     ctx.fillText(footerText, canvas.width / 2, contactY + 15);
 
     let performanceText = '';
     let badgeColor = scoreColor;
 
     if (result.score >= 90) {
-      performanceText =
-        i18n.language === 'kk'
-          ? i18n.t('ui.excellent')
-          : i18n.language === 'ru'
-            ? i18n.t('ui.excellent2')
-            : 'EXCELLENT!';
+      performanceText = i18n.t('ui.excellent');
     } else if (result.score >= 70) {
-      performanceText =
-        i18n.language === 'kk'
-          ? i18n.t('ui.good')
-          : i18n.language === 'ru'
-            ? i18n.t('ui.good2')
-            : 'GOOD';
+      performanceText = i18n.t('ui.good');
     } else if (result.score >= 50) {
-      performanceText =
-        i18n.language === 'kk'
-          ? i18n.t('ui.keepPractising')
-          : i18n.language === 'ru'
-            ? i18n.t('ui.keepPractising2')
-            : 'SATISFACTORY';
+      performanceText = i18n.t('ui.keepPractising');
     }
 
     if (performanceText) {

@@ -516,7 +516,7 @@ export default function QuestionEditor({ question, onSave, onCancel }) {
             throwOnError: false,
             displayMode: isDisplay,
           });
-        } catch (_) {
+        } catch {
           return (
             <span
               key={`${keyPrefix}-math-fallback-${idx}`}

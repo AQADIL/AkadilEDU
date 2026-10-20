@@ -81,7 +81,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       await updateUserCourse(user.uid, courseId, newExpiryTimestamp, auth.currentUser.uid);
       await loadUserCourses();
       setEditingCourseId(null);
-    } catch (error) {}
+    } catch {}
   };
 
   const handleRemoveCourse = async (courseId) => {
@@ -90,7 +90,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
     try {
       await removeUserCourse(user.uid, courseId, auth.currentUser.uid);
       await loadUserCourses();
-    } catch (error) {
+    } catch {
       alert(i18n.t('courses.deleteError'));
     }
   };
@@ -100,7 +100,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       const currentEnabled = pushStatus?.enabled || false;
       await toggleUserPushNotifications(user.uid, !currentEnabled, auth.currentUser.uid);
       await loadPushStatus();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotChangeNotifications'));
     }
   };
@@ -153,7 +153,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       await updateUserProfile(user.uid, profile);
       alert(i18n.t('ui.profileUpdated'));
       onClose();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotUpdateProfile'));
     } finally {
       setSaving(false);
@@ -165,7 +165,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
       try {
         const status = await getUserPushStatus(user.uid);
         setPushStatus(status);
-      } catch (error) {}
+      } catch {}
     }
   }, [user]);
 
@@ -174,7 +174,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
     try {
       const courses = await getUserCourses(user.uid);
       setUserCourses(courses);
-    } catch (error) {
+    } catch {
     } finally {
       setLoadingCourses(false);
     }
@@ -184,7 +184,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
     try {
       const userSessions = await getUserSessions(user.uid);
       setSessions(userSessions || {});
-    } catch (error) {}
+    } catch {}
   }, [user]);
 
   useEffect(() => {
@@ -390,7 +390,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                               {i18n.t('ui.lastSignin')}
-                              {new Date(data.lastSeen).toLocaleString('ru-RU')}
+                              {new Date(data.lastSeen).toLocaleString(i18n.resolvedLanguage)}
                             </p>
                             {data.device && (
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -430,12 +430,12 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                {session.device?.browser || 'Unknown'}
+                                {session.device?.browser || i18n.t('common.unknown')}
                                 {i18n.t('ui.on')}
-                                {session.device?.os || 'Unknown'}
+                                {session.device?.os || i18n.t('common.unknown')}
                               </p>
                               <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {new Date(session.timestamp).toLocaleString('ru-RU')}
+                                {new Date(session.timestamp).toLocaleString(i18n.resolvedLanguage)}
                               </span>
                             </div>
                             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -452,7 +452,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                                   {i18n.t('ui.device')}
                                 </span>
                                 <span className="ml-2 text-gray-900 dark:text-white">
-                                  {session.device?.deviceType || 'Unknown'}
+                                  {session.device?.deviceType || i18n.t('common.unknown')}
                                 </span>
                               </div>
                               <div className="col-span-2">
@@ -460,7 +460,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                                   {i18n.t('ui.timeZone')}
                                 </span>
                                 <span className="ml-2 text-gray-900 dark:text-white">
-                                  {session.device?.timezone || 'Unknown'}
+                                  {session.device?.timezone || i18n.t('common.unknown')}
                                 </span>
                               </div>
                             </div>
@@ -495,7 +495,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                           {alert.riskLevel}
                         </p>
                         <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                          {new Date(alert.timestamp).toLocaleString('ru-RU')}
+                          {new Date(alert.timestamp).toLocaleString(i18n.resolvedLanguage)}
                         </p>
                       </div>
                     ))}
@@ -536,7 +536,9 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                     const isExpired =
                       course.enrollment?.expiryDate && course.enrollment.expiryDate < Date.now();
                     const expiryDateStr = course.enrollment?.expiryDate
-                      ? new Date(course.enrollment.expiryDate).toLocaleDateString('ru-RU')
+                      ? new Date(course.enrollment.expiryDate).toLocaleDateString(
+                          i18n.resolvedLanguage,
+                        )
                       : i18n.t('ui.permanent');
 
                     return (
@@ -668,7 +670,7 @@ export default function UserDetailDrawer({ user, isOpen, onClose }) {
                       {data.expiresAt && (
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {i18n.t('ui.expires')}
-                          {new Date(data.expiresAt).toLocaleDateString('ru-RU')}
+                          {new Date(data.expiresAt).toLocaleDateString(i18n.resolvedLanguage)}
                         </p>
                       )}
                     </div>

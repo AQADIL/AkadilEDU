@@ -67,20 +67,6 @@ export default function TopNavigator({ questions, currentIndex, onQuestionSelect
           </div>
         </div>
       </div>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `,
-        }}
-      />
     </div>
   );
 }

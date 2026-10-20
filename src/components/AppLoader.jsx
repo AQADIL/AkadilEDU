@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
+export default function AppLoader({ text = i18n.t('common.loading'), fullScreen = true }) {
   const containerClass = fullScreen
     ? 'min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4'
     : 'flex items-center justify-center w-full';
@@ -27,8 +27,6 @@ export default function AppLoader({ text = 'Loading...', fullScreen = true }) {
             --loader-eye-lid: #020617;
             --loader-eye-pupil: rgb(2,60,115);
           }
-
-          /* Eye loader */
           .app-loader-eye {
             position: relative;
             width: 78px;

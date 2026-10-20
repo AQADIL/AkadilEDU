@@ -77,7 +77,7 @@ export default function QuestionCard({
             throwOnError: false,
             displayMode: isDisplay,
           });
-        } catch (_) {
+        } catch {
           return (
             <span
               key={`${keyPrefix}-math-fallback-${idx}`}

@@ -197,7 +197,7 @@ export default function ResetPassword() {
                   type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder={i18n.t('language.russian2')}
+                  placeholder={i18n.t('auth.passwordPlaceholder')}
                   className="w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required
                   disabled={loading}
@@ -232,7 +232,7 @@ export default function ResetPassword() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={i18n.t('language.russian2')}
+                  placeholder={i18n.t('auth.passwordPlaceholder')}
                   className="w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required
                   disabled={loading}

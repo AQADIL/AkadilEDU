@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Clock, AlertTriangle } from 'lucide-react';
 import QuestionCard from './QuestionCard';
 import TopNavigator from './TopNavigator';
-import { fetchTestQuestions, saveTestResult, saveTestProgress } from '../../firebase/rtdbApi';
+import { fetchTestQuestions, saveTestResult, saveTestProgress } from '../../firebase/tests';
 import { getCurrentUser } from '../../firebase/auth';
 import AppLoader from '../AppLoader';
 
@@ -73,7 +73,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
     setTimeout(async () => {
       try {
         await saveTestProgress(user.uid, testConfig.testId, progress);
-      } catch (error) {}
+      } catch {}
     }, 50);
   };
 
@@ -211,7 +211,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
               typeof testConfig.startFromQuestion === 'number' ? testConfig.startFromQuestion : 0,
             );
           }
-        } catch (e) {
+        } catch {
           setCurrentQuestionIndex(
             typeof testConfig.startFromQuestion === 'number' ? testConfig.startFromQuestion : 0,
           );
@@ -272,7 +272,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
       } else {
         throw new Error(i18n.t('ui.testIdIsMissing'));
       }
-    } catch (error) {
+    } catch {
       alert(t('test.errorLoadingTest'));
       onBackToLanding();
     } finally {
@@ -330,7 +330,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
 
     try {
       await saveTestProgress(user.uid, testConfig.testId, progress);
-    } catch (error) {}
+    } catch {}
   }, [
     answers,
     currentQuestionIndex,
@@ -510,7 +510,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
                     isCorrect = true;
                     questionEarnedPoints = questionPoints;
                   }
-                } catch (error) {
+                } catch {
                   isCorrect = false;
                 }
               }
@@ -581,7 +581,7 @@ export default function TestPlayer({ testConfig, onTestComplete, onBackToLanding
         navigate('/test-ubt', { replace: true });
 
         onTestComplete(result);
-      } catch (error) {
+      } catch {
         alert(t('test.errorSubmittingTest'));
       } finally {
         setSaving(false);

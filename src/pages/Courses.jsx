@@ -55,7 +55,7 @@ const getTotalDurationMinutes = (course) => {
 };
 
 export default function Courses() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +94,7 @@ export default function Courses() {
 
     try {
       setIsAdmin(await isUserAdmin(auth.currentUser.uid));
-    } catch (error) {
+    } catch {
       setIsAdmin(false);
     }
   };
@@ -118,7 +118,7 @@ export default function Courses() {
     try {
       const userCoursesData = await getUserCourses(auth.currentUser.uid);
       setUserCourses(userCoursesData);
-    } catch (error) {}
+    } catch {}
   };
 
   const isPurchased = (courseId) => {
@@ -149,7 +149,7 @@ export default function Courses() {
     try {
       await deleteCourse(courseId, auth.currentUser.uid);
       await loadCourses();
-    } catch (error) {
+    } catch {
       alert(t('courses.deleteError'));
     }
   };
@@ -312,7 +312,9 @@ export default function Courses() {
                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(course.createdAt).toLocaleDateString('ru-RU')}</span>
+                      <span>
+                        {new Date(course.createdAt).toLocaleDateString(i18n.resolvedLanguage)}
+                      </span>
                     </div>
                     {formattedDuration && (
                       <div className="flex items-center gap-1">

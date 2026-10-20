@@ -203,7 +203,7 @@ export default function ContextBlockEditor({ sectionId, section, onSaveBlock, on
             throwOnError: false,
             displayMode: isDisplay,
           });
-        } catch (_) {
+        } catch {
           return (
             <span
               key={`${keyPrefix}-math-fallback-${idx}`}

@@ -9,9 +9,6 @@ import {
   update,
   remove,
   push,
-  query,
-  limitToFirst,
-  onValue,
 } from 'firebase/database';
 import { app, auth, isFirebaseConfigured } from './config';
 
@@ -20,45 +17,10 @@ let database = null;
 if (isFirebaseConfigured()) {
   try {
     database = getDatabase(app);
-  } catch (error) {}
+  } catch {}
 }
 
 export { database };
-
-export async function logUserSession(uid, sessionData) {
-  if (!database) {
-    return null;
-  }
-
-  try {
-    const userRef = ref(database, `users/${uid}`);
-    const userSnap = await get(userRef);
-
-    if (userSnap.exists()) {
-      const userData = userSnap.val();
-      if (userData.role === 'admin') {
-        return null;
-      }
-    }
-  } catch (error) {}
-
-  if (!sessionData || !sessionData.ip || !sessionData.sessionId) {
-    return null;
-  }
-
-  try {
-    const sessionRef = ref(database, `users/${uid}/sessions/${sessionData.sessionId}`);
-    await set(sessionRef, sessionData);
-
-    await update(ref(database, `users/${uid}`), {
-      lastLogin: sessionData.timestamp,
-    });
-
-    return sessionData.sessionId;
-  } catch (error) {
-    return null;
-  }
-}
 
 export async function getUserSessions(uid) {
   if (!database) {
@@ -69,50 +31,8 @@ export async function getUserSessions(uid) {
     const sessionsRef = ref(database, `users/${uid}/sessions`);
     const snapshot = await get(sessionsRef);
     return snapshot.exists() ? snapshot.val() : {};
-  } catch (error) {
+  } catch {
     return {};
-  }
-}
-
-export async function createSecurityAlert(uid, alertData) {
-  if (!database) return null;
-
-  try {
-    const userRef = ref(database, `users/${uid}`);
-    const userSnap = await get(userRef);
-
-    if (userSnap.exists()) {
-      const userData = userSnap.val();
-      if (userData.role === 'admin') {
-        return null;
-      }
-    }
-  } catch (error) {}
-
-  try {
-    const userAlertRef = push(ref(database, `users/${uid}/securityAlerts`));
-    await set(userAlertRef, {
-      ...alertData,
-      timestamp: new Date().toISOString(),
-      read: false,
-    });
-
-    const adminAlertRef = push(ref(database, 'adminSecurityAlerts'));
-    await set(adminAlertRef, {
-      uid,
-      ...alertData,
-      timestamp: new Date().toISOString(),
-      resolved: false,
-    });
-
-    await update(ref(database, `users/${uid}`), {
-      securityStatus: alertData.riskLevel,
-      lastSecurityAlert: new Date().toISOString(),
-    });
-
-    return userAlertRef.key;
-  } catch (error) {
-    return null;
   }
 }
 
@@ -160,7 +80,7 @@ export async function getUserProfile(uid) {
       return snapshot.val();
     }
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -337,19 +257,6 @@ export async function assignCourseToUser(userId, courseId, expiryDate, adminUid)
   });
 }
 
-export async function removeCourseFromUser(userId, courseId, adminUid) {
-  if (!database) throw new Error(i18n.t('ui.databaseIsUnavailable'));
-
-  await remove(ref(database, `users/${userId}/courses/${courseId}`));
-
-  await push(ref(database, 'adminLogs'), {
-    adminUid,
-    action: 'removeCourse',
-    payload: { userId, courseId },
-    ts: new Date().toISOString(),
-  });
-}
-
 export async function getUserCourses(userId) {
   if (!database) return [];
 
@@ -390,7 +297,7 @@ export async function getUserCoursesProgress(uid) {
     const progressRef = ref(database, `users/${uid}/progress`);
     const snapshot = await get(progressRef);
     return snapshot.exists() ? snapshot.val() : {};
-  } catch (error) {
+  } catch {
     return {};
   }
 }
@@ -420,33 +327,7 @@ export async function updateLessonProgress(uid, courseId, lessonId, progress) {
     };
 
     await update(ref(database), updates);
-  } catch (error) {}
-}
-
-export function subscribeToCourseProgress(uid, courseId, callback) {
-  if (!database || !uid || !courseId) {
-    if (typeof callback === 'function') callback(null);
-    return () => {};
-  }
-
-  const progressRef = ref(database, `users/${uid}/progress/${courseId}`);
-
-  const unsubscribe = onValue(
-    progressRef,
-    (snapshot) => {
-      const data = snapshot.exists() ? snapshot.val() : null;
-      if (typeof callback === 'function') {
-        callback(data);
-      }
-    },
-    (error) => {
-      if (typeof callback === 'function') {
-        callback(null);
-      }
-    },
-  );
-
-  return unsubscribe;
+  } catch {}
 }
 
 export async function updateUserCoursesOrder(userId, orderedCourseIds) {
@@ -458,49 +339,6 @@ export async function updateUserCoursesOrder(userId, orderedCourseIds) {
   });
 
   await update(ref(database), updates);
-}
-
-export async function fetchAdminLogs(limit = 100) {
-  if (!database) return [];
-
-  try {
-    const logsRef = ref(database, 'adminLogs');
-    const logsQuery = query(logsRef, limitToFirst(limit));
-    const snapshot = await get(logsQuery);
-
-    if (snapshot.exists()) {
-      const logsData = snapshot.val();
-      return Object.keys(logsData).map((logId) => ({
-        id: logId,
-        ...logsData[logId],
-      }));
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function getUserAuthLogs(uid) {
-  if (!database) return [];
-
-  try {
-    const logsRef = ref(database, `auth_logs/${uid}`);
-    const snapshot = await get(logsRef);
-
-    if (snapshot.exists()) {
-      const logsData = snapshot.val();
-      return Object.keys(logsData)
-        .map((logId) => ({
-          id: logId,
-          ...logsData[logId],
-        }))
-        .sort((a, b) => new Date(b.ts) - new Date(a.ts));
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
 }
 
 export async function toggleUserPushNotifications(uid, enabled, adminUid) {
@@ -539,7 +377,7 @@ export async function getUserPushStatus(uid) {
       };
     }
     return { enabled: false, status: 'unknown', lastUpdated: null };
-  } catch (error) {
+  } catch {
     return { enabled: false, status: 'error', lastUpdated: null };
   }
 }
@@ -557,7 +395,7 @@ export async function updateUserCourse(uid, courseId, expiryTimestamp, adminUid)
   }
 
   if (!Number.isFinite(numericExpiryTimestamp) || numericExpiryTimestamp <= Date.now()) {
-    throw new Error('Invalid access expiry');
+    throw new Error(i18n.t('courses.invalidExpiry'));
   }
   await update(enrollmentRef, {
     expiryDate: numericExpiryTimestamp,

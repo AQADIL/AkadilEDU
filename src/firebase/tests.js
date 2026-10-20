@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-import { ref, set, get, push, update, remove } from 'firebase/database';
+import { ref, push, set, get, update, remove } from 'firebase/database';
 import { auth, rtdb } from './config';
 
 const getDeviceId = () => {
@@ -9,59 +9,6 @@ const getDeviceId = () => {
     localStorage.setItem('ak_deviceId', deviceId);
   }
   return deviceId;
-};
-
-export const createTest = async (testData) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error(i18n.t('ui.signInToContinue'));
-  }
-
-  const testRef = push(ref(rtdb, 'tests'));
-  const testId = testRef.key;
-
-  const test = {
-    id: testId,
-    title: testData.title,
-    variant: testData.variant || 1,
-    language: testData.language || 'kk',
-    mode: testData.mode,
-    subjects: testData.subjects || [],
-    createdBy: user.uid,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    totalQuestions: testData.totalQuestions || 0,
-    timeLimit: testData.timeLimit,
-    sections: testData.sections || {},
-  };
-
-  await set(testRef, test);
-
-  return testId;
-};
-
-export const updateTest = async (testId, updates) => {
-  const user = auth.currentUser;
-  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const testRef = ref(rtdb, `tests/${testId}`);
-  const updatedData = {
-    ...updates,
-    updatedAt: new Date().toISOString(),
-    updatedBy: user.uid,
-  };
-
-  await update(testRef, updatedData);
-  return true;
-};
-
-export const deleteTest = async (testId) => {
-  const user = auth.currentUser;
-  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const testRef = ref(rtdb, `tests/${testId}`);
-  await remove(testRef);
-  return true;
 };
 
 export const fetchAvailableTests = async () => {
@@ -79,31 +26,6 @@ export const fetchAvailableTests = async () => {
     return tests;
   }
   return [];
-};
-
-export const fetchTestsBySubject = async (subject) => {
-  try {
-    const testsRef = ref(rtdb, 'tests');
-    const snapshot = await get(testsRef);
-
-    if (snapshot.exists()) {
-      const tests = [];
-      snapshot.forEach((childSnapshot) => {
-        const testData = childSnapshot.val();
-        if (testData.subjects && testData.subjects.includes(subject)) {
-          tests.push({
-            id: childSnapshot.key,
-            ...testData,
-          });
-        }
-      });
-
-      return tests;
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
 };
 
 export const fetchTestQuestions = async (testId) => {
@@ -137,72 +59,6 @@ export const fetchTestQuestions = async (testId) => {
     timeLimit: testData.timeLimit || 60,
     testData: testData,
   };
-};
-
-export const createQuestion = async (testId, sectionId, questionData) => {
-  const user = auth.currentUser;
-  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const questionRef = push(ref(rtdb, `tests/${testId}/sections/${sectionId}/questions`));
-  const questionId = questionRef.key;
-
-  const question = {
-    id: questionId,
-    order: questionData.order,
-    contentHtml: questionData.contentHtml,
-    contentText: questionData.contentText,
-    imageUrls: questionData.imageUrls || [],
-    options: questionData.options,
-    correct: questionData.correct,
-    points: questionData.points || 1,
-    createdBy: user.uid,
-    createdAt: new Date().toISOString(),
-  };
-
-  await set(questionRef, question);
-
-  const testRef = ref(rtdb, `tests/${testId}`);
-  const testSnapshot = await get(testRef);
-  if (testSnapshot.exists()) {
-    const testData = testSnapshot.val();
-    const newTotal = (testData.totalQuestions || 0) + 1;
-    await update(testRef, { totalQuestions: newTotal });
-  }
-
-  return questionId;
-};
-
-export const updateQuestion = async (testId, sectionId, questionId, updates) => {
-  const user = auth.currentUser;
-  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const questionRef = ref(rtdb, `tests/${testId}/sections/${sectionId}/questions/${questionId}`);
-  const updatedData = {
-    ...updates,
-    updatedAt: new Date().toISOString(),
-    updatedBy: user.uid,
-  };
-
-  await update(questionRef, updatedData);
-  return true;
-};
-
-export const deleteQuestion = async (testId, sectionId, questionId) => {
-  const user = auth.currentUser;
-  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const questionRef = ref(rtdb, `tests/${testId}/sections/${sectionId}/questions/${questionId}`);
-  await remove(questionRef);
-
-  const testRef = ref(rtdb, `tests/${testId}`);
-  const testSnapshot = await get(testRef);
-  if (testSnapshot.exists()) {
-    const testData = testSnapshot.val();
-    const newTotal = Math.max(0, (testData.totalQuestions || 0) - 1);
-    await update(testRef, { totalQuestions: newTotal });
-  }
-
-  return true;
 };
 
 export const saveTestResult = async (resultData) => {
@@ -313,19 +169,6 @@ export const fetchUserResults = async (userId) => {
   return [];
 };
 
-export const fetchTestResult = async (testId, userId, attemptId) => {
-  if (!userId) userId = auth.currentUser?.uid;
-  if (!userId) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const resultRef = ref(rtdb, `results/${testId}/${userId}/${attemptId}`);
-  const snapshot = await get(resultRef);
-
-  if (snapshot.exists()) {
-    return snapshot.val();
-  }
-  return null;
-};
-
 export const saveTestProgress = async (userId, testId, progressData) => {
   if (!userId) userId = auth.currentUser?.uid;
   if (!userId) throw new Error(i18n.t('ui.signInToContinue'));
@@ -341,29 +184,7 @@ export const saveTestProgress = async (userId, testId, progressData) => {
   return true;
 };
 
-export const fetchTestProgress = async (userId, testId) => {
-  if (!userId) userId = auth.currentUser?.uid;
-  if (!userId) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const progressRef = ref(rtdb, `testProgress/${userId}/${testId}`);
-  const snapshot = await get(progressRef);
-
-  if (snapshot.exists()) {
-    return snapshot.val();
-  }
-  return null;
-};
-
-export const clearTestProgress = async (userId, testId) => {
-  if (!userId) userId = auth.currentUser?.uid;
-  if (!userId) throw new Error(i18n.t('ui.signInToContinue'));
-
-  const progressRef = ref(rtdb, `testProgress/${userId}/${testId}`);
-  await remove(progressRef);
-  return true;
-};
-
-export const fetchAllTestResults = async (testId) => {
+const fetchAllTestResults = async (testId) => {
   const user = auth.currentUser;
   if (!user) throw new Error(i18n.t('ui.signInToContinue'));
 
@@ -409,4 +230,65 @@ export const getTestStatistics = async (testId) => {
     topScore: Math.max(...results.map((r) => r.score)),
     averageTime: Math.round(totalTime / results.length),
   };
+};
+
+export const createTest = async (testData) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
+  if (!rtdb) throw new Error(i18n.t('ui.databaseIsUnavailable2'));
+
+  const testsRef = ref(rtdb, 'tests');
+  const newTestRef = push(testsRef);
+  const testId = newTestRef.key;
+
+  const test = {
+    id: testId,
+    title: testData.title || i18n.t('common.untitledTest'),
+    variant: testData.variant || 1,
+    language: testData.language || 'kk',
+    mode: testData.mode || 'single',
+    creativeMode: Boolean(testData.creativeMode),
+    subjects: testData.subjects || [],
+    createdBy: user.uid,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalQuestions: testData.totalQuestions || 0,
+    timeLimit: testData.timeLimit || 60,
+    sections: testData.sections || {},
+    isActive: true,
+    deviceId: getDeviceId(),
+  };
+
+  await set(newTestRef, test);
+
+  const verifySnapshot = await get(newTestRef);
+  if (!verifySnapshot.exists()) {
+    throw new Error(i18n.t('ui.couldNotVerifyTheSavedTest'));
+  }
+
+  return testId;
+};
+
+export const updateTest = async (testId, updates) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
+
+  const testRef = ref(rtdb, `tests/${testId}`);
+  const updatedData = {
+    ...updates,
+    updatedAt: new Date().toISOString(),
+    updatedBy: user.uid,
+  };
+
+  await update(testRef, updatedData);
+  return true;
+};
+
+export const deleteTest = async (testId) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error(i18n.t('ui.signInToContinue'));
+
+  const testRef = ref(rtdb, `tests/${testId}`);
+  await remove(testRef);
+  return true;
 };

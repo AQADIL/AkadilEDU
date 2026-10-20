@@ -18,7 +18,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['functions/**/*.js', 'backend/**/*.js', 'scripts/**/*.{js,cjs,mjs}', '*.config.js'],
+      files: ['functions/**/*.js', 'scripts/**/*.{js,cjs,mjs}', '*.config.js'],
       env: { node: true },
     },
     { files: ['public/*.js'], env: { serviceworker: true } },

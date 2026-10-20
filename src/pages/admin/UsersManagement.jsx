@@ -43,7 +43,7 @@ export default function UsersManagement() {
     try {
       await suspendUser(uid, auth.currentUser.uid, i18n.t('ui.suspendedByAdministrator'));
       await loadUsers();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotSuspendUser'));
     }
   };
@@ -52,7 +52,7 @@ export default function UsersManagement() {
     try {
       await unsuspendUser(uid, auth.currentUser.uid);
       await loadUsers();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotRestoreUserAccess'));
     }
   };
@@ -69,7 +69,7 @@ export default function UsersManagement() {
         ...prev,
         [uid]: updatedStatus,
       }));
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotChangeNotificationSettings'));
     }
   };
@@ -80,7 +80,7 @@ export default function UsersManagement() {
     try {
       await softDeleteUser(uid, auth.currentUser.uid);
       await loadUsers();
-    } catch (error) {
+    } catch {
       alert(i18n.t('ui.couldNotDeleteUser'));
     }
   };
@@ -122,11 +122,11 @@ export default function UsersManagement() {
           try {
             const status = await getUserPushStatus(user.uid);
             statuses[user.uid] = status;
-          } catch (error) {}
+          } catch {}
         }
       }
       setPushStatuses(statuses);
-    } catch (error) {
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -288,7 +288,7 @@ export default function UsersManagement() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {user.lastLogin
-                        ? new Date(user.lastLogin).toLocaleDateString('ru-RU')
+                        ? new Date(user.lastLogin).toLocaleDateString(i18n.resolvedLanguage)
                         : i18n.t('ui.never')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -433,7 +433,7 @@ export default function UsersManagement() {
                   <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     {i18n.t('ui.lastSignin')}
                     {user.lastLogin
-                      ? new Date(user.lastLogin).toLocaleDateString('ru-RU')
+                      ? new Date(user.lastLogin).toLocaleDateString(i18n.resolvedLanguage)
                       : i18n.t('ui.never')}
                   </div>
                 </div>
