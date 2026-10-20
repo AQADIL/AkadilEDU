@@ -1,3 +1,4 @@
+import { formatDuration } from '../utils/duration';
 import { normalizeExternalUrl } from '../utils/urls';
 import i18n from '../i18n';
 import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
@@ -731,10 +732,9 @@ export default function CourseDetail() {
                                         >
                                           {lesson.title}
                                         </span>
-                                        {lesson.duration && (
+                                        {formatDuration(lesson.duration, t) && (
                                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                            {lesson.duration}
-                                            {i18n.t('ui.min')}
+                                            {formatDuration(lesson.duration, t)}
                                           </p>
                                         )}
                                       </div>
@@ -792,10 +792,9 @@ export default function CourseDetail() {
                     </div>
                   </div>
                   {renderLessonContent(selectedLesson)}
-                  {selectedLesson.duration && (
+                  {formatDuration(selectedLesson.duration, t) && (
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-                      {t('courseEditor.duration')}: {selectedLesson.duration}
-                      {i18n.t('ui.min')}
+                      {t('courseEditor.duration')}: {formatDuration(selectedLesson.duration, t)}
                     </p>
                   )}
                 </div>
@@ -911,11 +910,10 @@ export default function CourseDetail() {
                               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
                                 {lesson.title}
                               </p>
-                              {lesson.duration && (
+                              {formatDuration(lesson.duration, t) && (
                                 <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
                                   <Clock className="w-3 h-3" />
-                                  {lesson.duration}
-                                  {i18n.t('ui.min')}
+                                  {formatDuration(lesson.duration, t)}
                                 </p>
                               )}
                             </div>
@@ -1044,10 +1042,9 @@ export default function CourseDetail() {
                                       >
                                         {lesson.title}
                                       </span>
-                                      {lesson.duration && (
+                                      {formatDuration(lesson.duration, t) && (
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                          {lesson.duration}
-                                          {i18n.t('ui.min')}
+                                          {formatDuration(lesson.duration, t)}
                                         </p>
                                       )}
                                     </div>
