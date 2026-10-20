@@ -8,7 +8,7 @@ export default function CourseQuotes() {
   const quotes = t('courseDetail.quotes', { returnObjects: true });
   const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * quotes.length));
   const [showShareHelp, setShowShareHelp] = useState(false);
-  const sectionRef = useRef(null);
+  const quoteIndexRef = useRef(quoteIndex);
   const cardRef = useRef(null);
   const gestureRef = useRef(null);
   const [swipe, setSwipe] = useState(null);
@@ -24,12 +24,17 @@ export default function CourseQuotes() {
   };
 
   useEffect(() => {
-    const section = sectionRef.current;
+    quoteIndexRef.current = quoteIndex;
+  }, [quoteIndex]);
+
+  useEffect(() => {
     let timer;
+    let frame;
     let settling = false;
 
     const reset = () => {
       clearTimeout(timer);
+      cancelAnimationFrame(frame);
       gestureRef.current = null;
       settling = false;
       setSwipe(null);
@@ -42,8 +47,36 @@ export default function CourseQuotes() {
       const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280;
       setSwipe({ ...gesture, distance: complete ? gesture.height : 0, settling: true, duration });
       timer = setTimeout(() => {
-        if (complete) setQuoteIndex(gesture.nextIndex);
-        reset();
+        if (!complete) {
+          reset();
+          return;
+        }
+        setQuoteIndex(gesture.nextIndex);
+        if (!duration) {
+          reset();
+          return;
+        }
+        frame = requestAnimationFrame(() => {
+          frame = requestAnimationFrame(() => {
+            const rect = cardRef.current.getBoundingClientRect();
+            const styles = getComputedStyle(cardRef.current);
+            const returnDuration = 340;
+            setSwipe((current) => ({
+              ...current,
+              returning: true,
+              duration: returnDuration,
+              target: {
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                height: rect.height,
+                borderRadius: styles.borderRadius,
+                borderColor: styles.borderColor,
+              },
+            }));
+            timer = setTimeout(reset, returnDuration);
+          });
+        });
       }, duration);
     };
 
@@ -54,12 +87,15 @@ export default function CourseQuotes() {
         return;
       }
       if (
-        event.target.closest('button, a, input, textarea, select') &&
+        event.target.closest(
+          'button, a, input, textarea, select, nav, aside, [role="dialog"], [aria-modal="true"]',
+        ) &&
         !event.target.closest('[data-quote-swipe]')
       )
         return;
       const touch = event.touches[0];
       const rect = cardRef.current.getBoundingClientRect();
+      if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
       if (touch.clientY < Math.max(rect.top, Math.min(rect.bottom, window.innerHeight) - 150))
         return;
       gestureRef.current = {
@@ -72,15 +108,22 @@ export default function CourseQuotes() {
         velocity: 0,
         distance: 0,
         height: window.innerHeight,
+        contentWidth: cardRef.current.querySelector('[data-quote-content]').getBoundingClientRect()
+          .width,
         nextIndex:
-          (quoteIndex + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length,
+          (quoteIndexRef.current + 1 + Math.floor(Math.random() * (quotes.length - 1))) %
+          quotes.length,
         locked: false,
       };
     };
 
     const move = (event) => {
       const gesture = gestureRef.current;
-      if (!gesture || settling) return;
+      if (!gesture) return;
+      if (settling) {
+        if (event.cancelable) event.preventDefault();
+        return;
+      }
       if (event.touches.length !== 1) {
         settle(false);
         return;
@@ -134,23 +177,24 @@ export default function CourseQuotes() {
     };
 
     const cancel = () => settle(false);
-    section.addEventListener('touchstart', start, { passive: true });
-    section.addEventListener('touchmove', move, { passive: false });
-    section.addEventListener('touchend', end);
-    section.addEventListener('touchcancel', cancel);
-    window.addEventListener('resize', cancel);
-    window.addEventListener('blur', cancel);
+    document.addEventListener('touchstart', start, { passive: true });
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('touchend', end);
+    document.addEventListener('touchcancel', cancel);
+    window.addEventListener('resize', reset);
+    window.addEventListener('blur', reset);
     return () => {
       clearTimeout(timer);
+      cancelAnimationFrame(frame);
       gestureRef.current = null;
-      section.removeEventListener('touchstart', start);
-      section.removeEventListener('touchmove', move);
-      section.removeEventListener('touchend', end);
-      section.removeEventListener('touchcancel', cancel);
-      window.removeEventListener('resize', cancel);
-      window.removeEventListener('blur', cancel);
+      document.removeEventListener('touchstart', start);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', end);
+      document.removeEventListener('touchcancel', cancel);
+      window.removeEventListener('resize', reset);
+      window.removeEventListener('blur', reset);
     };
-  }, [quoteIndex, quotes.length]);
+  }, [quotes.length]);
 
   const renderQuote = (displayQuote, preview = false) => (
     <>
@@ -185,7 +229,11 @@ export default function CourseQuotes() {
           fill={`url(#${gradientId}-${preview ? 'next' : 'current'})`}
         />
       </svg>
-      <div className="relative max-w-3xl mx-auto text-center space-y-8">
+      <div
+        data-quote-content
+        className="relative w-full max-w-3xl mx-auto text-center space-y-8"
+        style={preview ? { width: swipe.contentWidth } : undefined}
+      >
         <img
           src="/icons/logo-прозрачный.png"
           alt={t('ui.akadileduLogo')}
@@ -206,6 +254,7 @@ export default function CourseQuotes() {
         <button
           type="button"
           tabIndex={preview ? -1 : undefined}
+          disabled={Boolean(swipe)}
           onClick={() => setShowShareHelp((shown) => !shown)}
           aria-expanded={showShareHelp}
           aria-controls={preview ? undefined : helpId}
@@ -229,9 +278,10 @@ export default function CourseQuotes() {
   const inset = 30 * (1 - progress);
 
   return (
-    <section ref={sectionRef} className="relative" aria-label={t('courseDetail.quoteTitle')}>
+    <section className="relative" aria-label={t('courseDetail.quoteTitle')}>
       <div
         ref={cardRef}
+        style={{ opacity: swipe?.returning ? 0 : 1 }}
         className="min-h-[60vh] flex items-center justify-center bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 sm:p-12 relative overflow-hidden"
       >
         {renderQuote(quote)}
@@ -244,13 +294,21 @@ export default function CourseQuotes() {
           >
             <div
               data-quote-preview
-              className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 p-6 sm:p-12"
+              data-returning={swipe.returning || undefined}
+              className="absolute flex items-center justify-center overflow-hidden bg-white dark:bg-gray-800 p-6 sm:p-12 border border-transparent"
               style={{
+                top: swipe.target?.top ?? 0,
+                left: swipe.target?.left ?? 0,
+                width: swipe.target?.width ?? '100%',
+                height: swipe.target?.height ?? '100%',
+                borderRadius: swipe.target?.borderRadius ?? 0,
+                borderColor: swipe.target?.borderColor ?? 'transparent',
                 transform: `translateY(${swipe.height - swipe.distance}px)`,
                 clipPath: `polygon(${inset}% 0, ${100 - inset}% 0, 100% 100%, 0 100%)`,
-                transition: swipe.settling
-                  ? `transform ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1), clip-path ${swipe.duration}ms cubic-bezier(0.16, 1, 0.3, 1)`
-                  : 'none',
+                transitionProperty:
+                  'transform, clip-path, top, left, width, height, border-radius, border-color',
+                transitionDuration: swipe.settling ? `${swipe.duration}ms` : '0ms',
+                transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
               {renderQuote(quotes[swipe.nextIndex], true)}
