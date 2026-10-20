@@ -873,7 +873,218 @@ const resources = {
       'home.introduction':
         'Тағайындалған курстарды оқып, пәндік тесттермен дайындалыңыз және жауаптарыңызды талдаңыз.',
       'auth.signup': 'Аккаунт құру',
-      'courseDetail.chooseLesson': 'Бастау үшін курс мазмұнынан сабақты таңдаңыз.',
+      'courseDetail.quoteTitle': 'Мотивациялық цитаталар',
+      'courseDetail.quoteNext': 'Келесі',
+      'courseDetail.quoteSwipe': 'Келесі цитата үшін жоғары сырғытыңыз',
+      'courseDetail.quoteShare': 'Қалай бөлісу керек?',
+      'courseDetail.quoteShareHelp':
+        'Скриншот жасап, Instagram Stories-қа салыңыз және @aqdlsh парақшасын белгілеңіз.',
+      'courseDetail.quotes': [
+        {
+          text: 'Оқымасаң – табыс жоқ, табыс жоқ болса – құрмет жоқ. Таңда: оқу немесе кедейлік.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Сен өзіңе ақыл айтатын адамдарды тыңдамайсың, ал өмір саған қатал сабақпен үйретеді.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Білім – жалғыз нәрсе, оны сенен ешкім ала алмайды. Ақшаны алады, денсаулықты алады, бірақ білімді – ешқашан.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ертең деп жүрген адамның ертеңі ешқашан келмейді. Бүгін бастамасаң – мәңгі бастамайсың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Табысты адамдар мен табыссыз адамдардың айырмашылығы – бірі істейді, екіншісі тек ойлайды.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Шаршадым дейтін адам – өз шегіне жетпеген адам. Адамның шегі – өз ойында.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Оқу қиын ба? Кедейлікте өмір сүру одан да қиын. Таңдау сенде.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Жолдастарыңмен уақыт өткізіп жүргенде, біреу сенің арманыңды жүзеге асырып жатыр.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ешкім сені құтқармайды. Өзің, тек өзің.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Егер сен күн сайын өспесең – артқа кетіп барасың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Өз уақытыңды құрметтемеген адам – өз өмірін ысырап етеді.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Сен қаншалықты шаршасаң да, сенің арманың сенен күшті болуы керек.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Күн сайын кішкентай қадам жасасаң да – бір жылда алыста боласың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Саған ешкім ештеңе бермейді. Барлығы өз қолыңда.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Қателік – бұл сәтсіздік емес, сабақ.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Тәртіп – табыстың әкесі. Еріншектік – сәтсіздіктің шешесі.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Білім – сенің қаруың. Ал білімсіз – сен нысанасың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Мақсатсыз адам – жел айдаған жапырақ. Қайда ұшып жатқанын өзі де білмейді.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Бүгін тырыссаң – ертең тынығасың. Бүгін жалқау болсаң – ертең жылайсың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Өз мүмкіндігіңді өзің шектейсің. Оны ешкім тартып алмайды.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Саған сеніп отырған адамдар бар. Сол сенімді ақтау – сенің міндетің.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Бүгінгі ауырлық – ертеңгі жеңіс.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Сен өз өміріңнің бағдарламашысысың. Қателік бар ма? Түзет.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Тәртіпсіз талант – бос қуат.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Қиындық – сенің өсуіңнің сигналы. Демек, сен дұрыс жолдасың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Өз потенциалыңды көрсең – қорқасың. Сол қорқыныш – дамудың белгісі.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Таңдауың қарапайым: не нәтиже, не сылтау.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Табыстың кілті – әр күнді есеппен өткізу.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Өзіңе уәде берсең – орында. Себебі сенің сөзің – сенің абыройың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Қазір оқы, кейін өмірің үшін рахмет айтасың.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Қиын болса да жалғастыр. Сындыра алмаса – күшейтеді.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Білім – күш, білім – қуат. Білімсіз адам – соқыр адам.',
+          author: 'Қазақ мақалы',
+        },
+        {
+          text: 'Ештеңе істемеген адам ештеңеге жетпейді. Әрекет ет қазір!',
+          author: 'Даналық',
+        },
+        {
+          text: 'Білімді адам – еркін адам. Надандық – құлдықтың түрі.',
+          author: 'Абай Құнанбаев',
+        },
+        {
+          text: 'Білмегенің үшін ұялма, үйренгің келмейтініңе ұял.',
+          author: 'Қазақ даналығы',
+        },
+        {
+          text: 'Сәтсіздік – жеңістің бөлшегі. Тоқтама, алға жүр!',
+          author: 'Томас Эдисон',
+        },
+        {
+          text: 'Knowledge is power. Power to change your life.',
+          author: 'Francis Bacon',
+        },
+        {
+          text: 'Discipline is stronger than motivation.',
+          author: 'Jocko Willink',
+        },
+        {
+          text: 'Success doesn’t come to those who wait, it comes to those who work.',
+          author: 'Unknown',
+        },
+        {
+          text: 'Pain is temporary, pride is forever.',
+          author: 'Anonymous',
+        },
+        {
+          text: 'Dream big. Work harder. Repeat.',
+          author: 'Aқәділ ағай',
+        },
+        {
+          text: 'No one cares how you feel — only what you do.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Be so good they can’t ignore you.',
+          author: 'Steve Martin',
+        },
+        {
+          text: 'The only limit is the one in your mind.',
+          author: 'Napoleon Hill',
+        },
+        {
+          text: 'Hard times create strong people.',
+          author: 'Aқәділ ағай',
+        },
+        {
+          text: 'If you can’t handle pressure, you can’t handle success.',
+          author: 'Aқәділ ағай',
+        },
+        {
+          text: 'Work until you don’t need to introduce yourself.',
+          author: 'Aқәділ ағай',
+        },
+        {
+          text: 'Бүгін бар күшіңді салып дайындал, ертең еркін демал! Осы девизбен өмір сүр',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Үлкен жетістіктер кішкентай қадамдардан басталады. Қазір кішкентай болып көрінген жаттығулар ертең үлкен нәтижеге әкеледі',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Қателіктерден қорықпа, олар сені күшейтеді. Әр қателікті ҰБТ жолыңдағы тек бір қадам ретінде қабылда, сүрінсең де бұл толық құлдырым емес',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Саған сеніп отырған адамдар туралы ұмытпа. Олардың сенімі саған үлкен мотивация. Сол адамдардың үмітің ақтағаң сәтті елестетші!',
+          author: 'Ақәділ ағай',
+        },
+      ],
       'admin.allOptionsRequired': 'Барлық жауап нұсқаларын толтырыңыз',
       'admin.answerOptions': 'Жауап нұсқалары',
       'admin.questionContent': 'Сұрақ мазмұны',
@@ -1787,7 +1998,218 @@ const resources = {
       'home.introduction':
         'Изучайте назначенные курсы, готовьтесь по предметным тестам и разбирайте ответы.',
       'auth.signup': 'Создать аккаунт',
-      'courseDetail.chooseLesson': 'Чтобы начать, выберите урок в содержании курса.',
+      'courseDetail.quoteTitle': 'Мотивационные цитаты',
+      'courseDetail.quoteNext': 'Следующая',
+      'courseDetail.quoteSwipe': 'Проведите вверх для следующей цитаты',
+      'courseDetail.quoteShare': 'Как поделиться?',
+      'courseDetail.quoteShareHelp':
+        'Сделайте скриншот, опубликуйте его в Instagram Stories и отметьте @aqdlsh.',
+      'courseDetail.quotes': [
+        {
+          text: 'Без учёбы нет успеха, без успеха нет уважения. Выбирай: учёба или бедность.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ты не слушаешь людей, которые дают тебе советы, а жизнь научит тебя суровыми уроками.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Знания — единственное, чего у тебя никто не отнимет. Деньги и здоровье можно потерять, но знания — никогда.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'У того, кто всё откладывает на завтра, завтра никогда не наступает. Не начнёшь сегодня — не начнёшь никогда.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Разница между успешными и неуспешными людьми в том, что одни действуют, а другие лишь думают.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Тот, кто говорит «я устал», ещё не достиг своего предела. Предел человека — в его мыслях.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Учиться трудно? Жить в бедности ещё труднее. Выбор за тобой.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Пока ты проводишь время с друзьями, кто-то воплощает твою мечту.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Никто тебя не спасёт. Только ты сам.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Если ты не растёшь каждый день, ты движешься назад.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Тот, кто не ценит своё время, тратит впустую свою жизнь.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Как бы сильно ты ни устал, твоя мечта должна быть сильнее тебя.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Даже маленький шаг каждый день за год приведёт тебя далеко.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Никто ничего тебе не даст. Всё в твоих руках.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ошибка — не поражение, а урок.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Дисциплина — отец успеха. Лень — мать неудачи.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Знания — твоё оружие. Без знаний ты сам становишься мишенью.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Человек без цели — лист на ветру. Он и сам не знает, куда летит.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Постараешься сегодня — отдохнёшь завтра. Поленишься сегодня — будешь плакать завтра.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ты сам ограничиваешь свои возможности. Никто не отнимает их у тебя.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Есть люди, которые в тебя верят. Оправдать их доверие — твоя обязанность.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Сегодняшняя тяжесть — завтрашняя победа.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ты программист собственной жизни. Есть ошибка? Исправь её.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Талант без дисциплины — нерастраченная энергия.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Трудности — сигнал твоего роста. Значит, ты на верном пути.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Увидев свой потенциал, ты испугаешься. Этот страх — признак развития.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Выбор прост: либо результат, либо оправдание.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Ключ к успеху — осмысленно проводить каждый день.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Дал себе обещание — выполни. Твоё слово — твоя честь.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Учись сейчас — потом поблагодаришь себя за свою жизнь.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Продолжай, даже если трудно. То, что не сломает, сделает сильнее.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Знания — сила и мощь. Человек без знаний подобен слепому.',
+          author: 'Казахская пословица',
+        },
+        {
+          text: 'Тот, кто ничего не делает, ничего не достигает. Действуй сейчас!',
+          author: 'Мудрость',
+        },
+        {
+          text: 'Образованный человек свободен. Невежество — форма рабства.',
+          author: 'Абай Кунанбаев',
+        },
+        {
+          text: 'Не стыдись того, что не знаешь. Стыдись нежелания учиться.',
+          author: 'Казахская мудрость',
+        },
+        {
+          text: 'Неудача — часть победы. Не останавливайся, иди вперёд!',
+          author: 'Томас Эдисон',
+        },
+        {
+          text: 'Знание — сила. Сила изменить свою жизнь.',
+          author: 'Фрэнсис Бэкон',
+        },
+        {
+          text: 'Дисциплина сильнее мотивации.',
+          author: 'Джоко Виллинк',
+        },
+        {
+          text: 'Успех приходит не к тем, кто ждёт, а к тем, кто работает.',
+          author: 'Автор неизвестен',
+        },
+        {
+          text: 'Боль временна, гордость остаётся навсегда.',
+          author: 'Автор неизвестен',
+        },
+        {
+          text: 'Мечтай масштабно. Работай усерднее. Повторяй.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Никому не важно, что ты чувствуешь. Важно, что ты делаешь.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Стань настолько хорош, чтобы тебя невозможно было игнорировать.',
+          author: 'Стив Мартин',
+        },
+        {
+          text: 'Единственное ограничение — то, что существует в твоём сознании.',
+          author: 'Наполеон Хилл',
+        },
+        {
+          text: 'Трудные времена создают сильных людей.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Если ты не выдерживаешь давления, ты не выдержишь и успеха.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Работай, пока тебе больше не придётся представляться.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Сегодня готовься изо всех сил, завтра отдыхай спокойно! Живи с этим девизом.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Большие достижения начинаются с маленьких шагов. Упражнения, которые сегодня кажутся незначительными, завтра принесут большой результат.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Не бойся ошибок: они делают тебя сильнее. Принимай каждую ошибку как шаг на пути к ЕНТ. Споткнуться — не значит потерпеть полное поражение.',
+          author: 'Ақәділ ағай',
+        },
+        {
+          text: 'Не забывай о людях, которые верят в тебя. Их вера — сильная мотивация. Представь момент, когда ты оправдаешь их надежды!',
+          author: 'Ақәділ ағай',
+        },
+      ],
       'admin.allOptionsRequired': 'Заполните все варианты ответа',
       'admin.answerOptions': 'Варианты ответа',
       'admin.questionContent': 'Содержание вопроса',
@@ -2675,7 +3097,218 @@ const resources = {
       'home.introduction':
         'Access your assigned courses, practise with subject tests and review your answers.',
       'auth.signup': 'Create account',
-      'courseDetail.chooseLesson': 'Choose a lesson from the course contents to begin.',
+      'courseDetail.quoteTitle': 'Motivational quotes',
+      'courseDetail.quoteNext': 'Next',
+      'courseDetail.quoteSwipe': 'Swipe up for the next quote',
+      'courseDetail.quoteShare': 'How to share',
+      'courseDetail.quoteShareHelp':
+        'Take a screenshot, post it to Instagram Stories and tag @aqdlsh.',
+      'courseDetail.quotes': [
+        {
+          text: 'Without study, there is no success; without success, there is no respect. Choose: education or poverty.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'You ignore the people who offer you advice, but life will teach you through hard lessons.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Knowledge is the one thing nobody can take from you. You can lose money and health, but never knowledge.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Tomorrow never comes for those who keep putting things off. If you do not start today, you may never start.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'The difference between successful and unsuccessful people is that some act while others only think.',
+          author: 'Akadil agai',
+        },
+        {
+          text: "Those who say they are tired have not yet reached their limit. A person's limit exists in their mind.",
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Is studying hard? Living in poverty is harder. The choice is yours.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'While you spend time with friends, someone else is making your dream a reality.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Nobody will save you. Only you can do that.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'If you are not growing every day, you are moving backwards.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Those who do not respect their time waste their lives.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'However tired you are, your dream must be stronger than you.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Even a small step every day will take you far in a year.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Nobody will hand you anything. It is all in your hands.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'A mistake is a lesson, not a defeat.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Discipline is the father of success. Laziness is the mother of failure.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Knowledge is your weapon. Without it, you become the target.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'A person without a goal is a leaf in the wind, unaware of where they are going.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Work hard today and rest tomorrow. Be lazy today and cry tomorrow.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'You set the limits on your own potential. Nobody takes it away from you.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'There are people who believe in you. Living up to their trust is your responsibility.',
+          author: 'Akadil agai',
+        },
+        {
+          text: "Today's hardship is tomorrow's victory.",
+          author: 'Akadil agai',
+        },
+        {
+          text: 'You are the programmer of your own life. Found an error? Fix it.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Talent without discipline is wasted energy.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Difficulty signals growth. It means you are on the right path.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Seeing your own potential can frighten you. That fear is a sign of growth.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'The choice is simple: results or excuses.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'The key to success is making every day count.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Keep the promises you make to yourself. Your word is your honour.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Study now, and later you will thank yourself for the life you have built.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Keep going, even when it is hard. What cannot break you will make you stronger.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Knowledge is strength and power. A person without knowledge is like someone who cannot see.',
+          author: 'Kazakh proverb',
+        },
+        {
+          text: 'Those who do nothing achieve nothing. Act now!',
+          author: 'Wisdom',
+        },
+        {
+          text: 'An educated person is free. Ignorance is a form of slavery.',
+          author: 'Abai Qunanbaiuly',
+        },
+        {
+          text: 'Do not be ashamed of what you do not know. Be ashamed of not wanting to learn.',
+          author: 'Kazakh wisdom',
+        },
+        {
+          text: 'Failure is part of victory. Keep moving forward!',
+          author: 'Thomas Edison',
+        },
+        {
+          text: 'Knowledge is power. Power to change your life.',
+          author: 'Francis Bacon',
+        },
+        {
+          text: 'Discipline is stronger than motivation.',
+          author: 'Jocko Willink',
+        },
+        {
+          text: 'Success doesn’t come to those who wait, it comes to those who work.',
+          author: 'Unknown',
+        },
+        {
+          text: 'Pain is temporary, pride is forever.',
+          author: 'Anonymous',
+        },
+        {
+          text: 'Dream big. Work harder. Repeat.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'No one cares how you feel — only what you do.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Be so good they can’t ignore you.',
+          author: 'Steve Martin',
+        },
+        {
+          text: 'The only limit is the one in your mind.',
+          author: 'Napoleon Hill',
+        },
+        {
+          text: 'Hard times create strong people.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'If you can’t handle pressure, you can’t handle success.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Work until you don’t need to introduce yourself.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Prepare with all your strength today and rest freely tomorrow! Live by this motto.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Great achievements begin with small steps. Exercises that seem small today will bring big results tomorrow.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Do not fear mistakes: they make you stronger. Treat each mistake as a step towards the UNT. Stumbling is not a complete defeat.',
+          author: 'Akadil agai',
+        },
+        {
+          text: 'Remember the people who believe in you. Their faith is a powerful motivation. Imagine the moment when you live up to their hopes!',
+          author: 'Akadil agai',
+        },
+      ],
       'admin.allOptionsRequired': 'Fill in every answer option',
       'admin.answerOptions': 'Answer options',
       'admin.questionContent': 'Question content',
