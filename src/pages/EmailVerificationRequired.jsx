@@ -44,6 +44,7 @@ export default function EmailVerificationRequired() {
       await auth.currentUser.reload();
 
       if (auth.currentUser.emailVerified) {
+        await auth.currentUser.getIdToken(true);
         navigate('/');
         window.location.reload();
       } else {

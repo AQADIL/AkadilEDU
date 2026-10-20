@@ -79,6 +79,9 @@ test(
           set(ref(student, 'users/student/courses/locked'), { expiryDate: Date.now() + 3600000 }),
         );
         await assertFails(set(ref(student, 'users/student/password'), 'never-store-passwords'));
+        await assertSucceeds(set(ref(student, 'users/student/courses/enrolled/order'), 1));
+        await assertFails(set(ref(student, 'users/student/courses/locked/order'), 1));
+        await assertFails(get(ref(student, 'courses/locked')));
         await assertFails(get(ref(student, 'users/other')));
         await assertFails(get(ref(student, 'users')));
       });

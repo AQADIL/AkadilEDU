@@ -51,7 +51,7 @@
         "courses": {
           "$courseId": {
             "order": {
-              ".write": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && root.child('users').child($uid).child('courses').child($courseId).exists()",
               ".validate": "newData.isNumber() && newData.val() >= 0"
             }
           }
