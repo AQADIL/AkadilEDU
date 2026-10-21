@@ -1,5 +1,7 @@
 # AkadilEdu v2 - Comprehensive Educational Platform
 
+**Copyright (c) 2026 Akadil Alish. All rights reserved.** This is proprietary software. Using, copying, modifying, redistributing or deploying the project for your own purposes requires prior written permission from Akadil Alish. See [LICENSE](LICENSE) for the full terms and exceptions.
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -594,19 +596,17 @@ git config core.hooksPath .githooks
 
 ## License
 
-The repository does not currently include a `LICENSE` file.
+This project is proprietary intellectual property of **Akadil Alish**. All rights reserved.
+
+The project's original source code, documentation and original assets may not be used, copied, modified, redistributed, sold or deployed for personal, educational, commercial or other purposes without prior written permission from Akadil Alish. Access to this repository does not itself grant permission to reuse the project.
+
+See [LICENSE](LICENSE) for the complete terms. Third-party components retain their own licenses. These terms do not revoke previously granted valid licenses or override rights required by applicable law or hosting-platform terms. Authorized use of the hosted educational service is governed separately from reuse of this repository.
 
 ---
 
 ## Author
 
-**AkadilEdu Development Team**
-
-- **Project Lead**: Akadil
-- **Frontend Development**: React, Vite, Tailwind CSS
-- **Backend Development**: Firebase Services
-- **UI/UX Design**: Modern, responsive design
-- **DevOps**: GitHub Actions and Firebase Hosting
+**Akadil Alish** — project author and owner of the original project materials.
 
 ---
 
