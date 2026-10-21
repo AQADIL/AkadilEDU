@@ -94,6 +94,8 @@ CI uses an isolated demo project for rules. Live email, video, AI, push and cred
 ## Lesson playback
 
 Deploy `getCourseContent` and `getLessonPlayback` before the frontend that calls them.
+The workflow checks that both functions are active and reject anonymous calls before
+publishing hosting or database rules, even if the deployment command exits successfully.
 After the new frontend is available, deploy the database rules that restrict `courses`
 to administrators. Course data does not need migration: the server removes video URLs
 from student responses. Administrator editing continues to use the existing records.
