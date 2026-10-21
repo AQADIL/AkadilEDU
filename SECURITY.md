@@ -1,30 +1,23 @@
-# Security
+# Security Policy
 
-Do not post credentials, access tokens, student records or database exports in issues.
-Report vulnerabilities through GitHub private vulnerability reporting when it is available.
-Otherwise contact the repository owner privately without including live credentials.
+## Reporting a vulnerability
 
-All `VITE_*` variables are public browser configuration. Gemini keys and service-account
-credentials belong only in server secret storage. Firebase web configuration is public
-and is not an authorization boundary.
+Please report suspected vulnerabilities privately to **Akadil Alish**, the project
+owner. When available, use **Security → Report a vulnerability** on GitHub.
+Do not disclose vulnerabilities in public issues or pull requests.
 
-Authorization uses Firebase custom claims and versioned Database/Storage rules.
-Frontend guards control navigation only. A database `role` field does not grant administrator authority.
+Include the affected feature or version, steps to reproduce the issue and its
+potential impact. Remove passwords, access tokens and personal information from
+screenshots and other supporting material. Never include student records or
+database exports.
 
-Before deploying security changes, complete the migration steps in `docs/DEPLOYMENT.md`.
-Previously exposed service-account private keys and browser-exposed Gemini keys must be revoked and replaced. Removing a key from
-the current files does not remove it from Git history or previously deployed assets.
+## Responsible testing
 
-A real service-account private key was found in the historical `backend/README.md`.
-That key was disabled in Google Cloud on 20 October 2026. Keep the repository private
-until history cleanup is coordinated. Local unpublished commits also contain a
-Gemini key and must not be pushed.
+Test only accounts and data you are authorized to access. Avoid actions that
+interrupt the service or expose other users' information. Coordinate public
+disclosure with the project owner so that a fix can be prepared.
 
-GitHub deployment uses a dedicated service account with short-lived credentials.
-Its identity provider accepts only this repository's numeric ID, owner ID, `main`
-branch, production environment and deployment workflow. Pull requests cannot obtain
-production credentials. Generated `gha-creds-*.json` files are ignored and rejected
-by the staged-file guard.
+## Scope
 
-Practice-test results are calculated in the browser. They are learning records, not
-tamper-proof examination scores or externally accredited certificates.
+Security reports should concern the current version of AkadilEdu on `main`.
+For ordinary bugs and feature requests, use GitHub Issues.
