@@ -73,15 +73,7 @@ jobs:
           project_id: ${{ vars.FIREBASE_PROJECT_ID }}
           workload_identity_provider: ${{ vars.FIREBASE_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}
-      - name: Deploy Firebase functions
-        run: npx --yes firebase-tools@15.28.1 deploy --project "$FIREBASE_PROJECT_ID" --only functions --non-interactive
-      - name: Verify course functions
-        run: |
-          npx --yes firebase-tools@15.28.1 functions:list --project "$FIREBASE_PROJECT_ID" --json > "$RUNNER_TEMP/firebase-functions.json"
-          node scripts/verify-functions.mjs "$RUNNER_TEMP/firebase-functions.json"
-      - name: Deploy hosting and storage
-        run: npx --yes firebase-tools@15.28.1 deploy --project "$FIREBASE_PROJECT_ID" --only hosting,storage --non-interactive
-      - name: Deploy database rules
-        run: npx --yes firebase-tools@15.28.1 deploy --project "$FIREBASE_PROJECT_ID" --only database --non-interactive
+      - name: Deploy Firebase services
+        run: npx --yes firebase-tools@15.28.1 deploy --project "$FIREBASE_PROJECT_ID" --only functions,database,storage,hosting --non-interactive
       - name: Verify published build
         run: node scripts/firebase-release.mjs verify
