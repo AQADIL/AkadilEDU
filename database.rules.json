@@ -64,7 +64,10 @@
     },
     "courses": {
       ".read": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
-      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)"
+      ".write": "auth != null && (auth.token.admin === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true)",
+      "$courseId": {
+        ".read": "(auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true) && root.child('users').child(auth.uid).child('courses').child($courseId).exists() && (!root.child('users').child(auth.uid).child('courses').child($courseId).child('expiryDate').exists() || root.child('users').child(auth.uid).child('courses').child($courseId).child('expiryDate').val() > now)"
+      }
     },
     "tests": {
       ".read": "auth != null && auth.token.email_verified === true && root.child('users').child(auth.uid).child('status').val() === 'active' && root.child('users').child(auth.uid).child('isDeleted').val() !== true",

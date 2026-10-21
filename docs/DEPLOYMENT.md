@@ -41,12 +41,11 @@ Revoke any Gemini key previously included in a browser build or repository histo
 
 ## Publish
 
-Deploy Functions first, initialize the catalog and administrator claims, then publish the frontend and Storage rules before restricting database reads. Older clients must reload to use callable course access. The GitHub workflow follows this order.
+Deploy Functions first, initialize the catalog and administrator claims, then deploy database and Storage rules together with the frontend during a maintenance window. Older clients may rely on previous permissions.
 
 ```sh
 firebase deploy --only functions
-firebase deploy --only hosting,storage
-firebase deploy --only database
+firebase deploy --only database,storage,hosting
 ```
 
 Push notifications use authenticated callable Functions.
@@ -90,17 +89,3 @@ Check registration, email verification, sign-in after reload, explicit sign-out,
 Firebase rules restrict course records. External video or Drive URLs remain shareable by anyone who has them; use a protected media provider if stronger distribution control is required.
 
 CI uses an isolated demo project for rules. Live email, video, AI, push and credential configuration require deployment checks.
-
-## Lesson playback
-
-Deploy `getCourseContent` and `getLessonPlayback` before the frontend that calls them.
-The workflow checks that both functions are active and reject anonymous calls before
-publishing hosting or database rules, even if the deployment command exits successfully.
-After the new frontend is available, deploy the database rules that restrict `courses`
-to administrators. Course data does not need migration: the server removes video URLs
-from student responses. Administrator editing continues to use the existing records.
-
-The per-account limits are 60 course-content requests and 12 playback requests per
-minute. The browser reuses concurrent identical requests without caching video IDs
-persistently. Monitor callable errors after release and verify an enrolled account,
-an expired enrollment, a blocked account and anonymous access.
