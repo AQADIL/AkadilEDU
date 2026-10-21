@@ -134,8 +134,8 @@ Videos use external YouTube embeds. Materials use supported external links or St
 | `functions/` | Server-side source and dependencies |
 | `scripts/` | Security checks, migrations and release verification |
 | `tests/` | Application and Firebase rule tests |
-| `SECURITY.md` | Security boundaries and reporting |
-| `docs/DEPLOYMENT.md` | Deployment and migration details |
+| `SECURITY.md` | Vulnerability reporting policy |
+| `LICENSE` | Project ownership and usage terms |
 
 ### Source Directory (`src/`)
 
@@ -240,7 +240,7 @@ Node.js 22.12 or later, npm, Git, access to this repository and a configured Fir
 
 3. Copy `.env.example` to `.env` and configure the selected project's web settings, local host and port.
 4. Enable the authentication providers and authorize the development domain in Firebase Authentication.
-5. Follow [deployment and migration](docs/DEPLOYMENT.md) for existing installations.
+5. Review [deployment](#deployment) and [administrator setup](#admin-account-setup) for existing installations.
 6. Start the application:
 
    ~~~sh
@@ -434,7 +434,7 @@ Production authentication uses Workload Identity Federation restricted to the re
 | `DATABASE_REGION` | Database trigger region |
 | `FIREBASE_WEB_CONFIG` | Repository secret with the public browser environment as JSON |
 
-The AI key stays in Secret Manager. Full setup is documented in [deployment and migration](docs/DEPLOYMENT.md).
+The AI key stays in Secret Manager. Set it with `firebase functions:secrets:set GEMINI_API_KEY` before deploying the AI import function.
 
 ### Firebase Hosting
 
@@ -445,7 +445,7 @@ firebase deploy --only functions
 firebase deploy --only database,storage,hosting
 ~~~
 
-The Hosting predeploy hook builds the application. Follow the coordinated migration process for existing installations.
+The Hosting predeploy hook builds the application. For existing installations, back up the database and verify account records, administrator claims and catalog data before activating updated rules.
 
 ---
 
@@ -484,7 +484,7 @@ Scripts default to a dry run. A database role label alone does not grant the req
 - Hosting supplies HTTPS and configured response headers.
 - Git exclusions and the commit guard protect against accidental publication of credentials and generated files.
 
-Read [SECURITY.md](SECURITY.md) for boundaries and reporting guidance.
+Read [SECURITY.md](SECURITY.md) for vulnerability reporting guidance.
 
 ### Local Storage Keys
 
@@ -612,7 +612,7 @@ See [LICENSE](LICENSE) for the complete terms. Third-party components retain the
 
 ## Support
 
-Use [GitHub Issues](https://github.com/AQADIL/akadiledu-v2-1/issues) for repository reports. Deployment guidance is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), and security guidance is in [SECURITY.md](SECURITY.md). Application support destinations are configured through environment variables.
+Use [GitHub Issues](https://github.com/AQADIL/akadiledu-v2-1/issues) for bug reports and feature requests. Follow [SECURITY.md](SECURITY.md) for private vulnerability reports. Application support destinations are configured through environment variables.
 
 ---
 

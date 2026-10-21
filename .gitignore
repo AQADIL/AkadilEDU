@@ -67,3 +67,6 @@ Desktop.ini
 
 .playwright-cli/
 gha-creds-*.json
+AGENTS.md
+/docs/DEPLOYMENT.md
+/.github/pull_request_template.md
