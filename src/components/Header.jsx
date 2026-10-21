@@ -107,7 +107,7 @@ export default function Header({ onMenuClick, onProfileClick, userAvatar, user }
               <div className="relative group">
                 <button
                   onClick={onProfileClick}
-                  className="w-9 h-9 rounded-full bg-primary-700 hover:bg-primary-800 flex items-center justify-center transition-colors overflow-hidden"
+                  className="w-9 h-9 rounded-full bg-primary-500 hover:bg-primary-600 dark:bg-primary-700 dark:hover:bg-primary-800 flex items-center justify-center transition-colors overflow-hidden"
                   aria-label={i18n.t('ui.openProfile')}
                 >
                   {userAvatar ? (
