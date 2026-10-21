@@ -72,3 +72,41 @@
     scroll-behavior: auto !important;
   }
 }
+
+.lesson-video-player {
+  --plyr-color-main: #3b82f6;
+}
+
+.lesson-video-player .plyr {
+  height: 100%;
+}
+
+.lesson-video-player .plyr__video-wrapper {
+  background: #000;
+}
+
+@media (max-width: 639px) {
+  .lesson-video-player .plyr__controls .plyr__volume input,
+  .lesson-video-player .plyr__controls .plyr__time--duration,
+  .lesson-video-player .plyr__controls [data-plyr='restart'] {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .lesson-video-player .plyr__controls .plyr__volume {
+    width: auto;
+    min-width: 0;
+  }
+
+  .lesson-video-player .plyr__menu__container {
+    max-height: 140px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .lesson-video-player .plyr:fullscreen .plyr__menu__container,
+  .lesson-video-player .plyr--fullscreen-fallback .plyr__menu__container {
+    max-height: 60dvh;
+  }
+}

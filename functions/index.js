@@ -522,3 +522,6 @@ exports.setUserRole = functions.https.onCall(async (data, context) => {
   await getAuth().revokeRefreshTokens(data.uid);
   return { success: true };
 });
+
+exports.getCourseContent = require('./courseAccess').getCourseContent;
+exports.getLessonPlayback = require('./courseAccess').getLessonPlayback;
