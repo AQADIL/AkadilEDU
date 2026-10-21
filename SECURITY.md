@@ -28,3 +28,13 @@ by the staged-file guard.
 
 Practice-test results are calculated in the browser. They are learning records, not
 tamper-proof examination scores or externally accredited certificates.
+
+Course records, including video sources, are readable directly only by administrators.
+Students obtain course content without video URLs through `getCourseContent` and request
+one lesson's YouTube ID through `getLessonPlayback`. Both endpoints check the current
+Auth account, active profile and enrollment. Playback requests are limited per account.
+
+This controls access and bulk disclosure, not copying after access is granted. The ID
+of a playing YouTube video remains visible to its viewer through browser tools. The
+YouTube URL does not expire when course access is revoked. This integration provides
+no DRM or guarantee against link sharing or screen recording.

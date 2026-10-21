@@ -1,3 +1,4 @@
+import { getCourseContent } from '../api/courseContent';
 import i18n from '../i18n';
 
 import {
@@ -273,13 +274,14 @@ export async function getUserCourses(userId) {
   const coursesPromises = courseIds.map(async (courseId) => {
     const enrollment = coursesData[courseId];
     const expired = enrollment.expiryDate && enrollment.expiryDate <= Date.now();
-    const courseRef = ref(database, (expired ? 'courseCatalog/' : 'courses/') + courseId);
-    const courseSnapshot = await get(courseRef);
+    const courseData = expired
+      ? (await get(ref(database, 'courseCatalog/' + courseId))).val()
+      : await getCourseContent(courseId);
 
-    if (courseSnapshot.exists()) {
+    if (courseData) {
       return {
         id: courseId,
-        ...courseSnapshot.val(),
+        ...courseData,
         enrollment: coursesData[courseId],
       };
     }

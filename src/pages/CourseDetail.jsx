@@ -1,3 +1,4 @@
+import { getCourseContent } from '../api/courseContent';
 import { formatDuration } from '../utils/duration';
 import { normalizeExternalUrl } from '../utils/urls';
 import i18n from '../i18n';
@@ -22,7 +23,7 @@ import {
   Target,
 } from 'lucide-react';
 import { ref, get } from 'firebase/database';
-import { database, getUserCourses, isUserAdmin } from '../firebase/realtimeDb';
+import { database, isUserAdmin } from '../firebase/realtimeDb';
 import { auth } from '../firebase/config';
 import VideoPlayer from '../components/VideoPlayer';
 import LessonQuizPlayer from '../components/LessonQuizPlayer';
@@ -284,11 +285,10 @@ export default function CourseDetail() {
 
     return (
       <div className="space-y-4">
-        <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
-          {lesson.videoUrl ? (
+        <div className="aspect-video min-h-[200px] bg-black rounded-lg overflow-hidden shadow-2xl">
+          {lesson.hasVideo || lesson.videoUrl ? (
             <VideoPlayer
               key={lesson.id}
-              videoUrl={lesson.videoUrl}
               courseId={id}
               lessonId={lesson.id}
               durationSeconds={
@@ -448,16 +448,17 @@ export default function CourseDetail() {
     }
 
     try {
-      const userCourses = await getUserCourses(auth.currentUser.uid);
-      const userCourse = userCourses.find((c) => c.id === id);
-
-      const isExpired =
-        userCourse &&
-        userCourse.enrollment?.expiryDate &&
-        userCourse.enrollment.expiryDate < Date.now();
-
-      const purchased = userCourse !== undefined && !isExpired;
-      setIsPurchased(purchased);
+      const [adminAccess, snapshot] = await Promise.all([
+        isUserAdmin(auth.currentUser.uid),
+        get(ref(database, `users/${auth.currentUser.uid}/courses/${id}`)),
+      ]);
+      const enrollment = snapshot.val();
+      setIsPurchased(
+        Boolean(
+          adminAccess ||
+          (enrollment && (!enrollment.expiryDate || enrollment.expiryDate > Date.now())),
+        ),
+      );
     } catch {
       setIsPurchased(false);
     }
@@ -479,12 +480,12 @@ export default function CourseDetail() {
       const access = enrollment.val();
       const canRead =
         adminAccess || (access && (!access.expiryDate || access.expiryDate > Date.now()));
-      const courseRef = ref(database, (canRead ? 'courses/' : 'courseCatalog/') + id);
-      const snapshot = await get(courseRef);
+      const courseData = canRead
+        ? await getCourseContent(id)
+        : (await get(ref(database, 'courseCatalog/' + id))).val();
 
-      if (snapshot.exists()) {
-        const courseData = { id, ...snapshot.val() };
-        setCourse(courseData);
+      if (courseData) {
+        setCourse({ id, ...courseData });
       } else {
         navigate('/courses');
       }

@@ -99,21 +99,28 @@ test(
         );
         await assertSucceeds(set(ref(account, 'users/new'), { ...profile, uid: 'new' }));
       });
-      await t.test('only valid enrolments unlock course contents', async () => {
-        await assertSucceeds(get(ref(student, 'courseCatalog')));
-        await assertSucceeds(get(ref(student, 'courses/enrolled')));
-        await assertFails(get(ref(student, 'courses/expired')));
-        await assertFails(get(ref(student, 'courses/locked')));
-        await assertFails(get(ref(student, 'courses')));
-        const blocked = environment
-          .authenticatedContext('blocked', { email_verified: true })
-          .database();
-        await assertFails(get(ref(blocked, 'courses/enrolled')));
-        const unverified = environment
-          .authenticatedContext('student', { email_verified: false })
-          .database();
-        await assertFails(get(ref(unverified, 'courses/enrolled')));
-      });
+      await t.test(
+        'students use server endpoints instead of reading course video sources',
+        async () => {
+          await assertSucceeds(get(ref(student, 'courseCatalog')));
+          await assertFails(get(ref(student, 'courses/enrolled')));
+          await assertFails(
+            get(ref(student, 'courses/enrolled/modules/one/lessons/first/videoUrl')),
+          );
+          await assertSucceeds(get(ref(administrator, 'courses/enrolled')));
+          await assertFails(get(ref(student, 'courses/expired')));
+          await assertFails(get(ref(student, 'courses/locked')));
+          await assertFails(get(ref(student, 'courses')));
+          const blocked = environment
+            .authenticatedContext('blocked', { email_verified: true })
+            .database();
+          await assertFails(get(ref(blocked, 'courses/enrolled')));
+          const unverified = environment
+            .authenticatedContext('student', { email_verified: false })
+            .database();
+          await assertFails(get(ref(unverified, 'courses/enrolled')));
+        },
+      );
       await t.test(
         'admin authority comes from claims and private limits remain server-only',
         async () => {
@@ -123,7 +130,7 @@ test(
               expiryDate: Date.now() + 3600000,
             }),
           );
-          await assertSucceeds(get(ref(student, 'courses/locked')));
+          await assertFails(get(ref(student, 'courses/locked')));
           await assertFails(get(ref(administrator, 'privateRateLimits')));
           const forgedRole = environment
             .authenticatedContext('student', { role: 'admin', email_verified: true })

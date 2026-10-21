@@ -40,7 +40,81 @@ test('deployed callable handlers reject unauthenticated requests', async () => {
     'assignCourseServer',
     'bulkAssignCourse',
     'processLearningAI',
+    'getCourseContent',
+    'getLessonPlayback',
   ]) {
     await assert.rejects(functions[name].run({}, {}), { code: 'unauthenticated' }, name);
   }
+});
+
+test('course callables filter sources and enforce access and playback rate limits', async (t) => {
+  let identity = { uid: 'student', emailVerified: true, disabled: false };
+  let profile = { status: 'active', courses: { course: { expiryDate: Date.now() + 60000 } } };
+  const counters = new Map();
+  const course = {
+    title: 'Course',
+    modules: {
+      one: {
+        lessons: {
+          first: { videoUrl: 'M7lc1UVf-VE', title: 'First' },
+          second: { videoUrl: 'aqz-KE-bpKQ', title: 'Second' },
+        },
+      },
+    },
+  };
+  t.mock.method(getAuth(), 'getUser', async () => identity);
+  t.mock.method(getDatabase(), 'ref', (path) => ({
+    get: async () => {
+      if (path === 'users/student') return { val: () => profile };
+      if (path === 'courses/course') return { val: () => course };
+      throw new Error('Unexpected database read');
+    },
+    transaction: async (callback) => {
+      const next = callback(counters.get(path));
+      if (next === undefined) return { committed: false };
+      counters.set(path, next);
+      return { committed: true };
+    },
+  }));
+  const context = { auth: { uid: 'student', token: {} } };
+  const content = await functions.getCourseContent.run({ courseId: 'course' }, context);
+  assert.equal(JSON.stringify(content).includes('videoUrl'), false);
+  assert.equal(JSON.stringify(content).includes('M7lc1UVf-VE'), false);
+  assert.equal(content.course.modules.one.lessons.first.hasVideo, true);
+  assert.deepEqual(
+    await functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'first' }, context),
+    { videoId: 'M7lc1UVf-VE' },
+  );
+  await assert.rejects(
+    functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'missing' }, context),
+    { code: 'not-found' },
+  );
+  await assert.rejects(
+    functions.getLessonPlayback.run({ courseId: '../course', lessonId: 'first' }, context),
+    { code: 'invalid-argument' },
+  );
+  profile = { ...profile, courses: {} };
+  await assert.rejects(
+    functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'first' }, context),
+    { code: 'permission-denied' },
+  );
+  profile = { ...profile, courses: { course: { expiryDate: 1 } } };
+  await assert.rejects(functions.getCourseContent.run({ courseId: 'course' }, context), {
+    code: 'permission-denied',
+  });
+  profile = { ...profile, courses: { course: {} } };
+  identity = { ...identity, disabled: true };
+  await assert.rejects(
+    functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'first' }, context),
+    { code: 'permission-denied' },
+  );
+  identity = { ...identity, disabled: false };
+  counters.clear();
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    await functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'first' }, context);
+  }
+  await assert.rejects(
+    functions.getLessonPlayback.run({ courseId: 'course', lessonId: 'first' }, context),
+    { code: 'resource-exhausted' },
+  );
 });
