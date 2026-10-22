@@ -41,6 +41,10 @@ Astana IT University · Software Engineering · 2026-2027<br>
 
 ## AkadilEDU ecosystem
 
+<table align="center">
+<tr>
+<td width="1000" align="center">
+
 <p align="center">
   <strong>AkadilEDU</strong> is the parent learning brand. <strong>AkadilEDU PRIME</strong> is its Telegram practice sub-brand.<br>
   Select a logo or product name to move between the two guides.
@@ -71,6 +75,9 @@ Astana IT University · Software Engineering · 2026-2027<br>
   <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.md">Open the PRIME guide →</a>
 </p>
 
+</td>
+</tr>
+</table>
 
 The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
 
