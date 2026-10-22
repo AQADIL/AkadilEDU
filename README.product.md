@@ -1,23 +1,25 @@
 <p align="center">
-  <img src="assets/readme/product-cover.svg" alt="AkadilEDU. Mathematics, with a place to learn and a way to practise. Courses, practice, progress." width="100%">
+  <a href="https://akadiledu.web.app">
+    <img src="public/icons/logo-прозрачный.png" alt="AkadilEDU logo" width="190">
+  </a>
 </p>
+
+<h1 align="center">AkadilEDU</h1>
 
 <p align="center">
   <strong>Learn here. Prove yourself anywhere.</strong>
 </p>
 
 <p align="center">
-  <a href="https://akadiledu.web.app">Open AkadilEDU</a> &nbsp; / &nbsp;
-  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">Meet PRIME</a> &nbsp; / &nbsp;
-  <a href="README.md">Diploma project</a> &nbsp; / &nbsp;
-  <a href="#development">Development</a>
+  <a href="https://akadiledu.web.app">Open the platform</a> &nbsp; · &nbsp;
+  <a href="#learning-experience">Learning experience</a> &nbsp; · &nbsp;
+  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">AkadilEDU PRIME</a> &nbsp; · &nbsp;
+  <a href="#ownership">Ownership and licence</a>
 </p>
 
-# AkadilEDU
+> **Intellectual property - all rights reserved.** Copyright © 2026 Akadil Alish. The original source code, documentation and brand assets are proprietary. Use, copying, modification, redistribution and deployment require prior written permission, subject to the exceptions and preserved rights in [LICENSE](LICENSE). Public repository visibility does not grant a reuse licence.
 
 AkadilEDU is a web learning platform for courses, lesson practice and preparation for Kazakhstan's Unified National Testing (UNT / ҰБТ / ЕНТ). It gives students a place to follow structured material, practise independently and return to their results. Educators manage the content and access from the same application.
-
-This is the product guide. The [main README](README.md) covers the diploma project, its scope, current status and academic deliverables.
 
 ## Explore this guide
 
@@ -77,7 +79,7 @@ AkadilEDU and AkadilEDU PRIME address different parts of mathematics preparation
 | **AkadilEDU** | Longer course sessions, video material and practice tests | [Web/PWA](https://github.com/AQADIL/AkadilEDU) |
 | **AkadilEDU PRIME** | Channel quizzes, private mistake review and topic practice in Telegram | [Telegram product](https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md) |
 
-The products currently maintain separate learning records. Verified account linking, shared progress, knowledge-gap diagnosis and AI-generated individual learning plans form the next diploma development stage. The existing administrative AI import helper is separate from the planned student learning-plan service.
+The products currently maintain separate learning records. Verified account linking, shared progress, knowledge-gap diagnosis and AI-generated individual learning plans are planned product integrations. The existing administrative AI import helper is separate from the planned student learning-plan service.
 
 ```mermaid
 flowchart LR
@@ -92,6 +94,9 @@ flowchart LR
 ```
 
 ## Architecture
+
+<details>
+<summary><strong>Explore the application architecture and data flow</strong></summary>
 
 React supplies the browser interface, React Router handles navigation, and Vite builds the application. Backend SDK calls are grouped in the Firebase modules, while Cloud Functions implement privileged actions.
 
@@ -112,7 +117,12 @@ flowchart TB
 
 These diagrams describe the product at repository level. They are not a claim that the separate Web and Telegram services already share a learner account or progress model.
 
+</details>
+
 ## Technology
+
+<details>
+<summary><strong>View the technology stack and implementation roles</strong></summary>
 
 | Layer | Technology | Purpose |
 | --- | --- | --- |
@@ -128,7 +138,12 @@ These diagrams describe the product at repository level. They are not a claim th
 
 Exact dependency declarations are in [`package.json`](package.json) and [`functions/package.json`](functions/package.json); lockfiles record resolved versions.
 
+</details>
+
 ## Repository map
+
+<details>
+<summary><strong>Browse source directories and their responsibilities</strong></summary>
 
 | Path | Responsibility |
 | --- | --- |
@@ -144,7 +159,12 @@ Exact dependency declarations are in [`package.json`](package.json) and [`functi
 | [`database.rules.json`](database.rules.json), [`storage.rules`](storage.rules) | Client access rules |
 | [`.github/workflows/check.yml`](.github/workflows/check.yml) | CI checks and deployment configuration |
 
+</details>
+
 ## Development
+
+<details>
+<summary><strong>Installation, environment configuration and local execution</strong></summary>
 
 ### Prerequisites
 
@@ -192,7 +212,12 @@ npm run preview
 
 [`firebase.json`](firebase.json) declares Hosting, Functions and the data rules. Hosting serves `dist`; its predeploy hook builds the frontend. The configured GitHub Actions workflow runs its checks before the production deployment job and verifies published assets afterwards. Cloud project permissions, identity federation, service configuration and secrets must be supplied by an authorised operator.
 
+</details>
+
 ## Verification
+
+<details>
+<summary><strong>Checks, builds and connected workflow verification</strong></summary>
 
 | Command | Purpose |
 | --- | --- |
@@ -207,14 +232,23 @@ The [CI workflow](.github/workflows/check.yml) also audits dependencies and expl
 
 For a manual connected check, sign in with an authorised test account, open an assigned course, complete a lesson interaction, take a practice test and confirm the result is available after returning to the application. Keep actual learner data out of public screenshots and issue reports.
 
+</details>
+
 ## Project boundaries
+
+<details>
+<summary><strong>Read current limitations and integration boundaries</strong></summary>
 
 Course access depends on enrolment, backend rules and the material available in the configured environment. The PWA manifest does not make streamed media available offline. Telegram progress synchronisation and student-facing AI learning plans remain planned integration work; no measured learning improvement is claimed here.
 
+</details>
+
 ## Ownership
+
+**The original AkadilEDU source, documentation and brand assets are the intellectual property of Akadil Alish.**
 
 Created and maintained by **[Akadil Alish / AQADIL](https://github.com/AQADIL)**.
 
 Copyright © 2026 Akadil Alish. All rights reserved. The original source, documentation and brand assets are proprietary. Use, modification, redistribution and deployment require prior written permission, subject to the terms and third-party exceptions in [LICENSE](LICENSE).
 
-[Security policy](SECURITY.md) · [Report a product issue](https://github.com/AQADIL/AkadilEDU/issues) · [Academic overview](README.md)
+[Security policy](SECURITY.md) · [Report a product issue](https://github.com/AQADIL/AkadilEDU/issues) · [Contact the owner](https://github.com/AQADIL)
