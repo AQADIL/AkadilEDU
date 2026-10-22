@@ -18,9 +18,46 @@ Astana IT University · Software Engineering · 2026-2027<br>
 
 [Product guide](README.product.md) · [YouTrack project](https://akadiledu-diploma.youtrack.cloud/issues/AEDU) · [Task board](https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1) · [Web repository](https://github.com/AQADIL/AkadilEDU) · [Telegram repository](https://github.com/AQADIL/AkadilEDU-PRIME)
 
+## AkadilEDU ecosystem
+
+**AkadilEDU** is the parent learning brand. **AkadilEDU PRIME** is its Telegram practice sub-brand. Select a logo or product name to move between the two guides.
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/AQADIL/AkadilEDU/blob/main/README.md">
+        <img src="https://github.com/AQADIL/AkadilEDU/raw/main/public/icons/logo-прозрачный.png" alt="AkadilEDU parent brand" width="110"><br>
+        <strong>AkadilEDU</strong>
+      </a><br>
+      <sub>PARENT BRAND · WEB/PWA</sub><br>
+      Courses, video lessons and exam preparation.<br>
+      <strong>Current guide</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <strong>↓</strong><br>
+      <sub>Telegram practice sub-brand</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.md">
+        <img src="https://github.com/AQADIL/AkadilEDU-PRIME/raw/main/assets/brand/prime-transparent.png" alt="AkadilEDU PRIME Telegram sub-brand" width="96"><br>
+        <strong>AkadilEDU PRIME</strong>
+      </a><br>
+      <sub>TELEGRAM PRACTICE</sub><br>
+      Channel quizzes, mistake review and focused topic practice.<br>
+      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.md">Open the PRIME guide →</a>
+    </td>
+  </tr>
+</table>
+
+The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
+
 ## Contents
 
-[Project overview](#project-overview) · [Problem and users](#problem-and-target-users) · [Aim and outcomes](#aim-objectives-and-expected-outcomes) · [Author and supervisor](#author-responsibilities-and-supervisor) · [Scope and status](#scope-and-current-development-status) · [Technologies](#selected-technologies) · [Documentation and evidence](#documentation-and-project-evidence) · [Run and verify](#setup-execution-and-verification) · [Submitted version](#submitted-version)
+[Ecosystem navigation](#akadiledu-ecosystem) · [Project overview](#project-overview) · [Problem and users](#problem-and-target-users) · [Aim and outcomes](#aim-objectives-and-expected-outcomes) · [Author and supervisor](#author-responsibilities-and-supervisor) · [Scope and status](#scope-and-current-development-status) · [Technologies](#selected-technologies) · [Documentation and evidence](#documentation-and-project-evidence) · [Run and verify](#setup-execution-and-verification) · [Submitted version](#submitted-version)
 
 ## Project overview
 

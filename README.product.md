@@ -21,9 +21,46 @@
 
 AkadilEDU is a web learning platform for courses, lesson practice and preparation for Kazakhstan's Unified National Testing (UNT / ҰБТ / ЕНТ). It gives students a place to follow structured material, practise independently and return to their results. Educators manage the content and access from the same application.
 
+## AkadilEDU ecosystem
+
+**AkadilEDU** is the parent learning brand. **AkadilEDU PRIME** is its Telegram practice sub-brand. Select a logo or product name to move between the two guides.
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/AQADIL/AkadilEDU/blob/main/README.product.md">
+        <img src="https://github.com/AQADIL/AkadilEDU/raw/main/public/icons/logo-прозрачный.png" alt="AkadilEDU parent brand" width="110"><br>
+        <strong>AkadilEDU</strong>
+      </a><br>
+      <sub>PARENT BRAND · WEB/PWA</sub><br>
+      Courses, video lessons and exam preparation.<br>
+      <strong>Current guide</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <strong>↓</strong><br>
+      <sub>Telegram practice sub-brand</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">
+        <img src="https://github.com/AQADIL/AkadilEDU-PRIME/raw/main/assets/brand/prime-transparent.png" alt="AkadilEDU PRIME Telegram sub-brand" width="96"><br>
+        <strong>AkadilEDU PRIME</strong>
+      </a><br>
+      <sub>TELEGRAM PRACTICE</sub><br>
+      Channel quizzes, mistake review and focused topic practice.<br>
+      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">Open the PRIME guide →</a>
+    </td>
+  </tr>
+</table>
+
+The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
+
 ## Explore this guide
 
-[Learning experience](#learning-experience) · [Product preview](#product-preview) · [Educator workspace](#educator-workspace) · [Ecosystem](#ecosystem) · [Architecture](#architecture) · [Technology](#technology) · [Repository map](#repository-map) · [Development](#development) · [Verification](#verification) · [Ownership](#ownership)
+[Learning experience](#learning-experience) · [Product preview](#product-preview) · [Educator workspace](#educator-workspace) · [Ecosystem](#akadiledu-ecosystem) · [Architecture](#architecture) · [Technology](#technology) · [Repository map](#repository-map) · [Development](#development) · [Verification](#verification) · [Ownership](#ownership)
 
 ## Learning experience
 
@@ -69,29 +106,6 @@ The administration interface brings content and learner management into the appl
 | Operational review | Administrative activity and security-related views |
 
 Privileged operations are implemented in server functions and database rules. A browser route guard controls navigation; the backend remains responsible for authorisation.
-
-## Ecosystem
-
-AkadilEDU and AkadilEDU PRIME address different parts of mathematics preparation.
-
-| Product | Student experience | Repository |
-| --- | --- | --- |
-| **AkadilEDU** | Longer course sessions, video material and practice tests | [Web/PWA](https://github.com/AQADIL/AkadilEDU) |
-| **AkadilEDU PRIME** | Channel quizzes, private mistake review and topic practice in Telegram | [Telegram product](https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md) |
-
-The products currently maintain separate learning records. Verified account linking, shared progress, knowledge-gap diagnosis and AI-generated individual learning plans are planned product integrations. The existing administrative AI import helper is separate from the planned student learning-plan service.
-
-```mermaid
-flowchart LR
-    Student[Student] --> Web[AkadilEDU Web/PWA]
-    Student --> Telegram[AkadilEDU PRIME]
-    Web --> Courses[Courses and lessons]
-    Web --> Tests[Practice tests and results]
-    Telegram --> Quizzes[Channel quizzes]
-    Telegram --> Review[Private review and practice]
-    Web -. Planned integration .-> Shared[Shared progress and personal plans]
-    Telegram -. Planned integration .-> Shared
-```
 
 ## Architecture
 
