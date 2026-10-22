@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="352" viewBox="0 0 1280 352" role="img" aria-labelledby="title desc">
+  <title id="title">AkadilEDU</title>
+  <desc id="desc">Mathematics, with a place to learn and a way to practise. Courses, practice and progress.</desc>
+  <rect width="1280" height="352" rx="20" fill="#12243b"/>
+  <path d="M846 0v352M946 0v352M1046 0v352M1146 0v352M1246 0v352M796 76h484M796 176h484M796 276h484" stroke="#243c58" stroke-width="1"/>
+  <path d="M846 275L946 225L1046 225L1146 125L1246 75" fill="none" stroke="#8eb3e0" stroke-width="3"/>
+  <path d="M846 275V310H1246" fill="none" stroke="#567391" stroke-width="1"/>
+  <g fill="#e4effc" stroke="#12243b" stroke-width="6"><circle cx="846" cy="275" r="8"/><circle cx="946" cy="225" r="8"/><circle cx="1046" cy="225" r="8"/><circle cx="1146" cy="125" r="8"/><circle cx="1246" cy="75" r="8"/></g>
+  <rect x="56" y="48" width="36" height="4" rx="2" fill="#8eb3e0"/>
+  <text x="56" y="126" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#ffffff">Akadil<tspan fill="#8eb3e0">EDU</tspan></text>
+  <text x="58" y="186" font-family="Arial, Helvetica, sans-serif" font-size="25" fill="#e0e8f3">Mathematics. A place to learn.</text>
+  <text x="58" y="224" font-family="Arial, Helvetica, sans-serif" font-size="25" fill="#e0e8f3">A way to practise.</text>
+  <text x="58" y="299" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#a1b9d5">COURSES / PRACTICE / PROGRESS</text>
+</svg>
