@@ -12,11 +12,6 @@
   <strong>Learn here. Prove yourself anywhere.</strong>
 </p>
 
-<p align="center">
-  <a href="https://akadiledu.web.app"><img src="assets/readme/open-platform.png" alt="Open the AkadilEDU learning platform" width="260" height="52"></a>
-  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md"><img src="assets/readme/open-prime.png" alt="Explore the AkadilEDU PRIME product guide" width="260" height="52"></a>
-</p>
-
 <p align="center"><a href="#learning-experience">Features</a> · <a href="#product-preview">Preview</a> · <a href="#development">Getting started</a> · <a href="#akadiledu-ecosystem">Ecosystem</a> · <a href="SECURITY.md">Security</a> · <a href="LICENSE">Licence</a></p>
 
 > **Intellectual property - all rights reserved.** Copyright © 2026 Akadil Alish. The original source code, documentation and brand assets are proprietary. Use, copying, modification, redistribution and deployment require prior written permission, subject to the exceptions and preserved rights in [LICENSE](LICENSE). Public repository visibility does not grant a reuse licence.
@@ -44,8 +39,6 @@ AkadilEDU is a web learning platform for courses, lesson practice and preparatio
 
 </details>
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Start here
 
 | Your goal | Go directly to | What to expect |
@@ -55,46 +48,40 @@ AkadilEDU is a web learning platform for courses, lesson practice and preparatio
 | Explore short Telegram practice | [Meet AkadilEDU PRIME](https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md) | Channel quizzes and personal mistake review |
 | Run an authorised environment | [Development](#development) | Expand installation, environment and execution instructions |
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## AkadilEDU ecosystem
 
-**AkadilEDU** is the parent learning brand. **AkadilEDU PRIME** is its Telegram practice sub-brand. Select a logo or product name to move between the two guides.
+<p align="center">
+  <strong>AkadilEDU</strong> is the parent learning brand. <strong>AkadilEDU PRIME</strong> is its Telegram practice sub-brand.<br>
+  Select a logo or product name to move between the two guides.
+</p>
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/AQADIL/AkadilEDU/blob/main/README.product.md">
-        <img src="https://github.com/AQADIL/AkadilEDU/raw/main/public/icons/logo-прозрачный.png" alt="AkadilEDU parent brand" width="110"><br>
-        <strong>AkadilEDU</strong>
-      </a><br>
-      <sub>PARENT BRAND · WEB/PWA</sub><br>
-      Courses, video lessons and exam preparation.<br>
-      <strong>Current guide</strong>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <strong>↓</strong><br>
-      <sub>Telegram practice sub-brand</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">
-        <img src="https://github.com/AQADIL/AkadilEDU-PRIME/raw/main/assets/brand/prime-transparent.png" alt="AkadilEDU PRIME Telegram sub-brand" width="96"><br>
-        <strong>AkadilEDU PRIME</strong>
-      </a><br>
-      <sub>TELEGRAM PRACTICE</sub><br>
-      Channel quizzes, mistake review and focused topic practice.<br>
-      <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">Open the PRIME guide →</a>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <a href="https://github.com/AQADIL/AkadilEDU/blob/main/README.product.md">
+    <img src="https://github.com/AQADIL/AkadilEDU/raw/main/public/icons/logo-прозрачный.png" alt="AkadilEDU parent brand" width="110"><br>
+    <strong>AkadilEDU</strong>
+  </a><br>
+  <sub>PARENT BRAND · WEB/PWA</sub><br>
+  Courses, video lessons and exam preparation.<br>
+  <strong>Current guide</strong>
+</p>
+
+<p align="center">
+  <strong>↓</strong><br>
+  <sub>Telegram practice sub-brand</sub>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">
+    <img src="https://github.com/AQADIL/AkadilEDU-PRIME/raw/main/assets/brand/prime-transparent.png" alt="AkadilEDU PRIME Telegram sub-brand" width="96"><br>
+    <strong>AkadilEDU PRIME</strong>
+  </a><br>
+  <sub>TELEGRAM PRACTICE</sub><br>
+  Channel quizzes, mistake review and focused topic practice.<br>
+  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">Open the PRIME guide →</a>
+</p>
+
 
 The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Learning experience
 
@@ -119,8 +106,6 @@ The interface supports Kazakh, Russian and English, with light and dark themes a
 | Return to previous work | Course and test records | Saved progress and results |
 | Manage an account | Account and profile flows | Sign-in, email verification and password recovery |
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Product preview
 
 The current desktop sign-in experience. Course content and student records require an authorised account.
@@ -128,8 +113,6 @@ The current desktop sign-in experience. Course content and student records requi
 <p align="center">
   <img src="assets/readme/desktop.png" alt="AkadilEDU desktop interface with email and Google sign-in" width="100%">
 </p>
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Educator workspace
 
@@ -144,8 +127,6 @@ The administration interface brings content and learner management into the appl
 | Operational review | Administrative activity and security-related views |
 
 Privileged operations are implemented in server functions and database rules. A browser route guard controls navigation; the backend remains responsible for authorisation.
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Architecture
 
@@ -173,8 +154,6 @@ These diagrams describe the product at repository level. They are not a claim th
 
 </details>
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Technology
 
 <details>
@@ -196,8 +175,6 @@ Exact dependency declarations are in [`package.json`](package.json) and [`functi
 
 </details>
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Repository map
 
 <details>
@@ -218,8 +195,6 @@ Exact dependency declarations are in [`package.json`](package.json) and [`functi
 | [`.github/workflows/check.yml`](.github/workflows/check.yml) | CI checks and deployment configuration |
 
 </details>
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Development
 
@@ -274,8 +249,6 @@ npm run preview
 
 </details>
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Verification
 
 <details>
@@ -296,8 +269,6 @@ For a manual connected check, sign in with an authorised test account, open an a
 
 </details>
 
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
-
 ## Project boundaries
 
 <details>
@@ -306,8 +277,6 @@ For a manual connected check, sign in with an authorised test account, open an a
 Course access depends on enrolment, backend rules and the material available in the configured environment. The PWA manifest does not make streamed media available offline. Telegram progress synchronisation and student-facing AI learning plans remain planned integration work; no measured learning improvement is claimed here.
 
 </details>
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Questions before you start
 
@@ -331,8 +300,6 @@ The applications currently keep separate learner records. Verified account linki
 Repository access does not grant access to production records, student enrolments or administrator accounts. Use the hosted application with an authorised account, or configure an environment you are permitted to operate using the setup instructions.
 
 </details>
-
-<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Ownership
 
