@@ -1,3 +1,13 @@
+<p align="center">
+  <a href="https://akadiledu.web.app">
+    <img src="public/icons/logo-прозрачный.png" alt="AkadilEDU logo" width="150">
+  </a>
+</p>
+
+<p align="center">
+  <strong>Learn here. Prove yourself anywhere.</strong>
+</p>
+
 # AkadilEDU - Diploma Project
 
 **Development of an Educational Ecosystem for UNT Mathematics Preparation with AI-Generated Personalized Learning Plans**
