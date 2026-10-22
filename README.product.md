@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 <p align="center">
   <a href="https://akadiledu.web.app">
     <img src="public/icons/logo-прозрачный.png" alt="AkadilEDU logo" width="190">
@@ -11,15 +13,49 @@
 </p>
 
 <p align="center">
-  <a href="https://akadiledu.web.app">Open the platform</a> &nbsp; · &nbsp;
-  <a href="#learning-experience">Learning experience</a> &nbsp; · &nbsp;
-  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md">AkadilEDU PRIME</a> &nbsp; · &nbsp;
-  <a href="#ownership">Ownership and licence</a>
+  <a href="https://akadiledu.web.app"><img src="assets/readme/open-platform.png" alt="Open the AkadilEDU learning platform" width="260" height="52"></a>
+  <a href="https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md"><img src="assets/readme/open-prime.png" alt="Explore the AkadilEDU PRIME product guide" width="260" height="52"></a>
 </p>
+
+<p align="center"><a href="#learning-experience">Features</a> · <a href="#product-preview">Preview</a> · <a href="#development">Getting started</a> · <a href="#akadiledu-ecosystem">Ecosystem</a> · <a href="SECURITY.md">Security</a> · <a href="LICENSE">Licence</a></p>
 
 > **Intellectual property - all rights reserved.** Copyright © 2026 Akadil Alish. The original source code, documentation and brand assets are proprietary. Use, copying, modification, redistribution and deployment require prior written permission, subject to the exceptions and preserved rights in [LICENSE](LICENSE). Public repository visibility does not grant a reuse licence.
 
 AkadilEDU is a web learning platform for courses, lesson practice and preparation for Kazakhstan's Unified National Testing (UNT / ҰБТ / ЕНТ). It gives students a place to follow structured material, practise independently and return to their results. Educators manage the content and access from the same application.
+
+## Explore this guide
+
+<details>
+<summary><strong>Open the section navigator</strong></summary>
+
+- [Start here](#start-here)
+- [AkadilEDU ecosystem](#akadiledu-ecosystem)
+- [Learning experience](#learning-experience)
+- [Product preview](#product-preview)
+- [Educator workspace](#educator-workspace)
+- [Architecture](#architecture)
+- [Technology](#technology)
+- [Repository map](#repository-map)
+- [Development](#development)
+- [Verification](#verification)
+- [Project boundaries](#project-boundaries)
+- [Questions before you start](#questions-before-you-start)
+- [Ownership](#ownership)
+
+</details>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
+## Start here
+
+| Your goal | Go directly to | What to expect |
+| --- | --- | --- |
+| Study or continue a course | [Open AkadilEDU](https://akadiledu.web.app/) | Sign in and access the courses assigned to your account |
+| See what the platform offers | [Learning experience](#learning-experience) | Courses, lesson practice, tests and progress |
+| Explore short Telegram practice | [Meet AkadilEDU PRIME](https://github.com/AQADIL/AkadilEDU-PRIME/blob/main/README.product.md) | Channel quizzes and personal mistake review |
+| Run an authorised environment | [Development](#development) | Expand installation, environment and execution instructions |
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## AkadilEDU ecosystem
 
@@ -58,9 +94,7 @@ AkadilEDU is a web learning platform for courses, lesson practice and preparatio
 
 The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
 
-## Explore this guide
-
-[Learning experience](#learning-experience) · [Product preview](#product-preview) · [Educator workspace](#educator-workspace) · [Ecosystem](#akadiledu-ecosystem) · [Architecture](#architecture) · [Technology](#technology) · [Repository map](#repository-map) · [Development](#development) · [Verification](#verification) · [Ownership](#ownership)
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Learning experience
 
@@ -85,6 +119,8 @@ The interface supports Kazakh, Russian and English, with light and dark themes a
 | Return to previous work | Course and test records | Saved progress and results |
 | Manage an account | Account and profile flows | Sign-in, email verification and password recovery |
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Product preview
 
 The current desktop sign-in experience. Course content and student records require an authorised account.
@@ -92,6 +128,8 @@ The current desktop sign-in experience. Course content and student records requi
 <p align="center">
   <img src="assets/readme/desktop.png" alt="AkadilEDU desktop interface with email and Google sign-in" width="100%">
 </p>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Educator workspace
 
@@ -106,6 +144,8 @@ The administration interface brings content and learner management into the appl
 | Operational review | Administrative activity and security-related views |
 
 Privileged operations are implemented in server functions and database rules. A browser route guard controls navigation; the backend remains responsible for authorisation.
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Architecture
 
@@ -133,6 +173,8 @@ These diagrams describe the product at repository level. They are not a claim th
 
 </details>
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Technology
 
 <details>
@@ -154,6 +196,8 @@ Exact dependency declarations are in [`package.json`](package.json) and [`functi
 
 </details>
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Repository map
 
 <details>
@@ -174,6 +218,8 @@ Exact dependency declarations are in [`package.json`](package.json) and [`functi
 | [`.github/workflows/check.yml`](.github/workflows/check.yml) | CI checks and deployment configuration |
 
 </details>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Development
 
@@ -228,6 +274,8 @@ npm run preview
 
 </details>
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Verification
 
 <details>
@@ -248,6 +296,8 @@ For a manual connected check, sign in with an authorised test account, open an a
 
 </details>
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Project boundaries
 
 <details>
@@ -256,6 +306,33 @@ For a manual connected check, sign in with an authorised test account, open an a
 Course access depends on enrolment, backend rules and the material available in the configured environment. The PWA manifest does not make streamed media available offline. Telegram progress synchronisation and student-facing AI learning plans remain planned integration work; no measured learning improvement is claimed here.
 
 </details>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
+## Questions before you start
+
+<details>
+<summary><strong>Can I reuse or deploy the source code?</strong></summary>
+
+Prior written permission from Akadil Alish is required under [LICENSE](LICENSE). Public visibility does not grant a reuse or deployment licence. Third-party terms and the preserved rights in the licence continue to apply.
+
+</details>
+
+<details>
+<summary><strong>Do Web and Telegram already share learner progress?</strong></summary>
+
+The applications currently keep separate learner records. Verified account linking, shared topic progress and student learning plans remain planned product integrations.
+
+</details>
+
+<details>
+<summary><strong>Does opening the repository provide a working account?</strong></summary>
+
+Repository access does not grant access to production records, student enrolments or administrator accounts. Use the hosted application with an authorised account, or configure an environment you are permitted to operate using the setup instructions.
+
+</details>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Ownership
 
@@ -266,3 +343,5 @@ Created and maintained by **[Akadil Alish / AQADIL](https://github.com/AQADIL)**
 Copyright © 2026 Akadil Alish. All rights reserved. The original source, documentation and brand assets are proprietary. Use, modification, redistribution and deployment require prior written permission, subject to the terms and third-party exceptions in [LICENSE](LICENSE).
 
 [Security policy](SECURITY.md) · [Report a product issue](https://github.com/AQADIL/AkadilEDU/issues) · [Contact the owner](https://github.com/AQADIL)
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>

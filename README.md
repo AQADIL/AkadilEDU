@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 <p align="center">
   <a href="https://akadiledu.web.app">
     <img src="public/icons/logo-прозрачный.png" alt="AkadilEDU logo" width="150">
@@ -17,6 +19,32 @@ Astana IT University · Software Engineering · 2026-2027<br>
 **Documentation reviewed:** 22 October 2026
 
 [Product guide](README.product.md) · [YouTrack project](https://akadiledu-diploma.youtrack.cloud/issues/AEDU) · [Task board](https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1) · [Web repository](https://github.com/AQADIL/AkadilEDU) · [Telegram repository](https://github.com/AQADIL/AkadilEDU-PRIME)
+
+<p align="center">
+  <a href="https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1"><img src="assets/readme/project-board.png" alt="Open the YouTrack project board" width="260" height="52"></a>
+  <a href="README.product.md"><img src="assets/readme/product-guide.png" alt="Read the product guide" width="260" height="52"></a>
+</p>
+
+## Contents
+
+<details>
+<summary><strong>Open the section navigator</strong></summary>
+
+- [AkadilEDU ecosystem](#akadiledu-ecosystem)
+- [Project overview](#project-overview)
+- [Problem and target users](#problem-and-target-users)
+- [Aim, objectives and expected outcomes](#aim-objectives-and-expected-outcomes)
+- [Author, responsibilities and supervisor](#author-responsibilities-and-supervisor)
+- [Scope and current development status](#scope-and-current-development-status)
+- [Selected technologies](#selected-technologies)
+- [Documentation and project evidence](#documentation-and-project-evidence)
+- [Setup, execution and verification](#setup-execution-and-verification)
+- [Submitted version](#submitted-version)
+- [Ownership](#ownership)
+
+</details>
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## AkadilEDU ecosystem
 
@@ -55,9 +83,7 @@ Astana IT University · Software Engineering · 2026-2027<br>
 
 The brand relationship connects the product family. The two applications currently keep separate learner records; verified account linking and shared progress remain planned integrations.
 
-## Contents
-
-[Ecosystem navigation](#akadiledu-ecosystem) · [Project overview](#project-overview) · [Problem and users](#problem-and-target-users) · [Aim and outcomes](#aim-objectives-and-expected-outcomes) · [Author and supervisor](#author-responsibilities-and-supervisor) · [Scope and status](#scope-and-current-development-status) · [Technologies](#selected-technologies) · [Documentation and evidence](#documentation-and-project-evidence) · [Run and verify](#setup-execution-and-verification) · [Submitted version](#submitted-version)
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Project overview
 
@@ -66,6 +92,8 @@ AkadilEDU is a proposed integrated ecosystem for mathematics preparation for Kaz
 The diploma contribution is to connect the two learning channels, identify gaps from actual learner attempts and generate individual learning plans that refer to available material. This repository contains the course and practice-test application, including the student interface, content administration and supporting server functions.
 
 The [product guide](README.product.md) documents the implemented application, its workflows and operating requirements. This README presents the academic scope and evidence expected for the diploma checkpoint.
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Problem and target users
 
@@ -80,6 +108,8 @@ The project addresses that preparation workflow by bringing evidence from both c
 | Mathematics educators and content administrators | Maintain material and interpret progress at topic level |
 
 User interviews and other research evidence must distinguish observed needs from these initial assumptions. They are tracked in [AEDU-2](https://akadiledu-diploma.youtrack.cloud/issue/AEDU-2).
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Aim, objectives and expected outcomes
 
@@ -105,6 +135,8 @@ The project objectives are to:
 
 These are expected diploma results. No improvement in UNT scores or learning effectiveness is asserted without collected evidence.
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Author, responsibilities and supervisor
 
 | Role | Person | Responsibilities |
@@ -113,6 +145,8 @@ These are expected diploma results. No improvement in UNT scores or learning eff
 | Scientific supervisor | **Elvira Aitmukhanbetova** | Academic supervision, review of selected significant deliverables and feedback at agreed checkpoints |
 
 This is an individual diploma project. Tasks are assigned to the student. Supervisor feedback is recorded when an actual review occurs; the supervisor is not presented as a co-developer or as having already approved unfinished materials.
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Scope and current development status
 
@@ -140,6 +174,8 @@ The two applications currently have separate identity and progress records. Exis
 
 Learner records and assessment data must be handled with appropriate access controls. The AI component must handle insufficient evidence and invalid recommendations explicitly, and human review remains necessary for educational content and interpretation.
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Selected technologies
 
 The following stack is present in the repositories; the integration design and model/provider choice for student plans remain subject to the technology comparison.
@@ -153,6 +189,8 @@ The following stack is present in the repositories; the integration design and m
 | Verification and delivery | ESLint, Node.js tests and rule emulators in the Web repository; component lint/build commands in the bot repository; GitHub Actions for the Web project | Available checks and configured delivery |
 
 Dependency versions and scripts are defined by each component's manifests and lockfiles. The [product guide](README.product.md) gives the detailed implementation map. Technology alternatives and justification are tracked in [AEDU-5](https://akadiledu-diploma.youtrack.cloud/issue/AEDU-5).
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Documentation and project evidence
 
@@ -175,6 +213,8 @@ The current navigation deliberately links to existing evidence or its tracked ta
 | Implementation and individual contributions | [`src/`](src/), [`functions/`](functions/), [`tests/`](tests/); [commit history](https://github.com/AQADIL/AkadilEDU/commits/main/) |
 
 Academic material should be versioned alongside the implementation when ready. Diagrams need editable source as well as readable exports. Review comments and resulting revisions should remain traceable. The product guides and source code are not substitutes for the literature review, comparison tables or evaluation plan.
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Setup, execution and verification
 
@@ -201,6 +241,7 @@ npm run check
 
 See the [product development guide](README.product.md#development) for the full configuration, workflow and repository map.
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
 
 ## Submitted version
 
@@ -211,6 +252,10 @@ See the [product development guide](README.product.md#development) for the full 
 
 The `prob-period-1` tags identify previously fixed snapshots. README and other changes made later on `main` are not automatically included in those snapshots. A submitted tag must remain stable, and uploaded material must correspond to the declared version. These README updates do not move the existing tags.
 
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
+
 ## Ownership
 
 Created and owned by **Akadil Alish**. The source and documentation are provided under the repository's proprietary [LICENSE](LICENSE). Third-party dependencies retain their respective terms. See [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+
+<p align="right"><a href="#readme-top">Back to top ↑</a></p>
