@@ -281,7 +281,9 @@ Each evaluation record will include the input fixture ID, provider and model ver
 
 I own the analysis, development and documentation tasks. Elvira Aitmukhanbetova provides academic supervision and reviews selected deliverables. YouTrack records the owner, priority, expected result, acceptance criteria and target date for each task.
 
-Project: https://akadiledu-diploma.youtrack.cloud/issues/AEDUBoard: https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1
+Project: https://akadiledu-diploma.youtrack.cloud/issues/AEDU
+
+Board: https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1
 
 | Work package | Task references | Milestone and evidence |
 | --- | --- | --- |
@@ -309,7 +311,9 @@ Dates after the first checkpoint are planning targets. The captured YouTrack boa
 | Web/PWA | 44bafc3a5754f6c072bbf8c54d2625b58a8cba5a |
 | Telegram | b5d0bfb401d8965f1b80b8e904c097bb43597e0c |
 
-https://github.com/AQADIL/AkadilEDU/tree/prob-period-1https://github.com/AQADIL/AkadilEDU-PRIME/tree/prob-period-1
+https://github.com/AQADIL/AkadilEDU/tree/prob-period-1
+
+https://github.com/AQADIL/AkadilEDU-PRIME/tree/prob-period-1
 
 The prob-period-1 tags contain the application baselines listed above together with the consolidated report and design materials. Both repositories use the same report file for this checkpoint.
 
@@ -349,7 +353,9 @@ The editable-materials folder contains three diagram sources, four detailed inte
 
 Interview and supporting folder: https://drive.google.com/drive/folders/1Tu-GkpZOWcqZGtE-whxeT8wxaD2wDqcR?usp=sharing
 
-Existing web interface: https://akadiledu.web.appYouTrack board: https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1
+Existing web interface: https://akadiledu.web.app
+
+YouTrack board: https://akadiledu-diploma.youtrack.cloud/agiles/204-1/218-1
 
 Published design index: https://github.com/AQADIL/AkadilEDU/blob/prob-period-1/docs/probationary-period-1/design/README.md
 
@@ -391,7 +397,9 @@ Readable prototype: https://github.com/AQADIL/AkadilEDU/blob/prob-period-1/docs/
 
 [17] Khan Academy. What is self-paced Mastery? Accessed 23 October 2026.https://support.khanacademy.org/hc/en-us/articles/360007253831-What-is-self-paced-Mastery
 
-[18] MoodleDocs. Quiz activity; Activity completion report. Accessed 23 October 2026.https://docs.moodle.org/502/en/Quiz_activityhttps://docs.moodle.org/502/en/Activity_completion_report
+[18] MoodleDocs. Quiz activity; Activity completion report. Accessed 23 October 2026.https://docs.moodle.org/502/en/Quiz_activity
+
+https://docs.moodle.org/502/en/Activity_completion_report
 
 [19] JUZ40. Online UNT preparation and course information. Accessed 24 October 2026.https://juz40-edu.kz/
 
