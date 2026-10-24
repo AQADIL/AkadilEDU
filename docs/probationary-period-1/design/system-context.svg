@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="880" viewBox="0 0 1440 880">
+<rect width="1440" height="880" fill="white"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#50647A" stroke-width="1.4"/></marker></defs>
+<text x="40" y="54" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#182D42" font-weight="650" text-anchor="start">System context</text>
+<text x="40" y="96" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">AkadilEDU educational ecosystem • proposed integrated scope</text>
+<rect x="40" y="180" width="330" height="180" rx="12" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="62" y="214" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">Person</text>
+<text x="62" y="252" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">Learner</text>
+<text x="62" y="288" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Studies mathematics</text>
+<text x="62" y="320" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">on web and Telegram</text>
+<rect x="40" y="560" width="330" height="180" rx="12" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="62" y="594" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">Person</text>
+<text x="62" y="632" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">Educator</text>
+<text x="62" y="668" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Maintains learning content</text>
+<text x="62" y="700" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">and reviews plan quality</text>
+<rect x="525" y="205" width="420" height="490" rx="16" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="552" y="248" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#235FA8" font-weight="400" text-anchor="start">Software system</text>
+<text x="552" y="298" font-family="Segoe UI, Arial, sans-serif" font-size="31" fill="#182D42" font-weight="650" text-anchor="start">AkadilEDU ecosystem</text>
+<text x="552" y="352" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#50647A" font-weight="400" text-anchor="start">Web / PWA and PRIME bot</text>
+<text x="552" y="406" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#50647A" font-weight="400" text-anchor="start">Courses and practice</text>
+<text x="552" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#50647A" font-weight="400" text-anchor="start">Topic diagnosis</text>
+<text x="552" y="490" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#50647A" font-weight="400" text-anchor="start">Individual learning plans</text>
+<text x="552" y="562" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#50647A" font-weight="400" text-anchor="start">Shared identity and progress</text>
+<path d="M552 590 H916" fill="none" stroke="#B8C7D6" stroke-width="2"/>
+<text x="552" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="400" text-anchor="start">Owned application boundary</text>
+<rect x="1090" y="180" width="310" height="180" rx="12" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="1112" y="214" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">External system</text>
+<text x="1112" y="252" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">Telegram</text>
+<text x="1112" y="288" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Delivers bot messages</text>
+<text x="1112" y="320" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">and account confirmation</text>
+<rect x="1090" y="560" width="310" height="180" rx="12" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="1112" y="594" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">External system</text>
+<text x="1112" y="632" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">AI provider</text>
+<text x="1112" y="668" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Returns a candidate</text>
+<text x="1112" y="700" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">structured study plan</text>
+<path d="M370 270 H525" fill="none" stroke="#50647A" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="375" y="216" width="90.19999999999999" height="35" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="382" y="242" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Learns</text>
+<path d="M370 650 H525" fill="none" stroke="#50647A" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="375" y="594" width="102.89999999999999" height="35" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="382" y="620" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Curates</text>
+<path d="M945 270 H1090" fill="none" stroke="#50647A" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="950" y="216" width="102.89999999999999" height="35" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="957" y="242" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Bot API</text>
+<path d="M945 650 H1090" fill="none" stroke="#50647A" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="949" y="589" width="115.6" height="35" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="956" y="615" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Generate</text>
+<text x="40" y="820" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#50647A" font-weight="400" text-anchor="start">Lessons, questions, attempts and plans remain inside the application data boundary.</text>
+</svg>

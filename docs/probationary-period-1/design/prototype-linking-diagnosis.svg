@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2880" height="940" viewBox="0 0 2880 940">
+<rect width="2880" height="940" fill="white"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#50647A" stroke-width="1.4"/></marker></defs>
+<g transform="translate(0,0)">
+<rect width="1440" height="940" fill="white"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#50647A" stroke-width="1.4"/></marker></defs>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#F7F9FC" stroke="none" stroke-width="1.8"/>
+<rect x="0" y="0" width="1440" height="82" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="30" y="51" font-family="Segoe UI, Arial, sans-serif" font-size="30" fill="#235FA8" font-weight="700" text-anchor="start">AkadilEDU</text>
+<text x="1132" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">EN   RU   KK</text>
+<circle cx="1362" cy="41" r="22" fill="#F1F6FB" stroke="#B8C7D6" stroke-width="2"/>
+<circle cx="1362" cy="36" r="6" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M1352 52 Q1362 40 1372 52" fill="none" stroke="#50647A" stroke-width="2"/>
+<rect x="0" y="82" width="216" height="858" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<path d="M216 82 V940" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="34" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Courses</text>
+<text x="34" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">My learning</text>
+<text x="34" y="256" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Study plan</text>
+<text x="34" y="322" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Topic practice</text>
+<rect x="14" y="357" width="188" height="50" rx="7" fill="#F1F6FB" stroke="none" stroke-width="1.8"/>
+<text x="34" y="388" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="600" text-anchor="start">Telegram</text>
+<path d="M30 806 H186" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="34" y="850" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">Help and settings</text>
+<text x="260" y="142" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#182D42" font-weight="650" text-anchor="start">Connect your Telegram practice</text>
+<text x="260" y="187" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Keep course learning and PRIME practice in one study history.</text>
+<rect x="260" y="235" width="1120" height="110" rx="10" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="290" y="280" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">AkadilEDU PRIME</text>
+<text x="290" y="316" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">Telegram account</text>
+<rect x="1136" y="266" width="210" height="44" rx="22" fill="#F1F6FB" stroke="none" stroke-width="1.8"/>
+<text x="1241" y="295" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="600" text-anchor="middle">Not connected</text>
+<circle cx="290" cy="404" r="23" fill="#F1F6FB" stroke="#B8C7D6" stroke-width="2"/>
+<text x="290" y="412" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="600" text-anchor="middle">1</text>
+<text x="335" y="414" font-family="Segoe UI, Arial, sans-serif" font-size="27" fill="#182D42" font-weight="600" text-anchor="start">Open PRIME in Telegram</text>
+<text x="335" y="454" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Use the Telegram account you want to connect.</text>
+<circle cx="290" cy="524" r="23" fill="#F1F6FB" stroke="#B8C7D6" stroke-width="2"/>
+<text x="290" y="532" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="600" text-anchor="middle">2</text>
+<text x="335" y="534" font-family="Segoe UI, Arial, sans-serif" font-size="27" fill="#182D42" font-weight="600" text-anchor="start">Confirm the connection</text>
+<text x="335" y="574" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Check the request in the bot before accepting.</text>
+<circle cx="290" cy="644" r="23" fill="#F1F6FB" stroke="#B8C7D6" stroke-width="2"/>
+<text x="290" y="652" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="600" text-anchor="middle">3</text>
+<text x="335" y="654" font-family="Segoe UI, Arial, sans-serif" font-size="27" fill="#182D42" font-weight="600" text-anchor="start">Continue your preparation</text>
+<text x="335" y="694" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Your linked practice will appear in your study history.</text>
+<rect x="260" y="764" width="332" height="50" rx="8" fill="#235FA8" stroke="#235FA8" stroke-width="1.8"/>
+<text x="426.0" y="797" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="white" font-weight="600" text-anchor="middle">Continue in Telegram</text>
+<text x="260" y="858" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">Request expired? Create a new connection request.</text>
+<text x="260" y="895" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">You can disconnect Telegram in account settings.</text>
+</g>
+<g transform="translate(1440,0)">
+<rect width="1440" height="940" fill="white"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#50647A" stroke-width="1.4"/></marker></defs>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#F7F9FC" stroke="none" stroke-width="1.8"/>
+<rect x="0" y="0" width="1440" height="82" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<text x="30" y="51" font-family="Segoe UI, Arial, sans-serif" font-size="30" fill="#235FA8" font-weight="700" text-anchor="start">AkadilEDU</text>
+<text x="1132" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">EN   RU   KK</text>
+<circle cx="1362" cy="41" r="22" fill="#F1F6FB" stroke="#B8C7D6" stroke-width="2"/>
+<circle cx="1362" cy="36" r="6" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M1352 52 Q1362 40 1372 52" fill="none" stroke="#50647A" stroke-width="2"/>
+<rect x="0" y="82" width="216" height="858" rx="0" fill="white" stroke="none" stroke-width="1.8"/>
+<path d="M216 82 V940" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="34" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Courses</text>
+<text x="34" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">My learning</text>
+<text x="34" y="256" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Study plan</text>
+<rect x="14" y="291" width="188" height="50" rx="7" fill="#F1F6FB" stroke="none" stroke-width="1.8"/>
+<text x="34" y="322" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#235FA8" font-weight="600" text-anchor="start">Topic practice</text>
+<text x="34" y="388" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Telegram</text>
+<path d="M30 806 H186" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="34" y="850" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="start">Help and settings</text>
+<text x="260" y="142" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#182D42" font-weight="650" text-anchor="start">Find your starting point</text>
+<text x="260" y="187" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">A short topic diagnostic helps decide what to study next.</text>
+<rect x="260" y="235" width="700" height="580" rx="10" fill="white" stroke="#B8C7D6" stroke-width="1.8"/>
+<text x="290" y="282" font-family="Segoe UI, Arial, sans-serif" font-size="29" fill="#182D42" font-weight="650" text-anchor="start">Mathematics topics</text>
+<text x="290" y="324" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Complete the diagnostic to build your topic profile.</text>
+<path d="M290 428 H930" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="290" y="390" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="400" text-anchor="start">Numbers and expressions</text>
+<text x="930" y="390" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="end">Not assessed</text>
+<path d="M290 507 H930" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="290" y="469" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="400" text-anchor="start">Equations and inequalities</text>
+<text x="930" y="469" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="end">Not assessed</text>
+<path d="M290 586 H930" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="290" y="548" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="400" text-anchor="start">Functions and graphs</text>
+<text x="930" y="548" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="end">Not assessed</text>
+<path d="M290 665 H930" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="290" y="627" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="400" text-anchor="start">Geometry</text>
+<text x="930" y="627" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="end">Not assessed</text>
+<path d="M290 744 H930" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="290" y="706" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="400" text-anchor="start">Probability and statistics</text>
+<text x="930" y="706" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#50647A" font-weight="400" text-anchor="end">Not assessed</text>
+<text x="1010" y="282" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="start">Before you begin</text>
+<text x="1010" y="335" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Work independently.</text>
+<text x="1010" y="382" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Use paper for calculations.</text>
+<text x="1010" y="429" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">You can review mistakes</text>
+<text x="1010" y="462" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">after the diagnostic.</text>
+<path d="M1010 508 H1370" fill="none" stroke="#B8C7D6" stroke-width="1"/>
+<text x="1010" y="552" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#182D42" font-weight="650" text-anchor="start">What happens next?</text>
+<text x="1010" y="595" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">See your topic evidence.</text>
+<text x="1010" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">Choose your daily study time.</text>
+<text x="1010" y="671" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#50647A" font-weight="400" text-anchor="start">Build an individual plan.</text>
+<rect x="1010" y="752" width="350" height="50" rx="8" fill="#235FA8" stroke="#235FA8" stroke-width="1.8"/>
+<text x="1185.0" y="785" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="white" font-weight="600" text-anchor="middle">Start diagnostic</text>
+<text x="260" y="875" font-family="Segoe UI, Arial, sans-serif" font-size="23" fill="#50647A" font-weight="400" text-anchor="start">Topic evidence appears after you submit your answers.</text>
+</g>
+</svg>

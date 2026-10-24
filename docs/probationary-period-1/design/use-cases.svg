@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1020" viewBox="0 0 1440 1020">
+<rect width="1440" height="1020" fill="white"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#50647A" stroke-width="1.4"/></marker></defs>
+<text x="40" y="54" font-family="Segoe UI, Arial, sans-serif" font-size="36" fill="#182D42" font-weight="650" text-anchor="start">Use case diagram</text>
+<text x="40" y="96" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Learner and educator interactions with the AkadilEDU ecosystem</text>
+<rect x="240" y="140" width="960" height="800" rx="14" fill="white" stroke="#235FA8" stroke-width="1.8"/>
+<text x="270" y="182" font-family="Segoe UI, Arial, sans-serif" font-size="27" fill="#235FA8" font-weight="650" text-anchor="start">AkadilEDU</text>
+<text x="310" y="236" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#50647A" font-weight="600" text-anchor="start">Learning and practice</text>
+<text x="850" y="236" font-family="Segoe UI, Arial, sans-serif" font-size="25" fill="#50647A" font-weight="600" text-anchor="start">Content and oversight</text>
+<circle cx="110" cy="500" r="22" fill="white" stroke="#182D42" stroke-width="2"/>
+<path d="M110 522 V594 M72 552 H148 M110 594 L78 640 M110 594 L142 640" fill="none" stroke="#182D42" stroke-width="2.6"/>
+<text x="110" y="685" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="middle">Learner</text>
+<circle cx="1330" cy="500" r="22" fill="white" stroke="#182D42" stroke-width="2"/>
+<path d="M1330 522 V594 M1292 552 H1368 M1330 594 L1298 640 M1330 594 L1362 640" fill="none" stroke="#182D42" stroke-width="2.6"/>
+<text x="1330" y="685" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#182D42" font-weight="650" text-anchor="middle">Educator</text>
+<path d="M150 552 L290 318" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M150 552 L290 450" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M150 552 L290 582" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M150 552 L290 714" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M150 552 L290 846" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M1290 552 L1160 405" fill="none" stroke="#50647A" stroke-width="2"/>
+<path d="M1290 552 L1160 715" fill="none" stroke="#50647A" stroke-width="2"/>
+<ellipse cx="480" cy="318" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="480" y="327.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Study course lessons</text>
+<ellipse cx="480" cy="450" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="480" y="459.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Connect Telegram account</text>
+<ellipse cx="480" cy="582" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="480" y="591.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Complete topic diagnosis</text>
+<ellipse cx="480" cy="714" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="480" y="723.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">View and adjust study plan</text>
+<ellipse cx="480" cy="846" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="480" y="855.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Practice and review mistakes</text>
+<ellipse cx="970" cy="405" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="970" y="399.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Manage courses</text>
+<text x="970" y="429.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">and question bank</text>
+<ellipse cx="970" cy="715" rx="190" ry="49" fill="#F1F6FB" stroke="#235FA8" stroke-width="1.8"/>
+<text x="970" y="724.0" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#182D42" font-weight="400" text-anchor="middle">Review study plan quality</text>
+<text x="40" y="990" font-family="Segoe UI, Arial, sans-serif" font-size="24" fill="#50647A" font-weight="400" text-anchor="start">Solid lines denote actor participation. The rectangle defines the application scope.</text>
+</svg>
