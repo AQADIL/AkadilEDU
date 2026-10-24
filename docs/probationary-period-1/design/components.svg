@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820"><rect width="100%" height="100%" fill="white"/>
+<text x="30" y="48" font-family="Arial" font-size="28" font-weight="700">Draft components and data flow</text>
+<rect x="30" y="90" width="330" height="95" fill="none" stroke="black" stroke-width="2"/>
+<text x="144.0078125" y="131.5" font-family="Arial" font-size="22" font-weight="400">Web/PWA</text>
+<text x="111.0" y="159.5" font-family="Arial" font-size="22" font-weight="400">Existing React UI</text>
+<rect x="530" y="90" width="330" height="95" fill="none" stroke="black" stroke-width="2"/>
+<text x="631.515625" y="131.5" font-family="Arial" font-size="22" font-weight="400">Telegram bot</text>
+<text x="568.0" y="159.5" font-family="Arial" font-size="22" font-weight="400">Existing grammY handlers</text>
+<rect x="1030" y="90" width="330" height="95" fill="none" stroke="black" stroke-width="2"/>
+<text x="1107.0" y="131.5" font-family="Arial" font-size="22" font-weight="400">Educator interface</text>
+<text x="1086.0" y="159.5" font-family="Arial" font-size="22" font-weight="400">Existing administration</text>
+<rect x="30" y="280" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="86.5078125" y="329.0" font-family="Arial" font-size="22" font-weight="400">Verified identity linking</text>
+<text x="111.0" y="357.0" font-family="Arial" font-size="22" font-weight="400">Proposed service</text>
+<rect x="530" y="280" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="586.0" y="329.0" font-family="Arial" font-size="22" font-weight="400">Learning event service</text>
+<text x="559.0078125" y="357.0" font-family="Arial" font-size="22" font-weight="400">Validation and deduplication</text>
+<rect x="1030" y="280" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="1098.5" y="329.0" font-family="Arial" font-size="22" font-weight="400">Resource catalogue</text>
+<text x="1063.515625" y="357.0" font-family="Arial" font-size="22" font-weight="400">Topics and published items</text>
+<rect x="30" y="610" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="121.0" y="659.0" font-family="Arial" font-size="22" font-weight="400">Shared records</text>
+<text x="61.0" y="687.0" font-family="Arial" font-size="22" font-weight="400">Attempts, summaries, plans</text>
+<rect x="530" y="610" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="582.0" y="659.0" font-family="Arial" font-size="22" font-weight="400">Diagnosis and planning</text>
+<text x="564.0" y="687.0" font-family="Arial" font-size="22" font-weight="400">Rules and output validation</text>
+<rect x="1030" y="610" width="330" height="110" fill="none" stroke="black" stroke-width="2"/>
+<text x="1142.5" y="659.0" font-family="Arial" font-size="22" font-weight="400">AI provider</text>
+<text x="1063.5" y="687.0" font-family="Arial" font-size="22" font-weight="400">External generation service</text>
+<line x1="195" y1="185" x2="195" y2="280" stroke="black" stroke-width="2"/>
+<polygon points="195,280 190.3269798922962,268.94726807196537 199.6730201077038,268.94726807196537" fill="black"/>
+<line x1="695" y1="185" x2="695" y2="280" stroke="black" stroke-width="2"/>
+<polygon points="695,280 690.3269798922962,268.94726807196537 699.6730201077038,268.94726807196537" fill="black"/>
+<line x1="1195" y1="185" x2="1195" y2="280" stroke="black" stroke-width="2"/>
+<polygon points="1195,280 1190.326979892296,268.94726807196537 1199.673020107704,268.94726807196537" fill="black"/>
+<line x1="360" y1="335" x2="530" y2="335" stroke="black" stroke-width="2"/>
+<polygon points="530,335 518.9472680719654,339.6730201077038 518.9472680719654,330.3269798922962" fill="black"/>
+<line x1="695" y1="390" x2="195" y2="610" stroke="black" stroke-width="2"/>
+<polygon points="195,610 203.23472604045529,601.2713525080544 206.998737325683,609.8259236108447" fill="black"/>
+<line x1="695" y1="390" x2="695" y2="610" stroke="black" stroke-width="2"/>
+<polygon points="695,610 690.3269798922962,598.9472680719654 699.6730201077038,598.9472680719654" fill="black"/>
+<line x1="1195" y1="390" x2="695" y2="610" stroke="black" stroke-width="2"/>
+<polygon points="695,610 703.2347260404553,601.2713525080544 706.998737325683,609.8259236108447" fill="black"/>
+<line x1="530" y1="665" x2="360" y2="665" stroke="black" stroke-width="2"/>
+<polygon points="360,665 371.05273192803463,660.3269798922962 371.05273192803463,669.6730201077038" fill="black"/>
+<line x1="860" y1="665" x2="1030" y2="665" stroke="black" stroke-width="2"/>
+<polygon points="1030,665 1018.9472680719654,669.6730201077038 1018.9472680719654,660.3269798922962" fill="black"/>
+<text x="50" y="774" font-family="Arial" font-size="20" font-weight="400">New shared services extend the existing applications. Arrows show logical dependencies, not deployment status.</text>
+</svg>
