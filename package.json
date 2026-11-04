@@ -35,7 +35,7 @@
   "devDependencies": {
     "@babel/parser": "^8.0.7",
     "@babel/traverse": "^8.0.7",
-    "@firebase/rules-unit-testing": "^5.0.2",
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^8.55.0",
